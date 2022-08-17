@@ -42,7 +42,7 @@ const Home: NextPage = () => {
 
 	return (
 		<>
-			{status === 'authenticated' ? (
+			{status === 'authenticated' && (
 				<Container type="start">
 					<Modal modalTitle="New character" buttonTitle="Add character">
 						<form onSubmit={handleSubmit}>
@@ -104,7 +104,8 @@ const Home: NextPage = () => {
 						</div>
 					)}
 				</Container>
-			) : (
+			)}
+			{status === 'unauthenticated' && (
 				<Container type="center">
 					<LoginForm />
 				</Container>

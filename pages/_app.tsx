@@ -19,12 +19,15 @@ export const App = ({ Component, pageProps: { session, ...pageProps } }: AppProp
 	);
 };
 
+const getBaseUrl = () => {
+	if (typeof window !== 'undefined') return '';
+	if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+	return `http://localhost:${process.env.PORT ?? 3000}`;
+};
+
 export default withTRPC<AppRouter>({
 	config({ ctx }) {
-		const url = process.env.VERCEL_URL
-			? `https://${process.env.VERCEL_URL}/api/trpc`
-			: 'http://localhost:3000/api/trpc';
-
+		const url = `${getBaseUrl()}/api/trpc`;
 		return { transformer: superjson, url };
 	},
 	ssr: true,
