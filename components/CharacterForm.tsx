@@ -75,7 +75,7 @@ const CharacterForm: React.FC = () => {
 				</label>
 				<div className="columns-2 md:columns-3">
 					{tagsQuery.isSuccess &&
-						tagsQuery.data.map((tag) => (
+						tagsQuery.data.map((tag: { id: string; name: string }) => (
 							<label
 								htmlFor={tag.id}
 								className="label justify-start	gap-2 cursor-pointer"
