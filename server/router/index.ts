@@ -3,12 +3,14 @@ import { ZodError } from 'zod';
 import superjson from 'superjson';
 
 import { authRouter } from './auth';
-import { characterRouter } from './characters';
+import { characterRouter } from './character';
+import { tagRouter } from './tag';
 
 export const appRouter = createRouter()
 	.transformer(superjson)
 	.merge('auth.', authRouter)
 	.merge('character.', characterRouter)
+	.merge('tag.', tagRouter)
 	.formatError(({ shape, error }) => {
 		return {
 			...shape,

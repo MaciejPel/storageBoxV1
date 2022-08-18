@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
 import { useSession, signOut } from 'next-auth/react';
-import { ColorSwatchIcon, UserIcon, LogoutIcon } from '@heroicons/react/solid';
+import { ColorSwatchIcon, UserIcon, LogoutIcon, LoginIcon } from '@heroicons/react/solid';
 import { CubeIcon } from '@heroicons/react/outline';
 import { useRouter } from 'next/router';
 
@@ -16,19 +16,15 @@ const Header = () => {
 
 	useEffect(() => setMounted(true), []);
 
-	const navItems: { title: string; href: string; icon: JSX.Element }[] = [
-		{ title: 'Profile', href: '/profile', icon: <UserIcon className="h-5 w-5" /> },
-	];
-
 	if (!mounted) return null;
 
 	return (
 		<header className="navbar sticky top-0 backdrop-blur bg-opacity-50 bg-base-300 flex justify-center h-16 shadow-sm">
 			<div className="flex justify-between lg:w-4/5 w-full">
-				<div className="px-2">
+				<div className="md:px-2">
 					<Link href="/">
-						<a className="text-lg font-bold flex items-center rounded px-2 gap-2 btn btn-ghost normal-case">
-							<CubeIcon className="w-10 h-full" />
+						<a className="md:text-lg text-base font-bold flex items-center rounded px-2 md:gap-2 btn btn-ghost normal-case">
+							<CubeIcon className="md:w-10 w-7 h-full" />
 							<div>
 								Storage
 								<span className="text-accent">Box</span>
@@ -40,37 +36,33 @@ const Header = () => {
 					<div className="flex">
 						{status === 'authenticated' && (
 							<>
-								{navItems.map((item, index) => (
-									<Link href={item.href} key={index}>
-										<a className="btn btn-sm btn-ghost text-base-content normal-case gap-1">
-											{item.icon}
-											{item.title}
-										</a>
-									</Link>
-								))}
+								<Link href="/profile">
+									<a className="btn btn-sm btn-ghost text-base-content normal-case gap-1 ">
+										<UserIcon className="h-5 w-5" />
+										<span className="hidden md:inline">Profile</span>
+									</a>
+								</Link>
 							</>
 						)}
-						<div className="dropdown dropdown-end">
+						<div className="dropdown">
 							<label tabIndex={0} className="btn btn-sm gap-1 normal-case btn-ghost">
 								<ColorSwatchIcon className="w-5 h-5" />
 								<span className="hidden md:inline">Themes</span>
 							</label>
 							<ul
 								tabIndex={0}
-								className="menu dropdown-content px-1 shadow bg-base-200 rounded w-40 mt-4 pt-1 z-50"
+								className="menu dropdown-content px-1 shadow bg-base-200 rounded mt-4 pt-1 whitespace-nowrap -ml-4 md:ml-auto md:w-36"
 							>
 								{themes.map((theme, index) => (
 									<li
 										data-theme={theme}
 										key={index}
 										onClick={() => setTheme(theme)}
-										className={`bg-base-100 text-base-content hover:bg-base-200 rounded mb-1 border-2 ${
-											currentTheme === theme
-												? 'border-accent'
-												: 'border-base-100 hover:border-base-200'
+										className={`bg-base-100 text-base-content hover:bg-base-200 rounded mb-1 ${
+											currentTheme === theme ? 'border-2 border-accent' : ''
 										}`}
 									>
-										<a className="font-semibold">
+										<a className="font-semibold capitalize">
 											{theme} {currentTheme === theme && '✔'}
 										</a>
 									</li>
@@ -82,12 +74,22 @@ const Header = () => {
 								className="btn btn-sm btn-ghost text-base-content normal-case gap-1"
 								onClick={() => {
 									signOut({ redirect: false });
-									router.push('/');
+									router.push('/login');
 								}}
 							>
-								<LogoutIcon className="h-5 w-5" />
-								Logout
+								<LogoutIcon className="h-5 w-5 -scale-100" />
+								<span className="hidden md:inline">Logout</span>
 							</a>
+						)}
+						{status === 'unauthenticated' && (
+							<>
+								<Link href="/register">
+									<a className="btn btn-sm btn-ghost text-base-content normal-case gap-1 ">
+										<LoginIcon className="h-5 w-5 -scale-100" />
+										<span className="hidden md:inline">Register</span>
+									</a>
+								</Link>
+							</>
 						)}
 					</div>
 				</nav>

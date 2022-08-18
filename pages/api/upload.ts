@@ -2,6 +2,8 @@ import formidable from 'formidable';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { unstable_getServerSession } from 'next-auth/next';
 import { authOptions } from './auth/[...nextauth]';
+import { bunnyStorage } from '../../utils/bunny';
+import fs from 'fs';
 
 export const config = {
 	api: {
@@ -11,7 +13,14 @@ export const config = {
 
 const post = async (req: NextApiRequest, res: NextApiResponse) => {
 	const form = new formidable.IncomingForm();
-	form.parse(req, async function (err, fields, files) {});
+	form.parse(req, async function (err, fields, files) {
+		let x = await bunnyStorage.upload(
+			// @ts-ignore
+			fs.readFileSync(files.file.filepath),
+			// @ts-ignore
+			files.file.originalFilename
+		);
+	});
 	return res.status(201).send('123');
 };
 

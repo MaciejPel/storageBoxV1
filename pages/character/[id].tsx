@@ -1,7 +1,8 @@
 import { useRouter } from 'next/router';
 import { trpc } from '../../utils/trpc';
-import { useSession } from 'next-auth/react';
+import { getSession, useSession } from 'next-auth/react';
 import Container from '../../components/Container';
+import Upload from '../../components/Upload';
 
 const CharacterPage = () => {
 	const router = useRouter();
@@ -17,11 +18,25 @@ const CharacterPage = () => {
 	}
 
 	return (
-		<Container type="">
+		<Container type="start">
 			<h1>{character?.name}</h1>
 			<p>{character?.description}</p>
+			<Upload />
 		</Container>
 	);
 };
 
 export default CharacterPage;
+
+export const getServerSideProps = async (context: any) => {
+	const session = await getSession(context);
+	if (!session) {
+		return {
+			redirect: {
+				destination: '/login',
+				pernament: false,
+			},
+		};
+	}
+	return { props: { session } };
+};

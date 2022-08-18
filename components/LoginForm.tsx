@@ -1,9 +1,10 @@
 import { signIn } from 'next-auth/react';
 import { useState } from 'react';
-import Alert from './Alert';
-import { AlertTypes } from './Alert';
+import Alert, { AlertTypes } from './Alert';
+import { useRouter } from 'next/router';
 
 const LoginForm = () => {
+	const router = useRouter();
 	const [credentials, setCredentials] = useState({ username: '', password: '' });
 	const [alert, setAlert] = useState<boolean>(false);
 
@@ -15,6 +16,7 @@ const LoginForm = () => {
 			password: credentials.password,
 		});
 		if (!res?.ok) setAlert(true);
+		if (res?.ok) router.push('/');
 	};
 
 	return (
@@ -22,12 +24,11 @@ const LoginForm = () => {
 			<Alert
 				message="Invalid credentials"
 				type={AlertTypes.ERROR}
-				duration={5000}
 				open={alert}
 				setOpen={setAlert}
 			/>
-			<form onSubmit={handleSubmit} className="flex flex-col card bg-base-300 w-96">
-				<div className="form-control w-full max-w-lg card-body">
+			<form onSubmit={handleSubmit} className="flex flex-col card bg-base-300 w-96 form-control">
+				<div className="w-full max-w-lg card-body">
 					<div className="text-4xl font-extrabold text-center pb-2">Login</div>
 					<div>
 						<label className="label pb-1 cursor-pointer" htmlFor="username">
@@ -55,7 +56,7 @@ const LoginForm = () => {
 							onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
 						/>
 					</div>
-					<div className="flex flex-col gap-3 pt-2">
+					<div className="flex flex-col gap-3 pt-4">
 						<input className="btn btn-primary w-full rounded" type="submit" value="Submit" />
 					</div>
 				</div>

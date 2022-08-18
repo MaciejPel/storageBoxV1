@@ -17,7 +17,7 @@ export enum AlertTypes {
 interface AlertProps {
 	type: AlertTypes;
 	message: string;
-	duration: number;
+	duration?: number;
 	open: boolean;
 	setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -31,13 +31,13 @@ const AlertOptions: Record<
 		name: 'info',
 		alert: 'alert-info',
 		hover: 'hover:bg-info-content',
-		icon: <ExclamationCircleIcon className={iconStyling} />,
+		icon: <InformationCircleIcon className={iconStyling} />,
 	},
 	[AlertTypes.SUCCESS]: {
 		name: 'success',
 		alert: 'alert-success',
 		hover: 'hover:bg-success-content',
-		icon: <InformationCircleIcon className={iconStyling} />,
+		icon: <CheckCircleIcon className={iconStyling} />,
 	},
 	[AlertTypes.WARNING]: {
 		name: 'warning',
@@ -53,7 +53,7 @@ const AlertOptions: Record<
 	},
 };
 
-const Alert = ({ type, message, duration, open, setOpen }: AlertProps) => {
+const Alert = ({ type, message, duration = 5000, open, setOpen }: AlertProps) => {
 	useEffect(() => {
 		setTimeout(() => {
 			setOpen(false);

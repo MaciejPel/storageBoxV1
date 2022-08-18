@@ -1,25 +1,23 @@
+import { NextPage } from 'next';
 import { getSession } from 'next-auth/react';
 import Container from '../components/Container';
-import Meta from '../components/Meta';
-import { NextPage } from 'next';
+import LoginForm from '../components/LoginForm';
 
-const profile: NextPage = () => {
+const login: NextPage = () => {
 	return (
 		<Container type="center">
-			<Meta title="Profile" />
-			<div>profile</div>
+			<LoginForm />
 		</Container>
 	);
 };
-
-export default profile;
+export default login;
 
 export const getServerSideProps = async (context: any) => {
 	const session = await getSession(context);
-	if (!session) {
+	if (session) {
 		return {
 			redirect: {
-				destination: '/login',
+				destination: '/',
 				pernament: false,
 			},
 		};
