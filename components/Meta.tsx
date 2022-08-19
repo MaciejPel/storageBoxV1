@@ -1,7 +1,7 @@
 import Head from 'next/head';
 
 const Meta: React.FC<{ title?: string }> = ({ title = 'Home' }) => {
-	const titleTag = `${title} | Bestiary`;
+	const titleTag = `${title} | StorageBox 📦`;
 	return (
 		<Head>
 			<title>{titleTag}</title>

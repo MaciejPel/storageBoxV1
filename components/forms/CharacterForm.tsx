@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { trpc } from '../utils/trpc';
+import { trpc } from '../../utils/trpc';
 
 const CharacterForm: React.FC = () => {
 	const [character, setCharacter] = useState<{ name: string; description: string; tags: string[] }>(
@@ -75,7 +75,7 @@ const CharacterForm: React.FC = () => {
 				</label>
 				<div className="columns-2 md:columns-3">
 					{tagsQuery.isSuccess &&
-						tagsQuery.data.map((tag: { id: string; name: string }) => (
+						tagsQuery.data.map((tag) => (
 							<label
 								htmlFor={tag.id}
 								className="label justify-start	gap-2 cursor-pointer"

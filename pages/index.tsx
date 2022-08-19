@@ -5,9 +5,9 @@ import { useSession, getSession } from 'next-auth/react';
 import Container from '../components/Container';
 import Search from '../components/Search';
 import Modal from '../components/Modal';
-import CharacterForm from '../components/CharacterForm';
+import CharacterForm from '../components/forms/CharacterForm';
 import Masonry from '../components/Masonry';
-import TagForm from '../components/TagForm';
+import TagForm from '../components/forms/TagForm';
 
 const Home: NextPage = () => {
 	const { data: session, status } = useSession();

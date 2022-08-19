@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { trpc } from '../utils/trpc';
+import { trpc } from '../../utils/trpc';
 
 const TagForm: React.FC = () => {
 	const [tag, setTag] = useState<{ name: string }>({ name: '' });

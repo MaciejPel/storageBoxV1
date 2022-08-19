@@ -1,13 +1,17 @@
 import { NextPage } from 'next';
 import { getSession } from 'next-auth/react';
 import Container from '../components/Container';
-import RegisterForm from '../components/RegisterForm';
+import Meta from '../components/Meta';
+import RegisterForm from '../components/forms/RegisterForm';
 
 const register: NextPage = () => {
 	return (
-		<Container type="center">
-			<RegisterForm />
-		</Container>
+		<>
+			<Meta title="Register" />
+			<Container type="center">
+				<RegisterForm />
+			</Container>
+		</>
 	);
 };
 export default register;

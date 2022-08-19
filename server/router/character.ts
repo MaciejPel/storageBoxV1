@@ -15,6 +15,7 @@ export const characterRouter = createProtectedRouter()
 					authorId: true,
 					author: { select: { id: true, username: true } },
 					tags: { select: { id: true, name: true } },
+					media: { select: { id: true, fileName: true, fileType: true } },
 				},
 			});
 		},
@@ -24,7 +25,19 @@ export const characterRouter = createProtectedRouter()
 			characterId: z.string(),
 		}),
 		async resolve({ input }) {
-			return await prisma.character.findFirst({ where: { id: input.characterId } });
+			return await prisma.character.findFirst({
+				select: {
+					id: true,
+					name: true,
+					description: true,
+					authorId: true,
+					author: { select: { id: true, username: true } },
+					tags: { select: { id: true, name: true } },
+					media: { select: { id: true, fileName: true, fileType: true } },
+					mediaIds: true,
+				},
+				where: { id: input.characterId },
+			});
 		},
 	})
 	.mutation('create', {
@@ -46,7 +59,6 @@ export const characterRouter = createProtectedRouter()
 			tags: z.array(z.string()).nullish(),
 		}),
 		async resolve({ input, ctx }) {
-			console.log(input);
 			const author = ctx.session.user.id;
 			if (!author) throw new trpc.TRPCError({ code: 'UNAUTHORIZED' });
 			const character = await prisma.character.create({

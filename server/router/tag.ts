@@ -9,6 +9,7 @@ export const tagRouter = createProtectedRouter()
 		async resolve() {
 			return await prisma.tag.findMany({
 				select: { id: true, name: true },
+				orderBy: { name: 'asc' },
 			});
 		},
 	})
@@ -29,6 +30,6 @@ export const tagRouter = createProtectedRouter()
 				data: { name: input.name, authorId: author },
 			});
 
-			return tag.id;
+			return { id: tag.id };
 		},
 	});

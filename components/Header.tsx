@@ -1,11 +1,17 @@
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { useTheme } from 'next-themes';
-import { useSession, signOut } from 'next-auth/react';
-import { ColorSwatchIcon, UserIcon, LogoutIcon, LoginIcon } from '@heroicons/react/solid';
-import { CubeIcon } from '@heroicons/react/outline';
 import { useRouter } from 'next/router';
-
+import { useSession, signOut } from 'next-auth/react';
+import { useTheme } from 'next-themes';
+import Link from 'next/link';
+import {
+	ColorSwatchIcon,
+	UserIcon,
+	LogoutIcon,
+	LoginIcon,
+	FolderIcon,
+	PencilAltIcon,
+} from '@heroicons/react/solid';
+import { CubeIcon } from '@heroicons/react/outline';
 const themes = ['light', 'retro', 'dark', 'black', 'night', 'dracula', 'coffee', 'luxury'];
 
 const Header = () => {
@@ -36,6 +42,12 @@ const Header = () => {
 					<div className="flex">
 						{status === 'authenticated' && (
 							<>
+								<Link href="/media">
+									<a className="btn btn-sm btn-ghost text-base-content normal-case gap-1 ">
+										<FolderIcon className="h-5 w-5" />
+										<span className="hidden md:inline">Media</span>
+									</a>
+								</Link>
 								<Link href="/profile">
 									<a className="btn btn-sm btn-ghost text-base-content normal-case gap-1 ">
 										<UserIcon className="h-5 w-5" />
@@ -83,9 +95,19 @@ const Header = () => {
 						)}
 						{status === 'unauthenticated' && (
 							<>
-								<Link href="/register">
+								<Link href="/login">
 									<a className="btn btn-sm btn-ghost text-base-content normal-case gap-1 ">
 										<LoginIcon className="h-5 w-5 -scale-100" />
+										<span className="hidden md:inline">Login</span>
+									</a>
+								</Link>
+							</>
+						)}
+						{status === 'unauthenticated' && (
+							<>
+								<Link href="/register">
+									<a className="btn btn-sm btn-ghost text-base-content normal-case gap-1 ">
+										<PencilAltIcon className="h-5 w-5" />
 										<span className="hidden md:inline">Register</span>
 									</a>
 								</Link>

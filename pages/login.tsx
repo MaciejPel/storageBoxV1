@@ -1,13 +1,17 @@
 import { NextPage } from 'next';
 import { getSession } from 'next-auth/react';
 import Container from '../components/Container';
-import LoginForm from '../components/LoginForm';
+import LoginForm from '../components/forms/LoginForm';
+import Meta from '../components/Meta';
 
 const login: NextPage = () => {
 	return (
-		<Container type="center">
-			<LoginForm />
-		</Container>
+		<>
+			<Meta title="Login" />
+			<Container type="center">
+				<LoginForm />
+			</Container>
+		</>
 	);
 };
 export default login;

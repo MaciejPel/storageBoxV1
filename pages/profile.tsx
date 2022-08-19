@@ -5,10 +5,12 @@ import { NextPage } from 'next';
 
 const profile: NextPage = () => {
 	return (
-		<Container type="center">
+		<>
 			<Meta title="Profile" />
-			<div>profile</div>
-		</Container>
+			<Container type="center">
+				<div>profile</div>
+			</Container>
+		</>
 	);
 };
 

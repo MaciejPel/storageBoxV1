@@ -6,6 +6,9 @@ import { SessionProvider } from 'next-auth/react';
 import { withTRPC } from '@trpc/next';
 import type { AppRouter } from '../server/router';
 import superjson from 'superjson';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { getBaseUrl } from '../utils/functions';
 
 export const App = ({ Component, pageProps: { session, ...pageProps } }: AppProps) => {
 	return (
@@ -14,15 +17,10 @@ export const App = ({ Component, pageProps: { session, ...pageProps } }: AppProp
 				<Layout>
 					<Component {...pageProps} />
 				</Layout>
+				<ToastContainer position="bottom-left" hideProgressBar={true} />
 			</ThemeProvider>
 		</SessionProvider>
 	);
-};
-
-const getBaseUrl = () => {
-	if (typeof window !== 'undefined') return '';
-	if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
-	return `http://localhost:${process.env.PORT ?? 3000}`;
 };
 
 export default withTRPC<AppRouter>({

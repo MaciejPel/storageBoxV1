@@ -5,12 +5,14 @@ import superjson from 'superjson';
 import { authRouter } from './auth';
 import { characterRouter } from './character';
 import { tagRouter } from './tag';
+import { mediaRouter } from './media';
 
 export const appRouter = createRouter()
 	.transformer(superjson)
 	.merge('auth.', authRouter)
 	.merge('character.', characterRouter)
 	.merge('tag.', tagRouter)
+	.merge('media.', mediaRouter)
 	.formatError(({ shape, error }) => {
 		return {
 			...shape,
