@@ -1,7 +1,8 @@
+import { NextPage } from 'next';
 import Container from '../components/Container';
 import Meta from '../components/Meta';
 
-const media = () => {
+const media: NextPage = () => {
 	return (
 		<>
 			<Meta title="Media" />

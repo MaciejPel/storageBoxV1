@@ -34,7 +34,7 @@ export const authOptions: NextAuthOptions = {
 				const username = credentials?.username || '';
 				const password = credentials?.password || '';
 				const user = await prisma.user.findFirst({
-					where: { username, verified: true },
+					where: { username, verified: true, banned: false },
 					select: { id: true, username: true, password: true },
 				});
 				if (user && (await bcrypt.compare(password, user.password)))

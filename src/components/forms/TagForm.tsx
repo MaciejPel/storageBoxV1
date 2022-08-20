@@ -47,7 +47,7 @@ const TagForm: React.FC = () => {
 
 			<div className="btn-group w-full pt-3">
 				{tagMutation.isLoading ? (
-					<button type="button" className="btn  w-full loading disabled">
+					<button type="button" className="btn w-full loading disabled">
 						Processing...
 					</button>
 				) : (

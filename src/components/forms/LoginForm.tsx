@@ -5,10 +5,11 @@ import { toast } from 'react-toastify';
 
 const LoginForm = () => {
 	const router = useRouter();
-	const [credentials, setCredentials] = useState({ username: '', password: '' });
+	const [credentials, setCredentials] = useState({ username: '', password: '', loading: false });
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
+		setCredentials({ ...credentials, loading: true });
 		const res = await signIn('credentials', {
 			redirect: false,
 			username: credentials.username,
@@ -19,6 +20,7 @@ const LoginForm = () => {
 				className: '!bg-base-300 !text-base-content !rounded-xl',
 			});
 		if (res?.ok) router.push('/');
+		res && setCredentials({ ...credentials, loading: false });
 	};
 
 	return (
@@ -55,7 +57,13 @@ const LoginForm = () => {
 					/>
 				</div>
 				<div className="flex flex-col gap-3 pt-4">
-					<input className="btn btn-primary w-full rounded" type="submit" value="Submit" />
+					{credentials.loading ? (
+						<button type="button" className="btn w-full loading disabled">
+							Processing...
+						</button>
+					) : (
+						<input className="btn btn-primary w-full rounded" type="submit" value="Submit" />
+					)}
 				</div>
 			</div>
 		</form>

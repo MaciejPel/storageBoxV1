@@ -14,14 +14,13 @@ import {
 import { CubeIcon } from '@heroicons/react/outline';
 const themes = ['light', 'retro', 'dark', 'black', 'night', 'dracula', 'coffee', 'luxury'];
 
-const Header = () => {
+const Header: React.FC = () => {
 	const router = useRouter();
 	const [mounted, setMounted] = useState(false);
 	const { theme: currentTheme, setTheme } = useTheme();
 	const { data: session, status } = useSession();
 
 	useEffect(() => setMounted(true), []);
-
 	if (!mounted) return null;
 
 	return (
@@ -63,7 +62,7 @@ const Header = () => {
 							</label>
 							<ul
 								tabIndex={0}
-								className="menu dropdown-content px-1 shadow bg-base-200 rounded mt-4 pt-1 whitespace-nowrap -ml-4 md:ml-auto md:w-36"
+								className="menu dropdown-content px-1 shadow bg-base-200 rounded mt-4 pt-1 whitespace-nowrap md:ml-auto md:w-36"
 							>
 								{themes.map((theme, index) => (
 									<li
@@ -74,8 +73,12 @@ const Header = () => {
 											currentTheme === theme ? 'border-2 border-accent' : ''
 										}`}
 									>
-										<a className="font-semibold capitalize">
-											{theme} {currentTheme === theme && '✔'}
+										<a
+											className={`font-medium capitalize active:bg-base-300 ${
+												currentTheme === theme ? 'link' : ''
+											}`}
+										>
+											{theme}
 										</a>
 									</li>
 								))}
@@ -101,10 +104,6 @@ const Header = () => {
 										<span className="hidden md:inline">Login</span>
 									</a>
 								</Link>
-							</>
-						)}
-						{status === 'unauthenticated' && (
-							<>
 								<Link href="/register">
 									<a className="btn btn-sm btn-ghost text-base-content normal-case gap-1 ">
 										<PencilAltIcon className="h-5 w-5" />

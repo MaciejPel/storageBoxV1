@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 
-const Upload: React.FC = () => {
+const UploadForm: React.FC = () => {
 	const router = useRouter();
 	const { id } = router.query;
 	const [images, setImages] = useState<{ files: File[] }>();
@@ -27,10 +27,10 @@ const Upload: React.FC = () => {
 	};
 
 	return (
-		<form onSubmit={handleSubmit} className="form-control gap-2 py-2">
+		<form onSubmit={handleSubmit} className="form-control gap-2 py-2 w-full">
 			<input type="file" multiple onChange={handleChange} />
 			<input type="submit" value="Submit" className="btn" />
 		</form>
 	);
 };
-export default Upload;
+export default UploadForm;

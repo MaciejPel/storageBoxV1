@@ -20,7 +20,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ id, name, description, im
 		`${process.env.NEXT_PUBLIC_CDN_URL}/${process.env.NEXT_PUBLIC_STORAGE_FOLDER}/${id}/${image.id}.${image.fileType}`;
 
 	return (
-		<div className="card card-compact static w-full bg-base-300 shadow-xl">
+		<div className="card card-compact static w-full bg-base-300 col-span-1 card-bordered">
 			{image ? (
 				<img src={imageURL} alt={`${image.fileName}.${image.fileType}`} />
 			) : (
@@ -30,7 +30,9 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ id, name, description, im
 				<h2 className="card-title">{name}</h2>
 				<div className="flex flex-col gap-1">
 					<p>
-						{!readMore ? `${description?.slice(0, 50)}... ` : description + ' '}
+						{!readMore
+							? description?.slice(0, 50) + (description && description?.length >= 60 ? '... ' : '')
+							: description + ' '}
 						{description && description?.length >= 60 && (
 							<span
 								className="font-bold btn-link text-base-content cursor-pointer"
@@ -43,10 +45,10 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ id, name, description, im
 				</div>
 				<div className="card-actions justify-end gap-0">
 					<button className="btn btn-ghost p-3">
-						<TrashIcon className="w-6 h-full" />
+						<TrashIcon className="w-6 h-full group-hover:fill-error transition-all duration-200" />
 					</button>
 					<button className="btn btn-ghost p-3">
-						<HeartIcon className="w-6 h-full" />
+						<HeartIcon className="w-6 h-full group-hover:fill-warning transition-all duration-200" />
 					</button>
 					{imageURL && (
 						<a href={imageURL} target="_blank" rel="noreferrer" className="btn btn-ghost p-3">

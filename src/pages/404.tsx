@@ -1,7 +1,8 @@
+import { NextPage } from 'next';
 import Link from 'next/link';
 import Container from '../components/Container';
 
-const NotFound = () => {
+const NotFound: NextPage = () => {
 	return (
 		<Container type="center">
 			<h2 className="font-light text-4xl">Ooops...</h2>

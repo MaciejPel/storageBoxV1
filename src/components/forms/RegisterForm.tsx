@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { trpc } from '../../utils/trpc';
 import { toast } from 'react-toastify';
+import { useRouter } from 'next/router';
 
 const RegisterForm: React.FC = () => {
+	const router = useRouter();
 	const [credentials, setCredentials] = useState({
 		username: '',
 		password: '',
@@ -16,6 +18,7 @@ const RegisterForm: React.FC = () => {
 				className: '!bg-base-300 !text-base-content !rounded-xl',
 			});
 			setCredentials({ username: '', password: '', confirmPassword: '' });
+			router.push('/login');
 		},
 		onError: (error) => {
 			if (error?.data?.code === 'CONFLICT') {
@@ -50,7 +53,7 @@ const RegisterForm: React.FC = () => {
 				<div>
 					<label className="label pb-1 cursor-pointer" htmlFor="username">
 						<span className="label-text">
-							Username{' '}
+							Username
 							{error && error.field === 'username' && (
 								<span className="text-error text-sm"> {error.message}</span>
 							)}
@@ -71,7 +74,7 @@ const RegisterForm: React.FC = () => {
 				<div>
 					<label className="label pb-1 cursor-pointer" htmlFor="password">
 						<span className="label-text">
-							Password{' '}
+							Password
 							{error && error.field === 'password' && (
 								<span className="text-error text-sm"> {error.message}</span>
 							)}
@@ -90,7 +93,7 @@ const RegisterForm: React.FC = () => {
 				<div>
 					<label className="label pb-1 cursor-pointer" htmlFor="confirm-password">
 						<span className="label-text">
-							Confirm password{' '}
+							Confirm password
 							{error && error.field === 'confirmPassword' && (
 								<span className="text-error text-sm"> {error.message}</span>
 							)}
@@ -107,7 +110,13 @@ const RegisterForm: React.FC = () => {
 					/>
 				</div>
 				<div className="flex flex-col gap-3 pt-4">
-					<input className="btn btn-primary w-full rounded" type="submit" value="Submit" />
+					{userMutation.isLoading ? (
+						<button type="button" className="btn w-full loading disabled">
+							Processing...
+						</button>
+					) : (
+						<input className="btn btn-primary w-full rounded" type="submit" value="Submit" />
+					)}
 				</div>
 			</div>
 		</form>
