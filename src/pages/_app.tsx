@@ -26,18 +26,7 @@ export const App = ({ Component, pageProps: { session, ...pageProps } }: AppProp
 export default withTRPC<AppRouter>({
 	config({ ctx }) {
 		const url = `${getBaseUrl()}/api/trpc`;
-		return {
-			queryClientConfig: {
-				defaultOptions: {
-					queries: {
-						staleTime: 60,
-						cacheTime: 60,
-					},
-				},
-			},
-			transformer: superjson,
-			url,
-		};
+		return { transformer: superjson, url };
 	},
 	ssr: true,
 })(App);

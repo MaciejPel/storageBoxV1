@@ -12,19 +12,19 @@ import { authOptions } from '../api/auth/[...nextauth]';
 const CharacterPage = () => {
 	const { query } = useRouter();
 	const { data: session } = useSession();
-	const [character, setCharacter] = useState({ name: '', description: '' });
 
 	const characterQuery = trpc.useQuery(['character.single', { characterId: query.id as string }], {
 		enabled: session ? true : false,
-		onSuccess(data) {
-			setCharacter({ name: data?.name || '', description: data!.description || '' });
-		},
 	});
+
+	const [character, setCharacter] = useState({
+		name: characterQuery.data?.name,
+		description: characterQuery.data?.description,
+	});
+
 	const tagsQuery = trpc.useQuery(['tag.all'], { enabled: session ? true : false });
 
-	if (characterQuery.isLoading) {
-		return <Container type="start">Loading character ⌚</Container>;
-	}
+	if (characterQuery.isLoading) return <Container type="start">Loading character ⌚</Container>;
 
 	return (
 		<Container type="start">
@@ -60,7 +60,7 @@ const CharacterPage = () => {
 							<textarea
 								id="description"
 								className="textarea h-52"
-								value={character.description}
+								value={character.description || ''}
 								onChange={(e) => setCharacter({ ...character, description: e.target.value })}
 							/>
 							<label htmlFor="tags" className="label cursor-pointer pb-0 w-full">

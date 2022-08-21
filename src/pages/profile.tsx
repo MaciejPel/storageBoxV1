@@ -1,4 +1,3 @@
-import { getSession } from 'next-auth/react';
 import Container from '../components/Container';
 import Meta from '../components/Meta';
 import { NextPage } from 'next';
