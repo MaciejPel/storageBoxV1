@@ -2,18 +2,20 @@ import React, { useState } from 'react';
 
 interface ModalProps {
 	modalTitle: string;
-	buttonTitle: string;
+	buttonContent: string | JSX.Element;
+	buttonType: 'card' | 'button';
 	id: string;
 	children: React.ReactNode;
 }
 
-const Modal: React.FC<ModalProps> = ({ modalTitle, buttonTitle, id, children }) => {
+const Modal: React.FC<ModalProps> = ({ modalTitle, buttonContent, buttonType, id, children }) => {
 	const [open, setOpen] = useState<boolean>(false);
+	const styles = { button: 'btn w-full md:w-auto', card: 'btn btn-ghost p-3' };
 
 	return (
 		<>
-			<label htmlFor={id} className="btn modal-button w-full md:w-auto">
-				{buttonTitle}
+			<label htmlFor={id} className={styles[buttonType]}>
+				{buttonContent}
 			</label>
 			<input
 				type="checkbox"

@@ -5,3 +5,7 @@
 .main {
 	min-height: calc(100vh - 64px);
 }
+
+.masonry-grid-column {
+	background-clip: padding-box;
+}

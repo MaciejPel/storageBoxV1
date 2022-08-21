@@ -1,8 +1,16 @@
 /* eslint-disable @next/next/no-img-element */
-import { ExternalLinkIcon, HeartIcon, PhotographIcon, TrashIcon } from '@heroicons/react/solid';
+import {
+	ExternalLinkIcon,
+	HeartIcon,
+	PencilAltIcon,
+	PhotographIcon,
+	TrashIcon,
+} from '@heroicons/react/solid';
 import { useSession } from 'next-auth/react';
 import { useState } from 'react';
 import { trpc } from '../utils/trpc';
+import CharacterEditForm from './forms/CharacterEditForm';
+import Modal from './Modal';
 
 interface CharacterCardProps {
 	id: string;
@@ -27,6 +35,9 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ id, name, description, im
 		onSuccess() {
 			utils.invalidateQueries(['character.single']);
 		},
+	});
+	const characterQuery = trpc.useQuery(['character.single', { characterId: id as string }], {
+		enabled: session ? true : false,
 	});
 
 	return (
@@ -55,22 +66,35 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ id, name, description, im
 				</div>
 				<div className="card-actions justify-end gap-0">
 					<button className="btn btn-ghost p-3">
-						<TrashIcon className="w-6 h-full group-hover:fill-error transition-all duration-200" />
+						<TrashIcon className="w-6 group-hover:fill-error transition-all duration-200" />
 					</button>
 					{image && (
 						<>
+							<Modal
+								buttonContent={<PencilAltIcon className="w-6" />}
+								buttonType="card"
+								id="characterEdit"
+								modalTitle="Edit character"
+							>
+								<CharacterEditForm
+									id={id}
+									name={characterQuery.data?.name || ''}
+									description={characterQuery.data?.description || ''}
+									tags={characterQuery.data?.tags.map((tag) => tag.id) || []}
+								/>
+							</Modal>
 							<button
 								className="btn btn-ghost p-3"
 								onClick={() => mediaUpdate.mutate({ mediaId: image.id })}
 							>
 								<HeartIcon
-									className={`w-6 h-full group-hover:fill-warning transition-all duration-200 ${
+									className={`w-6 group-hover:fill-warning transition-all duration-200 ${
 										image.likeIds.includes(session?.user.id || '') ? 'fill-red-600 ' : ''
 									}`}
 								/>
 							</button>
 							<a href={imageURL} target="_blank" rel="noreferrer" className="btn btn-ghost p-3">
-								<ExternalLinkIcon className="w-6 h-full" />
+								<ExternalLinkIcon className="w-6" />
 							</a>
 						</>
 					)}

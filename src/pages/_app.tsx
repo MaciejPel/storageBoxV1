@@ -1,14 +1,14 @@
 import type { AppProps } from 'next/app';
 import { ThemeProvider } from 'next-themes';
-import '../styles/globals.css';
-import Layout from '../components/Layout';
 import { SessionProvider } from 'next-auth/react';
 import { withTRPC } from '@trpc/next';
 import type { AppRouter } from '../server/router';
+import { getBaseUrl } from '../utils/functions';
 import superjson from 'superjson';
 import { ToastContainer } from 'react-toastify';
+import Layout from '../components/Layout';
 import 'react-toastify/dist/ReactToastify.css';
-import { getBaseUrl } from '../utils/functions';
+import '../styles/globals.css';
 
 export const App = ({ Component, pageProps: { session, ...pageProps } }: AppProps) => {
 	return (

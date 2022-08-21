@@ -22,12 +22,12 @@ model User {
 model Character {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   name        String
-  description String?
-  mediaIds    String[] @db.ObjectId
+  description String
+  mediaIds    String[] @default([]) @db.ObjectId
   media       Media[]  @relation(fields: [mediaIds], references: [id])
   authorId    String   @db.ObjectId
   author      User     @relation(fields: [authorId], references: [id], name: "userCharacters")
-  tagIds      String[] @db.ObjectId
+  tagIds      String[] @default([]) @db.ObjectId
   tags        Tag[]    @relation(fields: [tagIds], references: [id])
 }
 
@@ -36,7 +36,7 @@ model Media {
   fileName     String
   fileType     String
   likes        User?       @relation(fields: [likeIds], references: [id], name: "userLikes")
-  likeIds      String[]    @db.ObjectId
+  likeIds      String[]    @default([]) @db.ObjectId
   characterIds String[]    @db.ObjectId
   characters   Character[] @relation(fields: [characterIds], references: [id])
   author       User        @relation(fields: [authorId], references: [id], name: "userMedia")
@@ -46,7 +46,7 @@ model Media {
 model Tag {
   id           String      @id @default(auto()) @map("_id") @db.ObjectId
   name         String
-  characterIds String[]    @db.ObjectId
+  characterIds String[]    @default([]) @db.ObjectId
   characters   Character[] @relation(fields: [characterIds], references: [id])
   authorId     String      @db.ObjectId
   author       User        @relation(fields: [authorId], references: [id], name: "userTags")

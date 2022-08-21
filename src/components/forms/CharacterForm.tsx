@@ -89,13 +89,13 @@ const CharacterForm: React.FC = () => {
 									checked={character.tags.includes(tag.id)}
 									className="checkbox"
 									onChange={(e) => {
-										if (e.target.checked === true)
-											setCharacter({ ...character, tags: [...character.tags, e.target.value] });
-										if (e.target.checked === false)
-											setCharacter({
-												...character,
-												tags: character.tags.filter((tag) => tag != e.target.value),
-											});
+										setCharacter({
+											...character,
+											tags:
+												e.target.checked === true
+													? [...character.tags, e.target.value]
+													: character.tags.filter((tag) => tag != e.target.value),
+										});
 									}}
 								/>
 								<span className="label-text">{tag.name}</span>
@@ -105,13 +105,13 @@ const CharacterForm: React.FC = () => {
 			</div>
 			<div className="btn-group w-full pt-3">
 				{characterMutation.isLoading ? (
-					<button type="button" className="btn  w-full loading disabled">
+					<button type="button" className="btn w-full loading disabled">
 						Processing...
 					</button>
 				) : (
-					<>
+					<div className="flex justify-end w-full btn-group">
 						<input
-							className="btn btn-error rounded w-1/4"
+							className="btn btn-error rounded w-1/6"
 							type="reset"
 							value="Reset"
 							onClick={() => {
@@ -119,8 +119,8 @@ const CharacterForm: React.FC = () => {
 								setError({});
 							}}
 						/>
-						<input className="btn btn-primary rounded w-3/4" type="submit" value="Submit" />
-					</>
+						<input className="btn btn-primary rounded w-1/3" type="submit" value="Submit" />
+					</div>
 				)}
 			</div>
 		</form>

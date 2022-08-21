@@ -51,9 +51,9 @@ const TagForm: React.FC = () => {
 						Processing...
 					</button>
 				) : (
-					<>
+					<div className="flex justify-end w-full btn-group">
 						<input
-							className="btn btn-error rounded w-1/4"
+							className="btn btn-error rounded w-1/6"
 							type="reset"
 							value="Reset"
 							onClick={() => {
@@ -61,8 +61,8 @@ const TagForm: React.FC = () => {
 								setError({});
 							}}
 						/>
-						<input className="btn btn-primary rounded w-3/4" type="submit" value="Submit" />
-					</>
+						<input className="btn btn-primary rounded w-1/3" type="submit" value="Submit" />
+					</div>
 				)}
 			</div>
 		</form>

@@ -29,7 +29,7 @@ const Header: React.FC = () => {
 				<div className="md:px-2">
 					<Link href="/">
 						<a className="md:text-lg text-base font-bold flex items-center rounded px-2 md:gap-2 btn btn-ghost normal-case">
-							<CubeIcon className="md:w-10 w-7 h-full" />
+							<CubeIcon className="md:w-10 w-7" />
 							<div>
 								Storage
 								<span className="text-accent">Box</span>

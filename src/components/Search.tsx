@@ -1,9 +1,11 @@
-import { SearchIcon, FilterIcon } from '@heroicons/react/outline';
+import { SearchIcon, FilterIcon, XIcon } from '@heroicons/react/outline';
+import { FilterIcon as FilterIconSolid } from '@heroicons/react/solid';
+import { SortAscendingIcon, SortDescendingIcon } from '@heroicons/react/solid';
 import { trpc } from '../utils/trpc';
 
 interface SearchProps {
-	setQuery: React.Dispatch<React.SetStateAction<{ string: string; tags: string[] }>>;
-	query: { string: string; tags: string[] };
+	setQuery: React.Dispatch<React.SetStateAction<{ string: string; tags: string[]; sort: boolean }>>;
+	query: { string: string; tags: string[]; sort: boolean };
 }
 
 const Search: React.FC<SearchProps> = ({ setQuery, query }) => {
@@ -13,19 +15,19 @@ const Search: React.FC<SearchProps> = ({ setQuery, query }) => {
 		<div className="w-full flex items-center">
 			<input
 				type="text"
-				className="input input-bordered w-full my-2 rounded-r-none focus:outline-0"
+				className="input input-bordered w-full rounded-r-none focus:outline-0"
 				onChange={(e) => setQuery({ ...query, string: e.target.value.toLowerCase() })}
 				value={query.string}
 				placeholder="Search..."
 				id="search"
 			/>
-			<label htmlFor="search" className="btn rounded-l-none w-16 no-animation ">
-				<SearchIcon className="w-6 h-full " />
+			<label htmlFor="search" className="btn rounded-l-none no-animation ">
+				<SearchIcon className="w-6 " />
 			</label>
 
-			<div className="dropdown dropdown-end">
-				<label tabIndex={0} className="btn m-1 mr-0">
-					<FilterIcon className="w-6 h-full" />
+			<div className="dropdown dropdown-end sticky">
+				<label tabIndex={0} className="btn m-1">
+					{query.tags.length ? <FilterIconSolid className="w-6" /> : <FilterIcon className="w-6" />}
 				</label>
 				<ul
 					tabIndex={0}
@@ -34,21 +36,22 @@ const Search: React.FC<SearchProps> = ({ setQuery, query }) => {
 					{tagsQuery.isSuccess &&
 						tagsQuery.data.map((tag) => (
 							<li key={tag.id}>
-								<label htmlFor={tag.id} className="label flex justify-start">
+								<label htmlFor={'filter-' + tag.id} className="label flex justify-start">
 									<input
-										id={tag.id}
+										id={'filter-' + tag.id}
 										type="checkbox"
 										className="checkbox label-text"
 										value={tag.id}
 										name="tagQuery"
+										checked={query.tags.includes(tag.id)}
 										onChange={(e) => {
-											if (e.target.checked === true)
-												setQuery({ ...query, tags: [...query.tags, e.target.value] });
-											if (e.target.checked === false)
-												setQuery({
-													...query,
-													tags: query.tags.filter((tag) => tag != e.target.value),
-												});
+											setQuery({
+												...query,
+												tags:
+													e.target.checked === true
+														? [...query.tags, e.target.value]
+														: query.tags.filter((tag) => tag != e.target.value),
+											});
 										}}
 									/>
 									{tag.name}
@@ -57,6 +60,26 @@ const Search: React.FC<SearchProps> = ({ setQuery, query }) => {
 						))}
 				</ul>
 			</div>
+			<button
+				title="Sort items"
+				className="btn mr-1"
+				type="button"
+				onClick={() => setQuery({ ...query, sort: !query.sort })}
+			>
+				{query.sort ? (
+					<SortDescendingIcon className="w-6" />
+				) : (
+					<SortAscendingIcon className="w-6" />
+				)}
+			</button>
+			<button
+				title="Clear search parameters"
+				className="btn"
+				type="button"
+				onClick={() => setQuery({ string: '', tags: [], sort: true })}
+			>
+				<XIcon className="w-6" />
+			</button>
 		</div>
 	);
 };

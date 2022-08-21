@@ -15,7 +15,7 @@ export const characterRouter = createProtectedRouter()
 					authorId: true,
 					author: { select: { id: true, username: true } },
 					tags: { select: { id: true, name: true } },
-					media: { select: { id: true, fileName: true, fileType: true } },
+					media: { select: { id: true, fileName: true, fileType: true, likeIds: true } },
 				},
 			});
 		},
@@ -70,6 +70,38 @@ export const characterRouter = createProtectedRouter()
 				},
 			});
 
-			return character.id;
+			return character;
+		},
+	})
+	.mutation('edit', {
+		input: z.object({
+			characterId: z.string(),
+			name: z.preprocess(
+				trimString,
+				z
+					.string()
+					.min(3, { message: 'must contain at least 3 character(s)' })
+					.max(18, { message: 'must contain at most 18 character(s)' })
+			),
+			description: z.preprocess(
+				trimString,
+				z
+					.string()
+					.min(3, { message: 'must contain at least 3 character(s)' })
+					.max(140, { message: 'must contain at most 140 character(s)' })
+			),
+			tags: z.array(z.string()),
+		}),
+		async resolve({ input }) {
+			const character = await prisma.character.update({
+				data: {
+					name: input.name,
+					description: input.description,
+					tagIds: input.tags,
+				},
+				where: { id: input.characterId },
+			});
+
+			return character;
 		},
 	});
