@@ -8,15 +8,15 @@ datasource db {
 }
 
 model User {
-  id         String      @id @default(auto()) @map("_id") @db.ObjectId
-  username   String      @unique
-  password   String      @db.String
-  verified   Boolean?    @default(false)
-  banned     Boolean?    @default(false)
-  characters Character[]
-  media      Media[]     @relation(name: "mediaAuthors")
-  likedMedia Media[]     @relation(name: "mediaLikes")
-  tags       Tag[]       @relation(name: "tags")
+  id                String      @id @default(auto()) @map("_id") @db.ObjectId
+  username          String      @unique
+  password          String      @db.String
+  verified          Boolean?    @default(false)
+  banned            Boolean?    @default(false)
+  createdCharacters Character[] @relation(name: "userCharacters")
+  createdTags       Tag[]       @relation(name: "userTags")
+  uploadedMedia     Media[]     @relation(name: "userMedia")
+  likedMedia        Media[]     @relation(name: "userLikes")
 }
 
 model Character {
@@ -26,7 +26,7 @@ model Character {
   mediaIds    String[] @db.ObjectId
   media       Media[]  @relation(fields: [mediaIds], references: [id])
   authorId    String   @db.ObjectId
-  author      User     @relation(fields: [authorId], references: [id])
+  author      User     @relation(fields: [authorId], references: [id], name: "userCharacters")
   tagIds      String[] @db.ObjectId
   tags        Tag[]    @relation(fields: [tagIds], references: [id])
 }
@@ -35,19 +35,19 @@ model Media {
   id           String      @id @default(auto()) @map("_id") @db.ObjectId
   fileName     String
   fileType     String
-  likes        User?       @relation(fields: [likeId], references: [id], name: "mediaLikes")
-  likeId       String?     @db.ObjectId
+  likes        User?       @relation(fields: [likeIds], references: [id], name: "userLikes")
+  likeIds      String[]    @db.ObjectId
   characterIds String[]    @db.ObjectId
   characters   Character[] @relation(fields: [characterIds], references: [id])
-  author       User        @relation(fields: [authorId], references: [id], name: "mediaAuthors")
+  author       User        @relation(fields: [authorId], references: [id], name: "userMedia")
   authorId     String      @db.ObjectId
 }
 
 model Tag {
   id           String      @id @default(auto()) @map("_id") @db.ObjectId
   name         String
-  characterIDs String[]    @db.ObjectId
-  characters   Character[] @relation(fields: [characterIDs], references: [id])
+  characterIds String[]    @db.ObjectId
+  characters   Character[] @relation(fields: [characterIds], references: [id])
   authorId     String      @db.ObjectId
-  author       User        @relation(fields: [authorId], references: [id], name: "tags")
+  author       User        @relation(fields: [authorId], references: [id], name: "userTags")
 }

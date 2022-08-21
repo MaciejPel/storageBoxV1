@@ -1,19 +1,20 @@
 /* eslint-disable @next/next/no-img-element */
 import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
 import type { NextPage } from 'next';
-import { useSession, getSession } from 'next-auth/react';
+import { useRouter } from 'next/router';
+import { useSession } from 'next-auth/react';
+import { unstable_getServerSession as getServerSession } from 'next-auth/next';
+import { authOptions } from './api/auth/[...nextauth]';
+import { trpc } from '../utils/trpc';
+import { bunnyCDN } from '../utils/constants';
+import { PhotographIcon } from '@heroicons/react/solid';
+import Link from 'next/link';
 import Container from '../components/Container';
 import Search from '../components/Search';
 import Modal from '../components/Modal';
 import CharacterForm from '../components/forms/CharacterForm';
 import Masonry from '../components/Masonry';
 import TagForm from '../components/forms/TagForm';
-import { trpc } from '../utils/trpc';
-import Link from 'next/link';
-import { PhotographIcon } from '@heroicons/react/solid';
-import { bunnyCDN } from '../utils/constants';
-
 interface QueryParams {
 	string: string;
 	tags: string[];
@@ -103,7 +104,8 @@ const Home: NextPage = () => {
 export default Home;
 
 export const getServerSideProps = async (context: any) => {
-	const session = await getSession(context);
+	const session = await getServerSession(context.req, context.res, authOptions);
+
 	if (!session) {
 		return {
 			redirect: {

@@ -1,6 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 import { ExternalLinkIcon, HeartIcon, PhotographIcon, TrashIcon } from '@heroicons/react/solid';
+import { useSession } from 'next-auth/react';
 import { useState } from 'react';
+import { trpc } from '../utils/trpc';
 
 interface CharacterCardProps {
 	id: string;
@@ -10,14 +12,22 @@ interface CharacterCardProps {
 		id: string;
 		fileName: string;
 		fileType: string;
+		likeIds: string[];
 	};
 }
 
 const CharacterCard: React.FC<CharacterCardProps> = ({ id, name, description, image }) => {
+	const { data: session } = useSession();
 	const [readMore, setReadMore] = useState<boolean>(false);
 	const imageURL =
 		image &&
 		`${process.env.NEXT_PUBLIC_CDN_URL}/${process.env.NEXT_PUBLIC_STORAGE_FOLDER}/${id}/${image.id}.${image.fileType}`;
+	const utils = trpc.useContext();
+	const mediaUpdate = trpc.useMutation(['media.update'], {
+		onSuccess() {
+			utils.invalidateQueries(['character.single']);
+		},
+	});
 
 	return (
 		<div className="card card-compact static w-full bg-base-300 col-span-1 card-bordered">
@@ -47,13 +57,22 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ id, name, description, im
 					<button className="btn btn-ghost p-3">
 						<TrashIcon className="w-6 h-full group-hover:fill-error transition-all duration-200" />
 					</button>
-					<button className="btn btn-ghost p-3">
-						<HeartIcon className="w-6 h-full group-hover:fill-warning transition-all duration-200" />
-					</button>
-					{imageURL && (
-						<a href={imageURL} target="_blank" rel="noreferrer" className="btn btn-ghost p-3">
-							<ExternalLinkIcon className="w-6 h-full" />
-						</a>
+					{image && (
+						<>
+							<button
+								className="btn btn-ghost p-3"
+								onClick={() => mediaUpdate.mutate({ mediaId: image.id })}
+							>
+								<HeartIcon
+									className={`w-6 h-full group-hover:fill-warning transition-all duration-200 ${
+										image.likeIds.includes(session?.user.id || '') ? 'fill-red-600 ' : ''
+									}`}
+								/>
+							</button>
+							<a href={imageURL} target="_blank" rel="noreferrer" className="btn btn-ghost p-3">
+								<ExternalLinkIcon className="w-6 h-full" />
+							</a>
+						</>
 					)}
 				</div>
 			</div>

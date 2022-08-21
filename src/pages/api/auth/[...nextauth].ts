@@ -9,13 +9,14 @@ export const authOptions: NextAuthOptions = {
 	jwt: {
 		maxAge: 60 * 60 * 24 * 30,
 	},
-	secret: process.env.JWT_SECRET,
+	secret: process.env.NEXTAUTH_SECRET,
 	adapter: PrismaAdapter(prisma),
 	callbacks: {
 		async session({ session, token }) {
-			session.user.id = token.user.id;
-			session.user.username = token.user.username;
-			return session;
+			return {
+				user: { id: token.user.id, username: token.user.username },
+				expires: session.expires,
+			};
 		},
 		async jwt({ token, user }) {
 			if (user) token.user = user;

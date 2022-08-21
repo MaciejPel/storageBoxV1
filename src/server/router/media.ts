@@ -34,4 +34,34 @@ export const mediaRouter = createProtectedRouter()
 
 			return { id: media.id };
 		},
+	})
+	.mutation('update', {
+		input: z.object({
+			mediaId: z.string(),
+		}),
+		async resolve({ input, ctx }) {
+			const userId = ctx.session.user.id;
+			if (!userId) throw new trpc.TRPCError({ code: 'UNAUTHORIZED' });
+
+			const media = await prisma.media.findFirst({
+				select: { likeIds: true },
+				where: { id: input.mediaId },
+			});
+
+			if (media) {
+				if (media.likeIds.includes(userId)) {
+					media.likeIds = media.likeIds.filter((like) => like != userId);
+				} else {
+					media?.likeIds.push(userId);
+				}
+
+				const mediaUpdate = await prisma.media.update({
+					data: {
+						likeIds: media.likeIds,
+					},
+					where: { id: input.mediaId },
+				});
+				return mediaUpdate;
+			}
+		},
 	});

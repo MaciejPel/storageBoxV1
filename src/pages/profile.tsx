@@ -2,6 +2,8 @@ import { getSession } from 'next-auth/react';
 import Container from '../components/Container';
 import Meta from '../components/Meta';
 import { NextPage } from 'next';
+import { unstable_getServerSession as getServerSession } from 'next-auth/next';
+import { authOptions } from './api/auth/[...nextauth]';
 
 const profile: NextPage = () => {
 	return (
@@ -17,7 +19,8 @@ const profile: NextPage = () => {
 export default profile;
 
 export const getServerSideProps = async (context: any) => {
-	const session = await getSession(context);
+	const session = await getServerSession(context.req, context.res, authOptions);
+
 	if (!session) {
 		return {
 			redirect: {

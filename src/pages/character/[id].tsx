@@ -1,11 +1,13 @@
 /* eslint-disable @next/next/no-img-element */
 import { useRouter } from 'next/router';
-import { getSession, useSession } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { trpc } from '../../utils/trpc';
 import Container from '../../components/Container';
 import UploadForm from '../../components/forms/UploadForm';
 import CharacterCard from '../../components/CharacterCard';
 import { useState } from 'react';
+import { unstable_getServerSession as getServerSession } from 'next-auth/next';
+import { authOptions } from '../api/auth/[...nextauth]';
 
 const CharacterPage = () => {
 	const { query } = useRouter();
@@ -15,7 +17,7 @@ const CharacterPage = () => {
 	const characterQuery = trpc.useQuery(['character.single', { characterId: query.id as string }], {
 		enabled: session ? true : false,
 		onSuccess(data) {
-			setCharacter({ name: data?.name || '', description: data?.description || '' });
+			setCharacter({ name: data?.name || '', description: data!.description || '' });
 		},
 	});
 	const tagsQuery = trpc.useQuery(['tag.all'], { enabled: session ? true : false });
@@ -108,7 +110,8 @@ const CharacterPage = () => {
 export default CharacterPage;
 
 export const getServerSideProps = async (context: any) => {
-	const session = await getSession(context);
+	const session = await getServerSession(context.req, context.res, authOptions);
+
 	if (!session) {
 		return {
 			redirect: {

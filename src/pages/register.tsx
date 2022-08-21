@@ -1,8 +1,9 @@
 import { NextPage } from 'next';
-import { getSession } from 'next-auth/react';
 import Container from '../components/Container';
 import Meta from '../components/Meta';
 import RegisterForm from '../components/forms/RegisterForm';
+import { unstable_getServerSession as getServerSession } from 'next-auth/next';
+import { authOptions } from './api/auth/[...nextauth]';
 
 const register: NextPage = () => {
 	return (
@@ -17,7 +18,8 @@ const register: NextPage = () => {
 export default register;
 
 export const getServerSideProps = async (context: any) => {
-	const session = await getSession(context);
+	const session = await getServerSession(context.req, context.res, authOptions);
+
 	if (session) {
 		return {
 			redirect: {

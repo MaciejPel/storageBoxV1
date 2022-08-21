@@ -33,7 +33,7 @@ export const characterRouter = createProtectedRouter()
 					authorId: true,
 					author: { select: { id: true, username: true } },
 					tags: { select: { id: true, name: true } },
-					media: { select: { id: true, fileName: true, fileType: true } },
+					media: { select: { id: true, fileName: true, fileType: true, likeIds: true } },
 					mediaIds: true,
 				},
 				where: { id: input.characterId },
