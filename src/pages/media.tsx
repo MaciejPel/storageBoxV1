@@ -4,15 +4,17 @@ import Container from '../components/Container';
 import Meta from '../components/Meta';
 import { authOptions } from './api/auth/[...nextauth]';
 
-const media: NextPage = () => {
+const Media: NextPage = () => {
 	return (
 		<>
 			<Meta title="Media" />
-			<Container type="center">media</Container>
+			<Container type="start">
+				<h2 className="text-4xl font-extrabold my-4">Media</h2>
+			</Container>
 		</>
 	);
 };
-export default media;
+export default Media;
 
 export const getServerSideProps = async (context: any) => {
 	const session = await getServerSession(context.req, context.res, authOptions);

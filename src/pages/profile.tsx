@@ -4,18 +4,18 @@ import { NextPage } from 'next';
 import { unstable_getServerSession as getServerSession } from 'next-auth/next';
 import { authOptions } from './api/auth/[...nextauth]';
 
-const profile: NextPage = () => {
+const Profile: NextPage = () => {
 	return (
 		<>
 			<Meta title="Profile" />
-			<Container type="center">
-				<div>profile</div>
+			<Container type="start">
+				<h2 className="text-4xl font-extrabold my-4">Profile</h2>
 			</Container>
 		</>
 	);
 };
 
-export default profile;
+export default Profile;
 
 export const getServerSideProps = async (context: any) => {
 	const session = await getServerSession(context.req, context.res, authOptions);

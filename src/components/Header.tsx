@@ -10,6 +10,7 @@ import {
 	LoginIcon,
 	FolderIcon,
 	PencilAltIcon,
+	HashtagIcon,
 } from '@heroicons/react/solid';
 import { CubeIcon } from '@heroicons/react/outline';
 const themes = ['light', 'retro', 'dark', 'black', 'night', 'dracula', 'coffee', 'luxury'];
@@ -28,9 +29,9 @@ const Header: React.FC = () => {
 			<div className="flex justify-between lg:w-4/5 w-full">
 				<div className="md:px-2">
 					<Link href="/">
-						<a className="md:text-lg text-base font-bold flex items-center rounded px-2 md:gap-2 btn btn-ghost normal-case">
+						<a className="md:text-lg text-base font-bold flex items-center rounded px-2 md:gap-1 btn btn-ghost normal-case">
 							<CubeIcon className="md:w-10 w-7" />
-							<div>
+							<div className="sm:block hidden">
 								Storage
 								<span className="text-accent">Box</span>
 							</div>
@@ -43,13 +44,19 @@ const Header: React.FC = () => {
 							<>
 								<Link href="/media">
 									<a className="btn btn-sm btn-ghost text-base-content normal-case gap-1 ">
-										<FolderIcon className="h-5 w-5" />
+										<FolderIcon className="w-5" />
 										<span className="hidden md:inline">Media</span>
+									</a>
+								</Link>
+								<Link href="/tags">
+									<a className="btn btn-sm btn-ghost text-base-content normal-case gap-1 ">
+										<HashtagIcon className="w-5" />
+										<span className="hidden md:inline">Tags</span>
 									</a>
 								</Link>
 								<Link href="/profile">
 									<a className="btn btn-sm btn-ghost text-base-content normal-case gap-1 ">
-										<UserIcon className="h-5 w-5" />
+										<UserIcon className="w-5" />
 										<span className="hidden md:inline">Profile</span>
 									</a>
 								</Link>
@@ -57,7 +64,7 @@ const Header: React.FC = () => {
 						)}
 						<div className="dropdown">
 							<label tabIndex={0} className="btn btn-sm gap-1 normal-case btn-ghost">
-								<ColorSwatchIcon className="w-5 h-5" />
+								<ColorSwatchIcon className="w-5" />
 								<span className="hidden md:inline">Themes</span>
 							</label>
 							<ul
@@ -92,7 +99,7 @@ const Header: React.FC = () => {
 									router.push('/login');
 								}}
 							>
-								<LogoutIcon className="h-5 w-5 -scale-100" />
+								<LogoutIcon className="w-5 -scale-100" />
 								<span className="hidden md:inline">Logout</span>
 							</a>
 						)}
@@ -100,13 +107,13 @@ const Header: React.FC = () => {
 							<>
 								<Link href="/login">
 									<a className="btn btn-sm btn-ghost text-base-content normal-case gap-1 ">
-										<LoginIcon className="h-5 w-5 -scale-100" />
+										<LoginIcon className="w-5 -scale-100" />
 										<span className="hidden md:inline">Login</span>
 									</a>
 								</Link>
 								<Link href="/register">
 									<a className="btn btn-sm btn-ghost text-base-content normal-case gap-1 ">
-										<PencilAltIcon className="h-5 w-5" />
+										<PencilAltIcon className="w-5" />
 										<span className="hidden md:inline">Register</span>
 									</a>
 								</Link>

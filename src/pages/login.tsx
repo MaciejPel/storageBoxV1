@@ -5,7 +5,7 @@ import LoginForm from '../components/forms/LoginForm';
 import Meta from '../components/Meta';
 import { authOptions } from './api/auth/[...nextauth]';
 
-const login: NextPage = () => {
+const Login: NextPage = () => {
 	return (
 		<>
 			<Meta title="Login" />
@@ -15,7 +15,7 @@ const login: NextPage = () => {
 		</>
 	);
 };
-export default login;
+export default Login;
 
 export const getServerSideProps = async (context: any) => {
 	const session = await getServerSession(context.req, context.res, authOptions);

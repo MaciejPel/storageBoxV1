@@ -8,16 +8,26 @@ import CharacterCard from '../../components/CharacterCard';
 import { useState } from 'react';
 import { unstable_getServerSession as getServerSession } from 'next-auth/next';
 import { authOptions } from '../api/auth/[...nextauth]';
+import { toast } from 'react-toastify';
 
 const CharacterPage = () => {
+	const router = useRouter();
 	const { query } = useRouter();
 	const { data: session } = useSession();
 
 	const characterQuery = trpc.useQuery(['character.single', { characterId: query.id as string }], {
 		enabled: session ? true : false,
+		onError(err) {
+			if (err.data?.code === 'NOT_FOUND') {
+				toast.error('Character not found', {
+					className: '!bg-base-300 !text-base-content !rounded-xl',
+				});
+				router.push('/');
+			}
+		},
 	});
 
-	if (characterQuery.isLoading) return <Container type="start">Loading character ⌚</Container>;
+	if (characterQuery.isLoading) return <Container type="center">Loading character ⌚</Container>;
 
 	return (
 		<Container type="start">
@@ -34,10 +44,6 @@ const CharacterPage = () => {
 				<div className="card card-compact card-bordered static text-base-content bg-base-300 2xl:col-span-3 lg:col-span-2 sm:col-span-1">
 					<div className="card-body items-center justify-between">
 						<UploadForm />
-						<div className="card-actions justify-end btn-group gap-0 w-full">
-							<button className="btn btn-error w-1/6">Reset</button>
-							<button className="btn btn-primary w-1/3">Submit</button>
-						</div>
 					</div>
 				</div>
 			</div>

@@ -1,4 +1,9 @@
-const Container = ({ children, type }: { children: React.ReactNode; type: string }) => {
+interface ContainerProps {
+	children: React.ReactNode;
+	type: 'center' | 'start';
+}
+
+const Container: React.FC<ContainerProps> = ({ children, type }) => {
 	return (
 		<main
 			className={`px-4 lg:px-8 flex flex-1 flex-col items-center lg:w-4/5 w-full ${

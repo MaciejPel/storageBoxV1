@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { closeModal } from '../../utils/functions';
 import { trpc } from '../../utils/trpc';
 
 const CharacterForm: React.FC = () => {
@@ -12,8 +13,7 @@ const CharacterForm: React.FC = () => {
 	const characterMutation = trpc.useMutation(['character.create'], {
 		onSuccess: () => {
 			utils.invalidateQueries(['character.all']);
-			const modal = document.getElementById('character') as HTMLInputElement;
-			modal.checked = false;
+			closeModal('character');
 			setCharacter({ name: '', description: '', tags: [] });
 		},
 		onError: (error) => {
@@ -70,48 +70,50 @@ const CharacterForm: React.FC = () => {
 				/>
 			</div>
 			<div>
-				<label className="label pb-1" htmlFor="tags">
-					<span className="label-text">Tags</span>
-				</label>
-				<div className="columns-2 md:columns-3">
-					{tagsQuery.isSuccess &&
-						tagsQuery.data.map((tag) => (
-							<label
-								htmlFor={tag.id}
-								className="label justify-start	gap-2 cursor-pointer"
-								key={tag.id}
-							>
-								<input
-									type="checkbox"
-									value={tag.id}
-									id={tag.id}
-									name="tag"
-									checked={character.tags.includes(tag.id)}
-									className="checkbox"
-									onChange={(e) => {
-										setCharacter({
-											...character,
-											tags:
-												e.target.checked === true
+				{tagsQuery.isSuccess && tagsQuery.data.length > 0 && (
+					<>
+						<label className="label pb-1" htmlFor="tags">
+							<span className="label-text">Tags</span>
+						</label>
+						<div className="columns-2 md:columns-3">
+							{tagsQuery.data.map((tag) => (
+								<label
+									htmlFor={tag.id}
+									className="label justify-start	gap-2 cursor-pointer"
+									key={tag.id}
+								>
+									<input
+										type="checkbox"
+										value={tag.id}
+										id={tag.id}
+										name="tag"
+										checked={character.tags.includes(tag.id)}
+										className="checkbox"
+										onChange={(e) => {
+											setCharacter({
+												...character,
+												tags: e.target.checked
 													? [...character.tags, e.target.value]
 													: character.tags.filter((tag) => tag != e.target.value),
-										});
-									}}
-								/>
-								<span className="label-text">{tag.name}</span>
-							</label>
-						))}
-				</div>
+											});
+										}}
+									/>
+									<span className="label-text">{tag.name}</span>
+								</label>
+							))}
+						</div>
+					</>
+				)}
 			</div>
 			<div className="btn-group w-full pt-3">
 				{characterMutation.isLoading ? (
-					<button type="button" className="btn w-full loading disabled">
+					<button title="Loading" type="button" className="btn loading w-1/2">
 						Processing...
 					</button>
 				) : (
 					<div className="flex justify-end w-full btn-group">
 						<input
-							className="btn btn-error rounded w-1/6"
+							className="btn btn-error rounded sm:w-1/6"
 							type="reset"
 							value="Reset"
 							onClick={() => {

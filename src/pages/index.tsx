@@ -65,6 +65,9 @@ const Home: NextPage = () => {
 					</div>
 					{charactersQuery.isError && <Container type="center">Something went wrong</Container>}
 					{charactersQuery.isLoading && <Container type="center">Loading data ⌚</Container>}
+					{charactersQuery.isSuccess && charactersQuery.data.length === 0 && (
+						<Container type="center">Pretty empty in here 🏜</Container>
+					)}
 					<Masonry
 						breakpointCols={breakpointColumnsObj}
 						className="flex w-full gap-4"
@@ -81,11 +84,11 @@ const Home: NextPage = () => {
 										query.tags.every((tag) => characterTags.includes(tag))
 									);
 								})
-								.sort((a, b) => {
-									const la = a.media.reduce((acc, media) => acc + media.likeIds.length, 0),
-										lb = b.media.reduce((acc, media) => acc + media.likeIds.length, 0);
-									if (la < lb) return query.sort ? 1 : -1;
-									if (la > lb) return query.sort ? -1 : 1;
+								.sort((f, s) => {
+									const likesA = f.media.reduce((acc, media) => acc + media.likeIds.length, 0),
+										likesB = s.media.reduce((acc, media) => acc + media.likeIds.length, 0);
+									if (likesA < likesB) return query.sort ? 1 : -1;
+									if (likesA > likesB) return query.sort ? -1 : 1;
 									return 0;
 								})
 								.map((character, index) => (
@@ -102,28 +105,33 @@ const Home: NextPage = () => {
 											) : (
 												<PhotographIcon />
 											)}
-											<div className="card-body py-2 px-4 w-full bg-base-300 gap-0">
+											<div className="card-body w-full bg-base-300">
 												<h2 className="card-title !mb-0">{character.name}</h2>
-												<p className="truncate mb-2">{character.description}</p>
-												<p>
-													{character.tags.map((tag, index) => (
-														<React.Fragment key={tag.id}>
-															{index ? ', ' : ''}
-															<span
-																className={`btn-link text-base-content`}
-																onClick={(e) => {
-																	e.preventDefault();
-																	setQuery({ ...query, tags: [tag.id] });
-																}}
-															>
-																{tag.name}
-															</span>
-														</React.Fragment>
+												<p className="truncate">{character.description}</p>
+												<p className="flex gap-1 flex-wrap">
+													{character.tags.map((tag) => (
+														<span
+															key={tag.id}
+															className={`badge badge-md badge-outline hover:bg-base-100 !py-3 ${
+																query.tags.includes(tag.id) ? 'bg-success text-success-content' : ''
+															}`}
+															onClick={(e) => {
+																e.preventDefault();
+																setQuery({
+																	...query,
+																	tags: query.tags.includes(tag.id)
+																		? query.tags.filter((tagId) => tagId !== tag.id)
+																		: [...query.tags, tag.id],
+																});
+															}}
+														>
+															{tag.name}
+														</span>
 													))}
 												</p>
 												<div className="card-actions justify-end">
-													<button className="flex gap-2 text-base">
-														<HeartIcon className="w-6" />
+													<button className="flex gap-1 text-base">
+														<HeartIcon className="w-6 fill-red-500" />
 														{character.media.reduce((acc, media) => acc + media.likeIds.length, 0)}
 													</button>
 												</div>

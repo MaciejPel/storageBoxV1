@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { closeModal } from '../../utils/functions';
 import { trpc } from '../../utils/trpc';
 
 interface CharacterEditFormProps {
@@ -12,9 +13,10 @@ const CharacterEditForm: React.FC<CharacterEditFormProps> = ({ id, name, descrip
 	const [character, setCharacter] = useState({ characterId: id, name, description, tags });
 	const utils = trpc.useContext();
 	const tagsQuery = trpc.useQuery(['tag.all']);
-	const characterMutation = trpc.useMutation(['character.edit'], {
+	const characterEditMutation = trpc.useMutation(['character.edit'], {
 		onSuccess() {
 			utils.invalidateQueries('character.single');
+			closeModal('characterEdit');
 		},
 	});
 
@@ -60,10 +62,9 @@ const CharacterEditForm: React.FC<CharacterEditFormProps> = ({ id, name, descrip
 								onChange={(e) => {
 									setCharacter({
 										...character,
-										tags:
-											e.target.checked === true
-												? [...character.tags, e.target.value]
-												: character.tags.filter((tag) => tag != e.target.value),
+										tags: e.target.checked
+											? [...character.tags, e.target.value]
+											: character.tags.filter((tag) => tag != e.target.value),
 									});
 								}}
 							/>
@@ -71,24 +72,30 @@ const CharacterEditForm: React.FC<CharacterEditFormProps> = ({ id, name, descrip
 						</label>
 					))}
 			</div>
-			<div className="card-actions justify-end btn-group gap-0 w-full">
-				<input
-					type="reset"
-					className="btn btn-error"
-					value="Reset"
-					onClick={() => setCharacter({ ...character, name, description, tags })}
-				/>
-				<input
-					type="submit"
-					className="btn btn-primary"
-					value="Submit"
-					onClick={(e) => {
-						e.preventDefault();
-						characterMutation.mutate(character);
-						const modal = document.getElementById('characterEdit') as HTMLInputElement;
-						modal.checked = false;
-					}}
-				/>
+			<div className="card-actions justify-end btn-group gap-0 w-full mt-2">
+				{characterEditMutation.isLoading ? (
+					<button title="Loading" type="button" className="btn loading w-1/2">
+						Processing...
+					</button>
+				) : (
+					<>
+						<input
+							type="reset"
+							className="btn btn-warning sm:w-1/6"
+							value="Reset"
+							onClick={() => setCharacter({ ...character, name, description, tags })}
+						/>
+						<input
+							type="submit"
+							className="btn btn-primary w-1/3"
+							value="Submit"
+							onClick={(e) => {
+								e.preventDefault();
+								characterEditMutation.mutate(character);
+							}}
+						/>
+					</>
+				)}
 			</div>
 		</form>
 	);

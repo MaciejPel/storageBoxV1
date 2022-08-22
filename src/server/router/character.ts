@@ -25,19 +25,21 @@ export const characterRouter = createProtectedRouter()
 			characterId: z.string(),
 		}),
 		async resolve({ input }) {
-			return await prisma.character.findFirst({
+			const character = await prisma.character.findFirst({
 				select: {
 					id: true,
 					name: true,
 					description: true,
 					authorId: true,
 					author: { select: { id: true, username: true } },
-					tags: { select: { id: true, name: true } },
+					tags: { select: { id: true, name: true }, orderBy: { name: 'desc' } },
 					media: { select: { id: true, fileName: true, fileType: true, likeIds: true } },
 					mediaIds: true,
 				},
 				where: { id: input.characterId },
 			});
+			if (!character) throw new trpc.TRPCError({ code: 'NOT_FOUND' });
+			return character;
 		},
 	})
 	.mutation('create', {
@@ -56,7 +58,7 @@ export const characterRouter = createProtectedRouter()
 					.min(3, { message: 'must contain at least 3 character(s)' })
 					.max(140, { message: 'must contain at most 140 character(s)' })
 			),
-			tags: z.array(z.string()).nullish(),
+			tags: z.array(z.string()),
 		}),
 		async resolve({ input, ctx }) {
 			const author = ctx.session.user.id;
@@ -66,8 +68,14 @@ export const characterRouter = createProtectedRouter()
 					name: input.name,
 					description: input.description,
 					authorId: author,
-					tagIds: input.tags || [],
+					tagIds: input.tags,
 				},
+			});
+			input.tags.forEach(async (tagId) => {
+				await prisma.tag.update({
+					data: { characterIds: { push: character.id } },
+					where: { id: tagId },
+				});
 			});
 
 			return character;
@@ -93,7 +101,30 @@ export const characterRouter = createProtectedRouter()
 			tags: z.array(z.string()),
 		}),
 		async resolve({ input }) {
-			const character = await prisma.character.update({
+			const character = await prisma.character.findFirst({
+				select: { tagIds: true, tags: true },
+				where: { id: input.characterId },
+			});
+			if (character) {
+				character.tags.forEach(async (tag) => {
+					if (!input.tags.includes(tag.id)) {
+						await prisma.tag.update({
+							data: { characterIds: tag.characterIds.filter((t) => t !== input.characterId) },
+							where: { id: tag.id },
+						});
+					}
+				});
+				input.tags.forEach(async (tagId) => {
+					if (!character.tagIds.includes(tagId)) {
+						await prisma.tag.update({
+							data: { characterIds: { push: input.characterId } },
+							where: { id: tagId },
+						});
+					}
+				});
+			}
+
+			const characterUpdate = await prisma.character.update({
 				data: {
 					name: input.name,
 					description: input.description,
@@ -102,6 +133,53 @@ export const characterRouter = createProtectedRouter()
 				where: { id: input.characterId },
 			});
 
-			return character;
+			return characterUpdate;
+		},
+	})
+	.mutation('delete', {
+		input: z.object({
+			characterId: z.string(),
+		}),
+		async resolve({ input }) {
+			const tags = await prisma.tag.findMany({
+				select: { id: true, characterIds: true },
+				where: { characterIds: { has: input.characterId } },
+			});
+			const media = await prisma.media.findMany({
+				select: { id: true, characterIds: true },
+				where: { characterIds: { has: input.characterId } },
+			});
+
+			const tagsToUpdate: { [key: string]: string } = tags.reduce(
+				(obj, item) => ({
+					...obj,
+					[item.id]: item.characterIds.filter((tag) => tag != input.characterId),
+				}),
+				{}
+			);
+			const mediaToUpdate: { [key: string]: string } = media.reduce(
+				(obj, item) => ({
+					...obj,
+					[item.id]: item.characterIds.filter((tag) => tag != input.characterId),
+				}),
+				{}
+			);
+
+			for (const [key, value] of Object.entries(tagsToUpdate)) {
+				await prisma.tag.update({
+					data: { characterIds: { set: value } },
+					where: { id: key },
+				});
+			}
+			for (const [key, value] of Object.entries(mediaToUpdate)) {
+				await prisma.media.update({
+					data: { characterIds: { set: value } },
+					where: { id: key },
+				});
+			}
+
+			const character = await prisma.character.delete({ where: { id: input.characterId } });
+
+			return { id: character.id };
 		},
 	});

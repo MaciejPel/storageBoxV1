@@ -12,29 +12,35 @@ const Search: React.FC<SearchProps> = ({ setQuery, query }) => {
 	const tagsQuery = trpc.useQuery(['tag.all']);
 
 	return (
-		<div className="w-full flex items-center">
-			<input
-				type="text"
-				className="input input-bordered w-full rounded-r-none focus:outline-0"
-				onChange={(e) => setQuery({ ...query, string: e.target.value.toLowerCase() })}
-				value={query.string}
-				placeholder="Search..."
-				id="search"
-			/>
-			<label htmlFor="search" className="btn rounded-l-none no-animation ">
-				<SearchIcon className="w-6 " />
-			</label>
-
-			<div className="dropdown dropdown-end sticky">
-				<label tabIndex={0} className="btn m-1">
-					{query.tags.length ? <FilterIconSolid className="w-6" /> : <FilterIcon className="w-6" />}
+		<div className="w-full flex items-center gap-1">
+			<div className="flex w-full">
+				<input
+					type="text"
+					className="input input-bordered w-full rounded-r-none focus:outline-0"
+					onChange={(e) => setQuery({ ...query, string: e.target.value.toLowerCase() })}
+					value={query.string}
+					placeholder="Search..."
+					id="search"
+				/>
+				<label htmlFor="search" className="btn rounded-l-none no-animation ">
+					<SearchIcon className="w-6 " />
 				</label>
-				<ul
-					tabIndex={0}
-					className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-80 grid grid-cols-2"
-				>
-					{tagsQuery.isSuccess &&
-						tagsQuery.data.map((tag) => (
+			</div>
+
+			{tagsQuery.isSuccess && tagsQuery.data.length > 0 && (
+				<div className="dropdown sticky">
+					<label tabIndex={0} className="btn">
+						{query.tags.length ? (
+							<FilterIconSolid className="w-6" />
+						) : (
+							<FilterIcon className="w-6" />
+						)}
+					</label>
+					<ul
+						tabIndex={0}
+						className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-80 grid grid-cols-2 -left-40"
+					>
+						{tagsQuery.data.map((tag) => (
 							<li key={tag.id}>
 								<label htmlFor={'filter-' + tag.id} className="label flex justify-start">
 									<input
@@ -47,10 +53,9 @@ const Search: React.FC<SearchProps> = ({ setQuery, query }) => {
 										onChange={(e) => {
 											setQuery({
 												...query,
-												tags:
-													e.target.checked === true
-														? [...query.tags, e.target.value]
-														: query.tags.filter((tag) => tag != e.target.value),
+												tags: e.target.checked
+													? [...query.tags, e.target.value]
+													: query.tags.filter((tag) => tag != e.target.value),
 											});
 										}}
 									/>
@@ -58,11 +63,12 @@ const Search: React.FC<SearchProps> = ({ setQuery, query }) => {
 								</label>
 							</li>
 						))}
-				</ul>
-			</div>
+					</ul>
+				</div>
+			)}
 			<button
 				title="Sort items"
-				className="btn mr-1"
+				className="btn"
 				type="button"
 				onClick={() => setQuery({ ...query, sort: !query.sort })}
 			>

@@ -7,10 +7,11 @@ import * as trpc from '@trpc/server';
 export const tagRouter = createProtectedRouter()
 	.query('all', {
 		async resolve() {
-			return await prisma.tag.findMany({
-				select: { id: true, name: true },
+			const tags = await prisma.tag.findMany({
+				select: { id: true, name: true, characterIds: true },
 				orderBy: { name: 'asc' },
 			});
+			return tags;
 		},
 	})
 	.mutation('create', {
@@ -26,9 +27,37 @@ export const tagRouter = createProtectedRouter()
 		async resolve({ input, ctx }) {
 			const author = ctx.session.user.id;
 			if (!author) throw new trpc.TRPCError({ code: 'UNAUTHORIZED' });
+
 			const tag = await prisma.tag.create({
 				data: { name: input.name, authorId: author },
 			});
+
+			return { id: tag.id };
+		},
+	})
+	.mutation('delete', {
+		input: z.object({
+			tagId: z.string(),
+		}),
+		async resolve({ input }) {
+			const characters = await prisma.character.findMany({
+				select: { id: true, tagIds: true },
+				where: { tagIds: { has: input.tagId } },
+			});
+
+			const charactersToUpdate: { [key: string]: string } = characters.reduce(
+				(obj, item) => ({ ...obj, [item.id]: item.tagIds.filter((tag) => tag != input.tagId) }),
+				{}
+			);
+
+			for (const [key, value] of Object.entries(charactersToUpdate)) {
+				await prisma.character.update({
+					data: { tagIds: { set: value } },
+					where: { id: key },
+				});
+			}
+
+			const tag = await prisma.tag.delete({ where: { id: input.tagId } });
 
 			return { id: tag.id };
 		},

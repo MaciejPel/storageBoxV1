@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { closeModal } from '../../utils/functions';
 import { trpc } from '../../utils/trpc';
 
 const TagForm: React.FC = () => {
@@ -8,8 +9,7 @@ const TagForm: React.FC = () => {
 	const tagMutation = trpc.useMutation(['tag.create'], {
 		onSuccess: () => {
 			utils.invalidateQueries(['tag.all']);
-			const modal = document.getElementById('tag') as HTMLInputElement;
-			modal.checked = false;
+			closeModal('tag');
 			setTag({ name: '' });
 		},
 		onError: (error) => {
@@ -47,13 +47,13 @@ const TagForm: React.FC = () => {
 
 			<div className="btn-group w-full pt-3">
 				{tagMutation.isLoading ? (
-					<button type="button" className="btn w-full loading disabled">
+					<button title="Loading" type="button" className="btn loading w-1/2">
 						Processing...
 					</button>
 				) : (
 					<div className="flex justify-end w-full btn-group">
 						<input
-							className="btn btn-error rounded w-1/6"
+							className="btn btn-error rounded sm:w-1/6"
 							type="reset"
 							value="Reset"
 							onClick={() => {

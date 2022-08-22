@@ -3,6 +3,14 @@ import { z } from 'zod';
 import { prisma } from '../db/client';
 import * as trpc from '@trpc/server';
 
+interface InitialMediaType {
+	fileName: string;
+	fileType: string;
+	uuid: string;
+	authorId: string;
+	characterIds: string[];
+}
+
 export const mediaRouter = createProtectedRouter()
 	.query('all', {
 		async resolve() {
@@ -11,28 +19,54 @@ export const mediaRouter = createProtectedRouter()
 	})
 	.mutation('create', {
 		input: z.object({
-			fileName: z.string(),
-			fileType: z.string(),
+			data: z.array(
+				z.object({
+					fileName: z.string(),
+					fileType: z.string(),
+					uuid: z.string(),
+				})
+			),
 			characterId: z.string(),
 		}),
 		async resolve({ input, ctx }) {
 			const author = ctx.session.user.id;
 			if (!author) throw new trpc.TRPCError({ code: 'UNAUTHORIZED' });
-			const media = await prisma.media.create({
-				data: {
-					fileName: input.fileName,
-					fileType: input.fileType,
+
+			const character = await prisma.character.findFirst({
+				select: { id: true, mediaIds: true },
+				where: { id: input.characterId },
+			});
+
+			const mediaToCreate: InitialMediaType[] = input.data.map((row) => ({
+				...row,
+				authorId: author,
+				characterIds: [input.characterId],
+			}));
+			const uuids: string[] = input.data.map((row) => row.uuid);
+
+			await prisma.media.createMany({
+				data: mediaToCreate,
+			});
+
+			const updatedMedia = await prisma.media.findMany({
+				select: { id: true, uuid: true },
+				where: {
+					uuid: { in: uuids },
 					authorId: author,
-					characterIds: [input.characterId],
+					characterIds: { has: input.characterId },
 				},
 			});
 
-			const character = await prisma.character.update({
-				where: { id: input.characterId },
-				data: { mediaIds: { push: media.id } },
-			});
+			if (updatedMedia && character) {
+				const mediaToPush = updatedMedia.map((record) => record.id);
 
-			return { id: media.id };
+				await prisma.character.update({
+					data: { mediaIds: { set: [...character.mediaIds, ...mediaToPush] } },
+					where: { id: input.characterId },
+				});
+			}
+
+			return updatedMedia;
 		},
 	})
 	.mutation('update', {
@@ -52,7 +86,7 @@ export const mediaRouter = createProtectedRouter()
 				if (media.likeIds.includes(userId)) {
 					media.likeIds = media.likeIds.filter((like) => like != userId);
 				} else {
-					media?.likeIds.push(userId);
+					media.likeIds.push(userId);
 				}
 
 				const mediaUpdate = await prisma.media.update({

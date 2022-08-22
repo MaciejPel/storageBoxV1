@@ -5,7 +5,7 @@ import RegisterForm from '../components/forms/RegisterForm';
 import { unstable_getServerSession as getServerSession } from 'next-auth/next';
 import { authOptions } from './api/auth/[...nextauth]';
 
-const register: NextPage = () => {
+const Register: NextPage = () => {
 	return (
 		<>
 			<Meta title="Register" />
@@ -15,7 +15,7 @@ const register: NextPage = () => {
 		</>
 	);
 };
-export default register;
+export default Register;
 
 export const getServerSideProps = async (context: any) => {
 	const session = await getServerSession(context.req, context.res, authOptions);

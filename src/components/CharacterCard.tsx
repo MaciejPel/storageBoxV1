@@ -7,7 +7,10 @@ import {
 	TrashIcon,
 } from '@heroicons/react/solid';
 import { useSession } from 'next-auth/react';
-import { useState } from 'react';
+import { useRouter } from 'next/router';
+import { FormEvent, useState } from 'react';
+import { toast } from 'react-toastify';
+import { closeModal } from '../utils/functions';
 import { trpc } from '../utils/trpc';
 import CharacterEditForm from './forms/CharacterEditForm';
 import Modal from './Modal';
@@ -25,13 +28,17 @@ interface CharacterCardProps {
 }
 
 const CharacterCard: React.FC<CharacterCardProps> = ({ id, name, description, image }) => {
+	const router = useRouter();
 	const { data: session } = useSession();
 	const [readMore, setReadMore] = useState<boolean>(false);
+	const [confirm, setConfirm] = useState<string>('');
+
 	const imageURL =
 		image &&
 		`${process.env.NEXT_PUBLIC_CDN_URL}/${process.env.NEXT_PUBLIC_STORAGE_FOLDER}/${id}/${image.id}.${image.fileType}`;
+
 	const utils = trpc.useContext();
-	const mediaUpdate = trpc.useMutation(['media.update'], {
+	const mediaUpdateMutation = trpc.useMutation(['media.update'], {
 		onSuccess() {
 			utils.invalidateQueries(['character.single']);
 		},
@@ -39,6 +46,20 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ id, name, description, im
 	const characterQuery = trpc.useQuery(['character.single', { characterId: id as string }], {
 		enabled: session ? true : false,
 	});
+	const characterDeleteMutation = trpc.useMutation(['character.delete'], {
+		onSuccess() {
+			toast.success('Character has been removed', {
+				className: '!bg-base-300 !text-base-content !rounded-xl',
+			});
+			closeModal('characterDelete');
+			router.push('/');
+		},
+	});
+
+	const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
+		characterDeleteMutation.mutate({ characterId: id });
+	};
 
 	return (
 		<div className="card card-compact static w-full bg-base-300 col-span-1 card-bordered">
@@ -65,27 +86,59 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ id, name, description, im
 					</p>
 				</div>
 				<div className="card-actions justify-end gap-0">
-					<button className="btn btn-ghost p-3">
-						<TrashIcon className="w-6 group-hover:fill-error transition-all duration-200" />
-					</button>
+					<Modal
+						buttonContent={
+							<TrashIcon className="w-6 group-hover:fill-error transition-all duration-200" />
+						}
+						buttonType="card"
+						id="characterDelete"
+						modalTitle="Delete character"
+					>
+						<form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+							<div>
+								<label className="label pb-1 cursor-pointer" htmlFor="name">
+									<span className="label-text">
+										Confirm by typing <span className="font-extrabold">{name}</span> in
+									</span>
+								</label>
+								<input
+									id="name"
+									type="text"
+									placeholder={name}
+									className="input w-full input-bordered"
+									required
+									value={confirm}
+									onChange={(e) => setConfirm(e.target.value)}
+								/>
+							</div>
+							<div className="flex justify-end">
+								<input
+									type="submit"
+									className="btn btn-error"
+									value="Delete"
+									disabled={name !== confirm}
+								/>
+							</div>
+						</form>
+					</Modal>
+					<Modal
+						buttonContent={<PencilAltIcon className="w-6" />}
+						buttonType="card"
+						id="characterEdit"
+						modalTitle="Edit character"
+					>
+						<CharacterEditForm
+							id={id}
+							name={characterQuery.data?.name || ''}
+							description={characterQuery.data?.description || ''}
+							tags={characterQuery.data?.tags.map((tag) => tag.id) || []}
+						/>
+					</Modal>
 					{image && (
 						<>
-							<Modal
-								buttonContent={<PencilAltIcon className="w-6" />}
-								buttonType="card"
-								id="characterEdit"
-								modalTitle="Edit character"
-							>
-								<CharacterEditForm
-									id={id}
-									name={characterQuery.data?.name || ''}
-									description={characterQuery.data?.description || ''}
-									tags={characterQuery.data?.tags.map((tag) => tag.id) || []}
-								/>
-							</Modal>
 							<button
 								className="btn btn-ghost p-3"
-								onClick={() => mediaUpdate.mutate({ mediaId: image.id })}
+								onClick={() => mediaUpdateMutation.mutate({ mediaId: image.id })}
 							>
 								<HeartIcon
 									className={`w-6 group-hover:fill-warning transition-all duration-200 ${
