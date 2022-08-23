@@ -5,7 +5,8 @@ import * as trpc from '@trpc/server';
 
 interface InitialMediaType {
 	fileName: string;
-	fileType: string;
+	fileExtension: string;
+	mimetype: string;
 	uuid: string;
 	authorId: string;
 	characterIds: string[];
@@ -22,7 +23,8 @@ export const mediaRouter = createProtectedRouter()
 			data: z.array(
 				z.object({
 					fileName: z.string(),
-					fileType: z.string(),
+					fileExtension: z.string(),
+					mimetype: z.string(),
 					uuid: z.string(),
 				})
 			),

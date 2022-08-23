@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import React, { useEffect, useState } from 'react';
-import type { NextPage } from 'next';
+import type { GetServerSidePropsContext, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
 import { unstable_getServerSession as getServerSession } from 'next-auth/next';
@@ -85,8 +85,12 @@ const Home: NextPage = () => {
 									);
 								})
 								.sort((f, s) => {
-									const likesA = f.media.reduce((acc, media) => acc + media.likeIds.length, 0),
-										likesB = s.media.reduce((acc, media) => acc + media.likeIds.length, 0);
+									const likesA =
+											f.media.reduce((acc, media) => acc + media.likeIds.length, 0) +
+											(f.mainMedia?.likeIds.length || 0),
+										likesB =
+											s.media.reduce((acc, media) => acc + media.likeIds.length, 0) +
+											(s.mainMedia?.likeIds.length || 0);
 									if (likesA < likesB) return query.sort ? 1 : -1;
 									if (likesA > likesB) return query.sort ? -1 : 1;
 									return 0;
@@ -97,10 +101,10 @@ const Home: NextPage = () => {
 											data-test={index}
 											className="card card-compact static bg-base-100 card-bordered cursor-pointer mb-4"
 										>
-											{character?.media[0] ? (
+											{character?.mainMedia && character?.mainMedia.mimetype.includes('image') ? (
 												<img
-													src={`${bunnyCDN}/${character.id}/${character.media[0].id}.${character.media[0].fileType}`}
-													alt={`${character.media[0].fileName}.${character.media[0].fileType}`}
+													src={`${bunnyCDN}/${character.id}/${character.mainMedia.id}.${character.mainMedia.fileExtension}`}
+													alt={`${character.mainMedia.fileName}.${character.mainMedia.fileExtension}`}
 												/>
 											) : (
 												<PhotographIcon />
@@ -132,7 +136,8 @@ const Home: NextPage = () => {
 												<div className="card-actions justify-end">
 													<button className="flex gap-1 text-base">
 														<HeartIcon className="w-6 fill-red-500" />
-														{character.media.reduce((acc, media) => acc + media.likeIds.length, 0)}
+														{character.media.reduce((acc, media) => acc + media.likeIds.length, 0) +
+															(character.mainMedia?.likeIds.length || 0)}
 													</button>
 												</div>
 											</div>
@@ -148,7 +153,7 @@ const Home: NextPage = () => {
 
 export default Home;
 
-export const getServerSideProps = async (context: any) => {
+export const getServerSideProps = async (context: GetServerSidePropsContext) => {
 	const session = await getServerSession(context.req, context.res, authOptions);
 
 	if (!session) {

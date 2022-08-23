@@ -27,6 +27,9 @@ model Character {
   authorId    String @db.ObjectId
   author      User   @relation(fields: [authorId], references: [id], name: "userCharacters")
 
+  mainMedia   Media?  @relation(fields: [mainMediaId], references: [id], name: "characterMainMedia")
+  mainMediaId String? @db.ObjectId
+
   mediaIds String[] @default([]) @db.ObjectId
   media    Media[]  @relation(fields: [mediaIds], references: [id])
   tagIds   String[] @default([]) @db.ObjectId
@@ -34,12 +37,15 @@ model Character {
 }
 
 model Media {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
-  fileName String
-  fileType String
-  uuid     String
-  author   User   @relation(fields: [authorId], references: [id], name: "userMedia")
-  authorId String @db.ObjectId
+  id            String @id @default(auto()) @map("_id") @db.ObjectId
+  fileName      String
+  fileExtension String
+  mimetype      String
+  uuid          String
+  author        User   @relation(fields: [authorId], references: [id], name: "userMedia")
+  authorId      String @db.ObjectId
+
+  mainFor Character[] @relation(name: "characterMainMedia")
 
   likes        User?       @relation(fields: [likeIds], references: [id], name: "userLikes")
   likeIds      String[]    @default([]) @db.ObjectId

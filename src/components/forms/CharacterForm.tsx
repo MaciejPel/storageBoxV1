@@ -36,7 +36,7 @@ const CharacterForm: React.FC = () => {
 				<label className="label pb-1 cursor-pointer" htmlFor="name">
 					<span className="label-text">
 						Name
-						{error && error.field === 'name' && (
+						{error?.field === 'name' && (
 							<span className="text-error text-sm"> {error.message}</span>
 						)}
 					</span>
@@ -55,7 +55,7 @@ const CharacterForm: React.FC = () => {
 				<label className="label pb-1 cursor-pointer" htmlFor="description">
 					<span className="label-text">
 						Description
-						{characterMutation.isError && error?.field === 'description' && (
+						{error?.field === 'description' && (
 							<span className="text-error text-sm"> {error.message}</span>
 						)}
 					</span>
@@ -105,13 +105,13 @@ const CharacterForm: React.FC = () => {
 					</>
 				)}
 			</div>
-			<div className="btn-group w-full pt-3">
+			<div className="btn-group justify-end w-full mt-3">
 				{characterMutation.isLoading ? (
 					<button title="Loading" type="button" className="btn loading w-1/2">
 						Processing...
 					</button>
 				) : (
-					<div className="flex justify-end w-full btn-group">
+					<>
 						<input
 							className="btn btn-error rounded sm:w-1/6"
 							type="reset"
@@ -122,7 +122,7 @@ const CharacterForm: React.FC = () => {
 							}}
 						/>
 						<input className="btn btn-primary rounded w-1/3" type="submit" value="Submit" />
-					</div>
+					</>
 				)}
 			</div>
 		</form>

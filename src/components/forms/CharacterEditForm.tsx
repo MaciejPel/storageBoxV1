@@ -11,19 +11,33 @@ interface CharacterEditFormProps {
 
 const CharacterEditForm: React.FC<CharacterEditFormProps> = ({ id, name, description, tags }) => {
 	const [character, setCharacter] = useState({ characterId: id, name, description, tags });
+	const [error, setError] = useState<{ message?: string; field?: string }>();
+
 	const utils = trpc.useContext();
 	const tagsQuery = trpc.useQuery(['tag.all']);
 	const characterEditMutation = trpc.useMutation(['character.edit'], {
 		onSuccess() {
-			utils.invalidateQueries('character.single');
+			utils.invalidateQueries(['character.single', { characterId: id }]);
 			closeModal('characterEdit');
+		},
+		onError: (error) => {
+			const fieldErrors = error.data?.zodError?.fieldErrors;
+			// how to fix double state update?
+			if (fieldErrors?.description)
+				setError({ ...error, message: fieldErrors.description[0], field: 'description' });
+			if (fieldErrors?.name) setError({ ...error, message: fieldErrors.name[0], field: 'name' });
 		},
 	});
 
 	return (
 		<form className="form-control">
 			<label htmlFor="name" className="label cursor-pointer pb-1">
-				<span className="label-text">Name</span>
+				<span className="label-text">
+					Name
+					{error && error.field === 'name' && (
+						<span className="text-error text-sm"> {error.message}</span>
+					)}
+				</span>
 			</label>
 			<input
 				type="text"
@@ -33,7 +47,12 @@ const CharacterEditForm: React.FC<CharacterEditFormProps> = ({ id, name, descrip
 				onChange={(e) => setCharacter({ ...character, name: e.target.value })}
 			/>
 			<label htmlFor="description" className="label cursor-pointer pb-1 w-full">
-				<span className="label-text">Description</span>
+				<span className="label-text">
+					Description
+					{error?.field === 'description' && (
+						<span className="text-error text-sm"> {error.message}</span>
+					)}
+				</span>
 			</label>
 			<textarea
 				id="description"
@@ -83,7 +102,10 @@ const CharacterEditForm: React.FC<CharacterEditFormProps> = ({ id, name, descrip
 							type="reset"
 							className="btn btn-warning sm:w-1/6"
 							value="Reset"
-							onClick={() => setCharacter({ ...character, name, description, tags })}
+							onClick={() => {
+								setCharacter({ ...character, name, description, tags });
+								setError({});
+							}}
 						/>
 						<input
 							type="submit"

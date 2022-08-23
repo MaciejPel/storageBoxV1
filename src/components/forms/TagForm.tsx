@@ -45,13 +45,13 @@ const TagForm: React.FC = () => {
 				/>
 			</div>
 
-			<div className="btn-group w-full pt-3">
+			<div className="btn-group justify-end mt-3">
 				{tagMutation.isLoading ? (
 					<button title="Loading" type="button" className="btn loading w-1/2">
 						Processing...
 					</button>
 				) : (
-					<div className="flex justify-end w-full btn-group">
+					<>
 						<input
 							className="btn btn-error rounded sm:w-1/6"
 							type="reset"
@@ -62,7 +62,7 @@ const TagForm: React.FC = () => {
 							}}
 						/>
 						<input className="btn btn-primary rounded w-1/3" type="submit" value="Submit" />
-					</div>
+					</>
 				)}
 			</div>
 		</form>

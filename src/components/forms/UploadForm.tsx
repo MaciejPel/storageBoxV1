@@ -47,8 +47,8 @@ const UploadForm: React.FC = () => {
 			body: formData,
 			credentials: 'include',
 		});
-		if (response) {
-			utils.invalidateQueries('character.single');
+		if (response && id) {
+			utils.invalidateQueries(['character.single', { characterId: id as string }]);
 			setImages({ files: [] });
 			setLoading(false);
 		}
@@ -112,7 +112,7 @@ const UploadForm: React.FC = () => {
 					}}
 				>
 					<div
-						className={`flex justify-center items-center h-full group-hover:text-success ${
+						className={`flex justify-center items-center h-full group-hover:duration-300 group-hover:text-success ${
 							bg ? 'text-success' : ''
 						}`}
 					>

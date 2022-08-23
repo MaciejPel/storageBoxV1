@@ -27,7 +27,8 @@ const parseForm = async (
 
 interface simplifiedFileType {
 	fileName: string;
-	fileType: string;
+	fileExtension: string;
+	mimetype: string;
 	path: string;
 	uuid: string;
 }
@@ -41,10 +42,12 @@ const upload = async (req: NextApiRequest, res: NextApiResponse) => {
 
 	fileList.forEach((element) => {
 		// @ts-ignore
-		const { originalFilename, filepath } = element;
+		const { originalFilename, filepath, mimetype } = element;
+		if (!(mimetype.includes('image') || mimetype.includes('video'))) return;
 		simplifiedFileList.push({
 			fileName: originalFilename.split('.').shift(),
-			fileType: originalFilename.split('.').pop(),
+			fileExtension: originalFilename.split('.').pop(),
+			mimetype: mimetype,
 			path: filepath,
 			uuid: uuidv4(),
 		});
@@ -57,7 +60,12 @@ const upload = async (req: NextApiRequest, res: NextApiResponse) => {
 			Cookie: req.headers.cookie!,
 		},
 		body: superjson.stringify({
-			data: simplifiedFileList,
+			// favorize images
+			data: simplifiedFileList.sort((a, b) => {
+				if (a.mimetype < b.mimetype) return -1;
+				if (a.mimetype > b.mimetype) return 1;
+				return 0;
+			}),
 			characterId: characterId,
 		}),
 	});
@@ -71,7 +79,7 @@ const upload = async (req: NextApiRequest, res: NextApiResponse) => {
 	simplifiedFileList.map(async (file) => {
 		const cdnUpload: Response = await bunnyStorage.upload(
 			fs.readFileSync(file.path),
-			`/${characterId}/${responseDataToObject[file.uuid]}.${file.fileType}`
+			`/${characterId}/${responseDataToObject[file.uuid]}.${file.fileExtension}`
 		);
 	});
 
@@ -80,7 +88,7 @@ const upload = async (req: NextApiRequest, res: NextApiResponse) => {
 			simplifiedFileList.map(async (file) => {
 				return await bunnyStorage.upload(
 					fs.readFileSync(file.path),
-					`/${characterId}/${responseDataToObject[file.uuid]}.${file.fileType}`
+					`/${characterId}/${responseDataToObject[file.uuid]}.${file.fileExtension}`
 				);
 			})
 		);

@@ -10,6 +10,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { FormEvent, useState } from 'react';
 import { toast } from 'react-toastify';
+import { bunnyCDN } from '../utils/constants';
 import { closeModal } from '../utils/functions';
 import { trpc } from '../utils/trpc';
 import CharacterEditForm from './forms/CharacterEditForm';
@@ -22,12 +23,25 @@ interface CharacterCardProps {
 	image?: {
 		id: string;
 		fileName: string;
-		fileType: string;
+		fileExtension: string;
+		mimetype: string;
 		likeIds: string[];
-	};
+	} | null;
+	tags: {
+		id: string;
+		name: string;
+	}[];
+	sumOfLikes: number;
 }
 
-const CharacterCard: React.FC<CharacterCardProps> = ({ id, name, description, image }) => {
+const CharacterCard: React.FC<CharacterCardProps> = ({
+	id,
+	name,
+	description,
+	image,
+	tags,
+	sumOfLikes,
+}) => {
 	const router = useRouter();
 	const { data: session } = useSession();
 	const [readMore, setReadMore] = useState<boolean>(false);
@@ -35,12 +49,13 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ id, name, description, im
 
 	const imageURL =
 		image &&
-		`${process.env.NEXT_PUBLIC_CDN_URL}/${process.env.NEXT_PUBLIC_STORAGE_FOLDER}/${id}/${image.id}.${image.fileType}`;
+		image.mimetype.includes('image') &&
+		`${bunnyCDN}/${id}/${image.id}.${image.fileExtension}`;
 
 	const utils = trpc.useContext();
 	const mediaUpdateMutation = trpc.useMutation(['media.update'], {
 		onSuccess() {
-			utils.invalidateQueries(['character.single']);
+			utils.invalidateQueries(['character.single', { characterId: id }]);
 		},
 	});
 	const characterQuery = trpc.useQuery(['character.single', { characterId: id as string }], {
@@ -63,14 +78,14 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ id, name, description, im
 
 	return (
 		<div className="card card-compact static w-full bg-base-300 col-span-1 card-bordered">
-			{image ? (
-				<img src={imageURL} alt={`${image.fileName}.${image.fileType}`} />
+			{imageURL ? (
+				<img src={imageURL} alt={`${image.fileName}.${image.fileExtension}`} />
 			) : (
 				<PhotographIcon />
 			)}
-			<div className="card-body">
-				<h2 className="card-title">{name}</h2>
-				<div className="flex flex-col gap-1">
+			<div className="card-body justify-between">
+				<div className="flex flex-col gap-2">
+					<h2 className="card-title !mb-0">{name}</h2>
 					<p>
 						{!readMore
 							? description?.slice(0, 50) + (description && description?.length >= 60 ? '... ' : '')
@@ -83,6 +98,16 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ id, name, description, im
 								{!readMore ? 'Read more' : 'Hide'}
 							</span>
 						)}
+					</p>
+					<p className="flex gap-1 flex-wrap">
+						{tags.map((tag) => (
+							<span
+								key={tag.id}
+								className="badge badge-md badge-outline hover:bg-base-100 !py-3 cursor-pointer"
+							>
+								{tag.name}
+							</span>
+						))}
 					</p>
 				</div>
 				<div className="card-actions justify-end gap-0">
@@ -134,22 +159,25 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ id, name, description, im
 							tags={characterQuery.data?.tags.map((tag) => tag.id) || []}
 						/>
 					</Modal>
-					{image && (
-						<>
-							<button
-								className="btn btn-ghost p-3"
-								onClick={() => mediaUpdateMutation.mutate({ mediaId: image.id })}
-							>
-								<HeartIcon
-									className={`w-6 group-hover:fill-warning transition-all duration-200 ${
-										image.likeIds.includes(session?.user.id || '') ? 'fill-red-600 ' : ''
-									}`}
-								/>
-							</button>
-							<a href={imageURL} target="_blank" rel="noreferrer" className="btn btn-ghost p-3">
-								<ExternalLinkIcon className="w-6" />
-							</a>
-						</>
+					<button
+						type="button"
+						title="Like image"
+						className="btn btn-ghost p-3 gap-1"
+						onClick={() => {
+							if (imageURL) mediaUpdateMutation.mutate({ mediaId: image.id });
+						}}
+					>
+						<HeartIcon
+							className={`w-6 group-hover:fill-warning transition-all duration-200 ${
+								imageURL && image.likeIds.includes(session?.user.id || '') ? 'fill-red-600 ' : ''
+							}`}
+						/>
+						<span className="text-md font-bold">{sumOfLikes}</span>
+					</button>
+					{imageURL && (
+						<a href={imageURL} target="_blank" rel="noreferrer" className="btn btn-ghost p-3">
+							<ExternalLinkIcon className="w-6" />
+						</a>
 					)}
 				</div>
 			</div>

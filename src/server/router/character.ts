@@ -15,7 +15,24 @@ export const characterRouter = createProtectedRouter()
 					authorId: true,
 					author: { select: { id: true, username: true } },
 					tags: { select: { id: true, name: true } },
-					media: { select: { id: true, fileName: true, fileType: true, likeIds: true } },
+					mainMedia: {
+						select: {
+							id: true,
+							fileName: true,
+							fileExtension: true,
+							mimetype: true,
+							likeIds: true,
+						},
+					},
+					media: {
+						select: {
+							id: true,
+							fileName: true,
+							fileExtension: true,
+							mimetype: true,
+							likeIds: true,
+						},
+					},
 				},
 			});
 		},
@@ -32,9 +49,25 @@ export const characterRouter = createProtectedRouter()
 					description: true,
 					authorId: true,
 					author: { select: { id: true, username: true } },
-					tags: { select: { id: true, name: true }, orderBy: { name: 'desc' } },
-					media: { select: { id: true, fileName: true, fileType: true, likeIds: true } },
-					mediaIds: true,
+					tags: { select: { id: true, name: true }, orderBy: { name: 'asc' } },
+					mainMedia: {
+						select: {
+							id: true,
+							fileName: true,
+							fileExtension: true,
+							mimetype: true,
+							likeIds: true,
+						},
+					},
+					media: {
+						select: {
+							id: true,
+							fileName: true,
+							fileExtension: true,
+							mimetype: true,
+							likeIds: true,
+						},
+					},
 				},
 				where: { id: input.characterId },
 			});
@@ -71,11 +104,9 @@ export const characterRouter = createProtectedRouter()
 					tagIds: input.tags,
 				},
 			});
-			input.tags.forEach(async (tagId) => {
-				await prisma.tag.update({
-					data: { characterIds: { push: character.id } },
-					where: { id: tagId },
-				});
+			await prisma.tag.updateMany({
+				data: { characterIds: { push: character.id } },
+				where: { id: { in: input.tags } },
 			});
 
 			return character;
@@ -134,6 +165,48 @@ export const characterRouter = createProtectedRouter()
 			});
 
 			return characterUpdate;
+		},
+	})
+	.mutation('setMain', {
+		input: z.object({
+			mediaId: z.string(),
+			characterId: z.string(),
+		}),
+		async resolve({ input }) {
+			const character = await prisma.character.findFirst({
+				select: { mainMediaId: true, mediaIds: true },
+				where: { id: input.characterId },
+			});
+
+			if (!character) return null;
+			const temp = character.mediaIds.filter((media) => media !== input.mediaId);
+			return await prisma.character.update({
+				data: {
+					mainMediaId: input.mediaId,
+					mediaIds: character.mainMediaId ? [...temp, character.mainMediaId] : temp,
+				},
+				where: { id: input.characterId },
+			});
+		},
+	})
+	.mutation('removeMedia', {
+		input: z.object({
+			mediaId: z.string(),
+			characterId: z.string(),
+		}),
+		async resolve({ input }) {
+			const character = await prisma.character.findFirst({
+				select: { mainMediaId: true, mediaIds: true },
+				where: { id: input.characterId },
+			});
+
+			if (!character) return null;
+			return await prisma.character.update({
+				data: {
+					mediaIds: character.mediaIds.filter((media) => media !== input.mediaId),
+				},
+				where: { id: input.characterId },
+			});
 		},
 	})
 	.mutation('delete', {
