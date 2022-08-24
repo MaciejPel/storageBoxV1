@@ -47,12 +47,12 @@ export const characterRouter = createProtectedRouter()
 					id: true,
 					name: true,
 					description: true,
-					authorId: true,
 					author: { select: { id: true, username: true } },
 					tags: { select: { id: true, name: true }, orderBy: { name: 'asc' } },
 					mainMedia: {
 						select: {
 							id: true,
+							catalogName: true,
 							fileName: true,
 							fileExtension: true,
 							mimetype: true,
@@ -62,6 +62,7 @@ export const characterRouter = createProtectedRouter()
 					media: {
 						select: {
 							id: true,
+							catalogName: true,
 							fileName: true,
 							fileExtension: true,
 							mimetype: true,

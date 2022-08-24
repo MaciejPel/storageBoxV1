@@ -1,15 +1,19 @@
 import { SearchIcon, FilterIcon, XIcon } from '@heroicons/react/outline';
 import { FilterIcon as FilterIconSolid } from '@heroicons/react/solid';
 import { SortAscendingIcon, SortDescendingIcon } from '@heroicons/react/solid';
+import { useSession } from 'next-auth/react';
 import { trpc } from '../utils/trpc';
 
 interface SearchProps {
-	setQuery: React.Dispatch<React.SetStateAction<{ string: string; tags: string[]; sort: boolean }>>;
-	query: { string: string; tags: string[]; sort: boolean };
+	query: { string: string; tags?: string[]; sort: boolean };
+	setQuery: React.Dispatch<
+		React.SetStateAction<{ string: string; tags?: string[]; sort: boolean }>
+	>;
 }
 
 const Search: React.FC<SearchProps> = ({ setQuery, query }) => {
-	const tagsQuery = trpc.useQuery(['tag.all']);
+	const { data: session } = useSession();
+	const tagsQuery = trpc.useQuery(['tag.all'], { enabled: session ? true : false });
 
 	return (
 		<div className="w-full flex items-center gap-1">
@@ -27,7 +31,7 @@ const Search: React.FC<SearchProps> = ({ setQuery, query }) => {
 				</label>
 			</div>
 
-			{tagsQuery.isSuccess && tagsQuery.data.length > 0 && (
+			{query.tags && tagsQuery.isSuccess && tagsQuery.data.length > 0 && (
 				<div className="dropdown sticky">
 					<label tabIndex={0} className="btn">
 						{query.tags.length ? (
@@ -49,14 +53,15 @@ const Search: React.FC<SearchProps> = ({ setQuery, query }) => {
 										className="checkbox label-text"
 										value={tag.id}
 										name="tagQuery"
-										checked={query.tags.includes(tag.id)}
+										checked={query.tags && query.tags.includes(tag.id)}
 										onChange={(e) => {
-											setQuery({
-												...query,
-												tags: e.target.checked
-													? [...query.tags, e.target.value]
-													: query.tags.filter((tag) => tag != e.target.value),
-											});
+											query.tags &&
+												setQuery({
+													...query,
+													tags: e.target.checked
+														? [...query.tags, e.target.value]
+														: query.tags.filter((tag) => tag != e.target.value),
+												});
 										}}
 									/>
 									{tag.name}

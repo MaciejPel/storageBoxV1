@@ -5,28 +5,45 @@ import { trpc } from '../utils/trpc';
 import { useSession } from 'next-auth/react';
 
 interface CharacterMediaCardProps {
+	cardType: 'media' | 'character-media';
+	assign?: boolean;
+	data?: {
+		characterIds: string[];
+		mediaIds: string[];
+	};
+	setData?: React.Dispatch<React.SetStateAction<{ characterIds: string[]; mediaIds: string[] }>>;
+	name?: string;
 	mediaId: string;
 	characterId: string;
+	catalog: string;
 	fileName: string;
 	fileExtension: string;
 	mimetype: string;
 	likeIds: string[];
 }
 
-const CharacterMediaCard: React.FC<CharacterMediaCardProps> = ({
+const MediaCard: React.FC<CharacterMediaCardProps> = ({
+	cardType,
+	assign,
+	data,
+	setData,
+	name,
 	mediaId,
 	characterId,
+	catalog,
 	fileName,
 	fileExtension,
 	mimetype,
 	likeIds,
 }) => {
 	const { data: session } = useSession();
+	const src = `${bunnyCDN}/${catalog}/${mediaId}.${fileExtension}`;
 
 	const utils = trpc.useContext();
 	const characterSetMainMutation = trpc.useMutation(['character.setMain'], {
 		onSuccess() {
 			utils.invalidateQueries(['character.single']);
+			utils.invalidateQueries(['character.all']);
 		},
 	});
 	const characterRemoveMediaMutation = trpc.useMutation(['character.removeMedia'], {
@@ -37,6 +54,13 @@ const CharacterMediaCard: React.FC<CharacterMediaCardProps> = ({
 	const mediaUpdateMutation = trpc.useMutation(['media.update'], {
 		onSuccess() {
 			utils.invalidateQueries(['character.single']);
+			utils.invalidateQueries(['media.all']);
+		},
+	});
+	const mediaDeleteMutation = trpc.useMutation(['media.delete'], {
+		onSuccess() {
+			utils.invalidateQueries(['character.single']);
+			utils.invalidateQueries(['media.all']);
 		},
 	});
 
@@ -44,27 +68,43 @@ const CharacterMediaCard: React.FC<CharacterMediaCardProps> = ({
 		<div className="card card-compact static w-full bg-base-300 col-span-1 card-bordered mb-4">
 			{mimetype.includes('video') && (
 				<video controls={true}>
-					<source src={`${bunnyCDN}/${characterId}/${mediaId}.${fileExtension}`} type="video/mp4" />
+					<source src={src} type="video/mp4" />
 				</video>
 			)}
-			{mimetype.includes('image') && (
-				<img
-					src={`${bunnyCDN}/${characterId}/${mediaId}.${fileExtension}`}
-					alt={`${fileName}.${fileExtension}`}
-				/>
-			)}
+			{mimetype.includes('image') && <img src={src} alt={`${fileName}.${fileExtension}`} />}
 			<div className="card-body">
+				{name && <h2>{name}</h2>}
 				<div className="card-actions justify-end gap-0">
 					<button
 						type="button"
-						title="Like image"
-						className="btn btn-ghost p-2 gap-1"
+						title="Remove image"
+						className="btn btn-ghost p-3"
 						onClick={() => {
-							characterRemoveMediaMutation.mutate({ characterId, mediaId });
+							if (cardType === 'character-media')
+								characterRemoveMediaMutation.mutate({ characterId, mediaId });
+							if (cardType === 'media') mediaDeleteMutation.mutate({ mediaId });
 						}}
 					>
 						<XIcon className="w-6 transition-all duration-300" />
 					</button>
+					{assign && data && setData && (
+						<label htmlFor={'assignMedia-' + mediaId} className="btn btn-ghost p-3">
+							<input
+								type="checkbox"
+								className="checkbox"
+								id={'assignMedia-' + mediaId}
+								checked={data?.mediaIds.includes(mediaId)}
+								onChange={(e) =>
+									setData({
+										...data,
+										mediaIds: e.target.checked
+											? [...data.mediaIds, mediaId]
+											: data.mediaIds.filter((id) => id !== mediaId),
+									})
+								}
+							/>
+						</label>
+					)}
 					<button
 						type="button"
 						title="Like image"
@@ -80,7 +120,7 @@ const CharacterMediaCard: React.FC<CharacterMediaCardProps> = ({
 						/>
 						<span className="text-md font-bold">{likeIds.length}</span>
 					</button>
-					{mimetype.includes('image') && (
+					{cardType === 'character-media' && mimetype.includes('image') && (
 						<button
 							type="button"
 							title="Set image as main"
@@ -92,12 +132,7 @@ const CharacterMediaCard: React.FC<CharacterMediaCardProps> = ({
 							<SparklesIcon className="w-6 group-hover:fill-warning duration-300 transition-all" />
 						</button>
 					)}
-					<a
-						href={`${bunnyCDN}/${characterId}/${mediaId}.${fileExtension}`}
-						target="_blank"
-						rel="noreferrer"
-						className="btn btn-ghost p-3"
-					>
+					<a href={src} target="_blank" rel="noreferrer" className="btn btn-ghost p-3">
 						<ExternalLinkIcon className="w-6" />
 					</a>
 				</div>
@@ -105,4 +140,4 @@ const CharacterMediaCard: React.FC<CharacterMediaCardProps> = ({
 		</div>
 	);
 };
-export default CharacterMediaCard;
+export default MediaCard;

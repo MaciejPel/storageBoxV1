@@ -4,6 +4,7 @@ import { prisma } from '../db/client';
 import * as trpc from '@trpc/server';
 
 interface InitialMediaType {
+	catalogName: string;
 	fileName: string;
 	fileExtension: string;
 	mimetype: string;
@@ -15,7 +16,18 @@ interface InitialMediaType {
 export const mediaRouter = createProtectedRouter()
 	.query('all', {
 		async resolve() {
-			return await prisma.media.findMany({});
+			return await prisma.media.findMany({
+				select: {
+					id: true,
+					author: { select: { username: true } },
+					catalogName: true,
+					fileName: true,
+					fileExtension: true,
+					mimetype: true,
+					likeIds: true,
+					mainFor: true,
+				},
+			});
 		},
 	})
 	.mutation('create', {
@@ -42,6 +54,7 @@ export const mediaRouter = createProtectedRouter()
 			const mediaToCreate: InitialMediaType[] = input.data.map((row) => ({
 				...row,
 				authorId: author,
+				catalogName: input.characterId,
 				characterIds: [input.characterId],
 			}));
 			const uuids: string[] = input.data.map((row) => row.uuid);
@@ -99,5 +112,74 @@ export const mediaRouter = createProtectedRouter()
 				});
 				return mediaUpdate;
 			}
+		},
+	})
+	.mutation('assign', {
+		input: z.object({
+			mediaIds: z.array(z.string()),
+			characterIds: z.array(z.string()),
+		}),
+		async resolve({ input }) {
+			const characters = await prisma.character.findMany({
+				select: { id: true, mainMediaId: true, mediaIds: true },
+				where: { id: { in: input.characterIds } },
+			});
+
+			if (characters) {
+				characters.forEach(async (character) => {
+					await prisma.character.update({
+						data: {
+							mediaIds: {
+								set: [
+									...character.mediaIds,
+									...input.mediaIds.filter(
+										(id) => !character.mediaIds.includes(id) && character.mainMediaId != id
+									),
+								],
+							},
+						},
+						where: { id: character.id },
+					});
+				});
+			}
+
+			return await prisma.character.findMany({
+				select: { id: true },
+				where: { id: { in: input.characterIds } },
+			});
+		},
+	})
+	.mutation('delete', {
+		input: z.object({
+			mediaId: z.string(),
+		}),
+		async resolve({ input }) {
+			const charactersMainImage = await prisma.character.findMany({
+				select: { id: true },
+				where: { mainMediaId: input.mediaId },
+			});
+			const charactersStandardMedia = await prisma.character.findMany({
+				select: { id: true, mediaIds: true },
+				where: { mediaIds: { has: input.mediaId } },
+			});
+
+			if (charactersMainImage) {
+				await prisma.character.updateMany({
+					data: { mainMediaId: null },
+					where: { id: { in: charactersMainImage.map((character) => character.id) } },
+				});
+			}
+			if (charactersStandardMedia) {
+				charactersStandardMedia.forEach(async (character) => {
+					await prisma.character.update({
+						data: { mediaIds: { set: character.mediaIds.filter((id) => id != input.mediaId) } },
+						where: { id: character.id },
+					});
+				});
+			}
+
+			const deletedMedia = await prisma.media.delete({ where: { id: input.mediaId } });
+
+			return deletedMedia;
 		},
 	});

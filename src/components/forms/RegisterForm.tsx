@@ -110,11 +110,12 @@ const RegisterForm: React.FC = () => {
 					/>
 				</div>
 				<div className="flex flex-col gap-3 pt-4">
-					{userMutation.isLoading ? (
-						<button type="button" className="btn w-full loading disabled">
+					{userMutation.isLoading && (
+						<button type="button" title="Processing..." className="btn w-full loading disabled">
 							Processing...
 						</button>
-					) : (
+					)}
+					{!userMutation.isLoading && (
 						<input className="btn btn-primary w-full rounded" type="submit" value="Submit" />
 					)}
 				</div>

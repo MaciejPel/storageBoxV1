@@ -60,43 +60,47 @@ const CharacterEditForm: React.FC<CharacterEditFormProps> = ({ id, name, descrip
 				value={character.description}
 				onChange={(e) => setCharacter({ ...character, description: e.target.value })}
 			/>
-			<label htmlFor="tags" className="label cursor-pointer pb-0 w-full">
-				<span className="label-text">Tags</span>
-			</label>
-			<div className="columns-2 xl:columns-3">
-				{tagsQuery.isSuccess &&
-					tagsQuery.data.map((tag) => (
-						<label
-							htmlFor={tag.id}
-							className="label justify-start gap-2 cursor-pointer"
-							key={tag.id}
-						>
-							<input
-								type="checkbox"
-								value={tag.id}
-								id={tag.id}
-								name="tag"
-								className="checkbox"
-								checked={character.tags.includes(tag.id)}
-								onChange={(e) => {
-									setCharacter({
-										...character,
-										tags: e.target.checked
-											? [...character.tags, e.target.value]
-											: character.tags.filter((tag) => tag != e.target.value),
-									});
-								}}
-							/>
-							<span className="label-text">{tag.name}</span>
-						</label>
-					))}
-			</div>
-			<div className="card-actions justify-end btn-group gap-0 w-full mt-2">
-				{characterEditMutation.isLoading ? (
+			{tagsQuery.isSuccess && tagsQuery.data.length > 0 && (
+				<>
+					<label htmlFor="tags" className="label cursor-pointer pb-0 w-full">
+						<span className="label-text">Tags</span>
+					</label>
+					<div className="columns-2 xl:columns-3">
+						{tagsQuery.data.map((tag) => (
+							<label
+								htmlFor={tag.id}
+								className="label justify-start gap-2 cursor-pointer"
+								key={tag.id}
+							>
+								<input
+									type="checkbox"
+									value={tag.id}
+									id={tag.id}
+									name="tag"
+									className="checkbox"
+									checked={character.tags.includes(tag.id)}
+									onChange={(e) => {
+										setCharacter({
+											...character,
+											tags: e.target.checked
+												? [...character.tags, e.target.value]
+												: character.tags.filter((tag) => tag != e.target.value),
+										});
+									}}
+								/>
+								<span className="label-text">{tag.name}</span>
+							</label>
+						))}
+					</div>
+				</>
+			)}
+			<div className="card-actions justify-end btn-group gap-0 w-full mt-4">
+				{characterEditMutation.isLoading && (
 					<button title="Loading" type="button" className="btn loading w-1/2">
 						Processing...
 					</button>
-				) : (
+				)}
+				{!characterEditMutation.isLoading && (
 					<>
 						<input
 							type="reset"

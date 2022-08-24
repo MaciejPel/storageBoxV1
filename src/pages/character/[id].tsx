@@ -10,7 +10,7 @@ import Container from '../../components/Container';
 import UploadForm from '../../components/forms/UploadForm';
 import CharacterCard from '../../components/CharacterCard';
 import Meta from '../../components/Meta';
-import CharacterMediaCard from '../../components/CharacterMediaCard';
+import MediaCard from '../../components/MediaCard';
 import { GetServerSidePropsContext } from 'next';
 
 const breakpointColumnsObj = {
@@ -50,13 +50,15 @@ const CharacterPage = () => {
 
 	return (
 		<>
-			<Meta title={characterQuery.data?.name || '...'} />
+			<Meta title={characterQuery.data?.name + ' | Character' || '...'} />
 			<Container type="start">
 				<div className="grid 2xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 w-full gap-4 mb-4">
 					{characterQuery.data && (
 						<CharacterCard
 							id={characterQuery.data.id}
 							name={characterQuery.data.name}
+							catalog={characterQuery.data.mainMedia?.catalogName}
+							author={characterQuery.data.author.username}
 							description={characterQuery.data.description}
 							image={characterQuery.data.mainMedia}
 							tags={characterQuery.data.tags}
@@ -80,10 +82,12 @@ const CharacterPage = () => {
 					{characterQuery?.data?.media
 						.sort((f, s) => s.likeIds.length - f.likeIds.length)
 						.map((media) => (
-							<CharacterMediaCard
+							<MediaCard
+								cardType="character-media"
 								key={media.id}
 								characterId={id as string}
 								mediaId={media.id}
+								catalog={media.catalogName}
 								fileName={media.fileName}
 								fileExtension={media.fileExtension}
 								mimetype={media.mimetype}

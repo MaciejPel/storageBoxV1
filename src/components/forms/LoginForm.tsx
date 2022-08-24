@@ -5,7 +5,12 @@ import { toast } from 'react-toastify';
 
 const LoginForm = () => {
 	const router = useRouter();
-	const [credentials, setCredentials] = useState({ username: '', password: '', loading: false });
+	const [credentials, setCredentials] = useState({
+		username: '',
+		password: '',
+		loading: false,
+		success: false,
+	});
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -15,12 +20,16 @@ const LoginForm = () => {
 			username: credentials.username,
 			password: credentials.password,
 		});
-		if (!res?.ok)
+		if (!res?.ok) {
+			setCredentials({ ...credentials, loading: false, success: false });
 			toast.error('Invalid credentials or not verified', {
 				className: '!bg-base-300 !text-base-content !rounded-xl',
 			});
-		if (res?.ok) router.push('/');
-		res && setCredentials({ ...credentials, loading: false });
+		}
+		if (res?.ok) {
+			setCredentials({ ...credentials, loading: false, success: true });
+			router.push('/');
+		}
 	};
 
 	return (
@@ -57,11 +66,17 @@ const LoginForm = () => {
 					/>
 				</div>
 				<div className="flex flex-col gap-3 pt-4">
-					{credentials.loading ? (
-						<button type="button" className="btn w-full loading disabled">
+					{credentials.loading && (
+						<button type="button" title="Processing..." className="btn w-full loading disabled">
 							Processing...
 						</button>
-					) : (
+					)}
+					{credentials.success && (
+						<button type="button" title="Success" className="btn btn-success w-full disabled">
+							Success
+						</button>
+					)}
+					{!credentials.success && !credentials.loading && (
 						<input className="btn btn-primary w-full rounded" type="submit" value="Submit" />
 					)}
 				</div>

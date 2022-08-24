@@ -19,6 +19,8 @@ import Modal from './Modal';
 interface CharacterCardProps {
 	id: string;
 	name: string;
+	catalog?: string;
+	author: string;
 	description: string | null;
 	image?: {
 		id: string;
@@ -37,6 +39,8 @@ interface CharacterCardProps {
 const CharacterCard: React.FC<CharacterCardProps> = ({
 	id,
 	name,
+	catalog,
+	author,
 	description,
 	image,
 	tags,
@@ -49,8 +53,9 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
 
 	const imageURL =
 		image &&
+		catalog &&
 		image.mimetype.includes('image') &&
-		`${bunnyCDN}/${id}/${image.id}.${image.fileExtension}`;
+		`${bunnyCDN}/${catalog}/${image.id}.${image.fileExtension}`;
 
 	const utils = trpc.useContext();
 	const mediaUpdateMutation = trpc.useMutation(['media.update'], {
@@ -85,7 +90,12 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
 			)}
 			<div className="card-body justify-between">
 				<div className="flex flex-col gap-2">
-					<h2 className="card-title !mb-0">{name}</h2>
+					<div>
+						<h2 className="card-title !mb-0">{name}</h2>
+						<h3 className="font-normal">
+							Created by: <span className="font-bold hover:link">{author}</span>
+						</h3>
+					</div>
 					<p>
 						{!readMore
 							? description?.slice(0, 50) + (description && description?.length >= 60 ? '... ' : '')
@@ -137,12 +147,19 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
 								/>
 							</div>
 							<div className="flex justify-end">
-								<input
-									type="submit"
-									className="btn btn-error"
-									value="Delete"
-									disabled={name !== confirm}
-								/>
+								{characterDeleteMutation.isLoading && (
+									<button type="button" title="Processing" className="btn loading">
+										Processing...
+									</button>
+								)}
+								{!characterDeleteMutation.isLoading && (
+									<input
+										type="submit"
+										className="btn btn-error"
+										value="Delete"
+										disabled={name !== confirm}
+									/>
+								)}
 							</div>
 						</form>
 					</Modal>

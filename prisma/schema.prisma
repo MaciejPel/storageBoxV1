@@ -38,6 +38,7 @@ model Character {
 
 model Media {
   id            String @id @default(auto()) @map("_id") @db.ObjectId
+  catalogName   String
   fileName      String
   fileExtension String
   mimetype      String

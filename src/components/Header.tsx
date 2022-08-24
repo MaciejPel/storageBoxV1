@@ -96,7 +96,7 @@ const Header: React.FC = () => {
 								className="btn btn-sm btn-ghost text-base-content normal-case gap-1"
 								onClick={() => {
 									signOut({ redirect: false });
-									router.push('/login');
+									router.push('/');
 								}}
 							>
 								<LogoutIcon className="w-5 -scale-100" />

@@ -16,9 +16,17 @@ import CharacterForm from '../components/forms/CharacterForm';
 import TagForm from '../components/forms/TagForm';
 import Masonry from 'react-masonry-css';
 
+const breakpointColumnsObj = {
+	default: 5,
+	1536: 4,
+	1280: 3,
+	1024: 3,
+	768: 2,
+	640: 1,
+};
 interface QueryParams {
 	string: string;
-	tags: string[];
+	tags?: string[];
 	sort: boolean;
 }
 
@@ -30,15 +38,6 @@ const Home: NextPage = () => {
 	const charactersQuery = trpc.useQuery(['character.all'], {
 		enabled: session ? true : false,
 	});
-
-	const breakpointColumnsObj = {
-		default: 5,
-		1536: 4,
-		1280: 3,
-		1024: 3,
-		768: 2,
-		640: 1,
-	};
 
 	useEffect(() => {
 		// solve problem with invalid redirect on signOut, however this solution causes problem with `Loading initial props cancelled`
@@ -81,18 +80,19 @@ const Home: NextPage = () => {
 										(character.name.toLowerCase().includes(query.string) ||
 											(character.description &&
 												character.description.toLowerCase().includes(query.string))) &&
+										query.tags &&
 										query.tags.every((tag) => characterTags.includes(tag))
 									);
 								})
 								.sort((f, s) => {
-									const likesA =
+									const likesF =
 											f.media.reduce((acc, media) => acc + media.likeIds.length, 0) +
 											(f.mainMedia?.likeIds.length || 0),
-										likesB =
+										likesS =
 											s.media.reduce((acc, media) => acc + media.likeIds.length, 0) +
 											(s.mainMedia?.likeIds.length || 0);
-									if (likesA < likesB) return query.sort ? 1 : -1;
-									if (likesA > likesB) return query.sort ? -1 : 1;
+									if (likesF < likesS) return query.sort ? 1 : -1;
+									if (likesF > likesS) return query.sort ? -1 : 1;
 									return 0;
 								})
 								.map((character, index) => (
@@ -110,23 +110,28 @@ const Home: NextPage = () => {
 												<PhotographIcon />
 											)}
 											<div className="card-body w-full bg-base-300">
-												<h2 className="card-title !mb-0">{character.name}</h2>
-												<p className="truncate">{character.description}</p>
+												<div>
+													<h2 className="card-title !mb-0">{character.name}</h2>
+													<p className="truncate">{character.description}</p>
+												</div>
 												<p className="flex gap-1 flex-wrap">
 													{character.tags.map((tag) => (
 														<span
 															key={tag.id}
 															className={`badge badge-md badge-outline hover:bg-base-100 !py-3 ${
-																query.tags.includes(tag.id) ? 'bg-success text-success-content' : ''
+																query.tags && query.tags.includes(tag.id)
+																	? 'bg-success text-success-content'
+																	: ''
 															}`}
 															onClick={(e) => {
 																e.preventDefault();
-																setQuery({
-																	...query,
-																	tags: query.tags.includes(tag.id)
-																		? query.tags.filter((tagId) => tagId !== tag.id)
-																		: [...query.tags, tag.id],
-																});
+																query.tags &&
+																	setQuery({
+																		...query,
+																		tags: query.tags.includes(tag.id)
+																			? query.tags.filter((tagId) => tagId !== tag.id)
+																			: [...query.tags, tag.id],
+																	});
 															}}
 														>
 															{tag.name}
