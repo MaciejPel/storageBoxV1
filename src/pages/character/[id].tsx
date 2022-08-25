@@ -57,14 +57,13 @@ const CharacterPage = () => {
 						<CharacterCard
 							id={characterQuery.data.id}
 							name={characterQuery.data.name}
-							catalog={characterQuery.data.mainMedia?.catalogName}
 							author={characterQuery.data.author.username}
 							description={characterQuery.data.description}
-							image={characterQuery.data.mainMedia}
+							image={characterQuery.data.cover}
 							tags={characterQuery.data.tags}
 							sumOfLikes={
 								characterQuery.data.media.reduce((acc, media) => acc + media.likeIds.length, 0) +
-								(characterQuery.data.mainMedia?.likeIds.length || 0)
+								(characterQuery.data.cover?.likeIds.length || 0)
 							}
 						/>
 					)}
@@ -87,7 +86,6 @@ const CharacterPage = () => {
 								key={media.id}
 								characterId={id as string}
 								mediaId={media.id}
-								catalog={media.catalogName}
 								fileName={media.fileName}
 								fileExtension={media.fileExtension}
 								mimetype={media.mimetype}

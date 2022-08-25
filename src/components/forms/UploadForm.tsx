@@ -1,37 +1,78 @@
 import { CloudUploadIcon } from '@heroicons/react/outline';
-import { TrashIcon } from '@heroicons/react/solid';
+import { CubeIcon, TrashIcon } from '@heroicons/react/solid';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { trpc } from '../../utils/trpc';
+import Compressor from 'compressorjs';
+
+const allowedFormats = {
+	types: ['image', 'video'],
+	extensions: ['gif', 'apng', 'webp', 'avif', 'mng', 'flif'],
+};
+const uploadLimits = { length: 10, size: 25 * 1024 * 1024 };
 
 const UploadForm: React.FC = () => {
 	const router = useRouter();
 	const { id } = router.query;
 	const [bg, setBg] = useState(false);
 	const [loading, setLoading] = useState(false);
+	const [compressing, setCompressing] = useState(false);
 	const [images, setImages] = useState<{ files: File[] }>({ files: [] });
-	const uploadLimit = { length: 10, size: 25 * 1024 * 1024 };
 	const utils = trpc.useContext();
 
-	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		e.preventDefault();
+		if (compressing) return;
 		let fileList = Array.from(e.target.files as FileList);
-		setImages({ ...images, files: validateList(fileList) });
+		setCompressing(true);
+		queueFiles(filterFiles(fileList));
 	};
 
-	const validateList = (fileList: File[]) => {
-		let currentQ = { length: 0, size: 0 };
-		return fileList.filter((file) => {
-			if (
-				!(file.type.includes('video') || file.type.includes('image')) ||
-				currentQ.size + file.size > uploadLimit.size ||
-				currentQ.length + 1 > uploadLimit.length
-			)
-				return;
-			currentQ.size += file.size;
-			currentQ.length += 1;
-			return file;
+	// set all files to queue for compression, then filter out limits
+	const queueFiles = (files: File[]) =>
+		Promise.all(
+			files.map(async (file) => {
+				return convertToFile(await compressFile(file), file.name, file.type);
+			})
+		).then((compressedFiles) => {
+			const limits = { size: 0, length: 0 };
+			const restrictFiles = compressedFiles.filter((file) => {
+				if (
+					limits.length + 1 <= uploadLimits.length &&
+					limits.size + file.size <= uploadLimits.size
+				) {
+					limits.length += 1;
+					limits.size += file.size;
+					return file;
+				}
+			});
+			setImages({ ...images, files: restrictFiles });
+			setCompressing(false);
 		});
+
+	// image compression
+	const compressFile = (file: File) => {
+		if (
+			!file.type.includes('video') &&
+			!allowedFormats.extensions.includes(file.type.replace('image/', ''))
+		)
+			return new Promise<Blob>((resolve, reject) => {
+				new Compressor(file, {
+					success: resolve,
+					error: reject,
+				});
+			});
+		return file;
+	};
+
+	// converts compressed result [blob] to file with same properties as before compression
+	const convertToFile = (blob: Blob, name: string, type: string): File => {
+		return new File([blob], name, { type });
+	};
+
+	// allows only video or image files
+	const filterFiles = (files: File[]) => {
+		return files.filter((file) => allowedFormats.types.includes(file.type.split('/')[0]));
 	};
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -106,8 +147,10 @@ const UploadForm: React.FC = () => {
 					}}
 					onDrop={(e) => {
 						e.preventDefault();
+						if (compressing) return;
 						const fileList = Array.from(e.dataTransfer.files);
-						setImages({ ...images, files: validateList(fileList) });
+						queueFiles(filterFiles(fileList));
+						setCompressing(true);
 						setBg(false);
 					}}
 				>
@@ -117,8 +160,22 @@ const UploadForm: React.FC = () => {
 						}`}
 					>
 						<div className="flex flex-col items-center">
-							<CloudUploadIcon className="w-8" />
-							Select or Drag &amp; Drop files
+							{compressing && (
+								<>
+									<CubeIcon className="w-8 animate-pulse" />
+									<div className="text-lg animate-pulse">Compressing...</div>
+								</>
+							)}
+							{!compressing && (
+								<>
+									<CloudUploadIcon className="w-8" />
+									<div className="text-lg">Select or Drag &amp; Drop files</div>
+									<div className="font-normal">Maximum amount: {uploadLimits.length}</div>
+									<div className="font-normal">
+										Maximum size: {uploadLimits.size / 1024 / 1024}MB
+									</div>
+								</>
+							)}
 						</div>
 					</div>
 				</label>
@@ -131,13 +188,15 @@ const UploadForm: React.FC = () => {
 				accept="image/*,video/*"
 				onChange={handleChange}
 				className="hidden"
+				disabled={compressing}
 			/>
 			<div className="btn-group justify-end">
-				{loading ? (
+				{loading && (
 					<button title="Loading" type="button" className="btn loading w-1/2">
 						Processing...
 					</button>
-				) : (
+				)}
+				{!loading && (
 					<>
 						<input
 							type="reset"

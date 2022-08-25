@@ -4,7 +4,6 @@ import { prisma } from '../db/client';
 import * as trpc from '@trpc/server';
 
 interface InitialMediaType {
-	catalogName: string;
 	fileName: string;
 	fileExtension: string;
 	mimetype: string;
@@ -20,12 +19,11 @@ export const mediaRouter = createProtectedRouter()
 				select: {
 					id: true,
 					author: { select: { username: true } },
-					catalogName: true,
 					fileName: true,
 					fileExtension: true,
 					mimetype: true,
 					likeIds: true,
-					mainFor: true,
+					characterCover: true,
 				},
 			});
 		},
@@ -54,7 +52,6 @@ export const mediaRouter = createProtectedRouter()
 			const mediaToCreate: InitialMediaType[] = input.data.map((row) => ({
 				...row,
 				authorId: author,
-				catalogName: input.characterId,
 				characterIds: [input.characterId],
 			}));
 			const uuids: string[] = input.data.map((row) => row.uuid);
@@ -121,7 +118,7 @@ export const mediaRouter = createProtectedRouter()
 		}),
 		async resolve({ input }) {
 			const characters = await prisma.character.findMany({
-				select: { id: true, mainMediaId: true, mediaIds: true },
+				select: { id: true, coverId: true, mediaIds: true },
 				where: { id: { in: input.characterIds } },
 			});
 
@@ -133,7 +130,7 @@ export const mediaRouter = createProtectedRouter()
 								set: [
 									...character.mediaIds,
 									...input.mediaIds.filter(
-										(id) => !character.mediaIds.includes(id) && character.mainMediaId != id
+										(id) => !character.mediaIds.includes(id) && character.coverId != id
 									),
 								],
 							},
@@ -156,7 +153,7 @@ export const mediaRouter = createProtectedRouter()
 		async resolve({ input }) {
 			const charactersMainImage = await prisma.character.findMany({
 				select: { id: true },
-				where: { mainMediaId: input.mediaId },
+				where: { coverId: input.mediaId },
 			});
 			const charactersStandardMedia = await prisma.character.findMany({
 				select: { id: true, mediaIds: true },
@@ -165,7 +162,7 @@ export const mediaRouter = createProtectedRouter()
 
 			if (charactersMainImage) {
 				await prisma.character.updateMany({
-					data: { mainMediaId: null },
+					data: { coverId: null },
 					where: { id: { in: charactersMainImage.map((character) => character.id) } },
 				});
 			}

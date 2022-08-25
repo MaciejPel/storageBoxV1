@@ -19,7 +19,6 @@ import Modal from './Modal';
 interface CharacterCardProps {
 	id: string;
 	name: string;
-	catalog?: string;
 	author: string;
 	description: string | null;
 	image?: {
@@ -39,7 +38,6 @@ interface CharacterCardProps {
 const CharacterCard: React.FC<CharacterCardProps> = ({
 	id,
 	name,
-	catalog,
 	author,
 	description,
 	image,
@@ -52,10 +50,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
 	const [confirm, setConfirm] = useState<string>('');
 
 	const imageURL =
-		image &&
-		catalog &&
-		image.mimetype.includes('image') &&
-		`${bunnyCDN}/${catalog}/${image.id}.${image.fileExtension}`;
+		image && image.mimetype.includes('image') && `${bunnyCDN}/${image.id}.${image.fileExtension}`;
 
 	const utils = trpc.useContext();
 	const mediaUpdateMutation = trpc.useMutation(['media.update'], {

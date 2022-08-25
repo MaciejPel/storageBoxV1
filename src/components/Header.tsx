@@ -48,7 +48,7 @@ const Header: React.FC = () => {
 										<span className="hidden md:inline">Media</span>
 									</a>
 								</Link>
-								<Link href="/tags">
+								<Link href="/tag">
 									<a className="btn btn-sm btn-ghost text-base-content normal-case gap-1 ">
 										<HashtagIcon className="w-5" />
 										<span className="hidden md:inline">Tags</span>

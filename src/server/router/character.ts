@@ -12,10 +12,9 @@ export const characterRouter = createProtectedRouter()
 					id: true,
 					name: true,
 					description: true,
-					authorId: true,
 					author: { select: { id: true, username: true } },
 					tags: { select: { id: true, name: true } },
-					mainMedia: {
+					cover: {
 						select: {
 							id: true,
 							fileName: true,
@@ -49,10 +48,9 @@ export const characterRouter = createProtectedRouter()
 					description: true,
 					author: { select: { id: true, username: true } },
 					tags: { select: { id: true, name: true }, orderBy: { name: 'asc' } },
-					mainMedia: {
+					cover: {
 						select: {
 							id: true,
-							catalogName: true,
 							fileName: true,
 							fileExtension: true,
 							mimetype: true,
@@ -62,7 +60,6 @@ export const characterRouter = createProtectedRouter()
 					media: {
 						select: {
 							id: true,
-							catalogName: true,
 							fileName: true,
 							fileExtension: true,
 							mimetype: true,
@@ -175,7 +172,7 @@ export const characterRouter = createProtectedRouter()
 		}),
 		async resolve({ input }) {
 			const character = await prisma.character.findFirst({
-				select: { mainMediaId: true, mediaIds: true },
+				select: { coverId: true, mediaIds: true },
 				where: { id: input.characterId },
 			});
 
@@ -183,8 +180,8 @@ export const characterRouter = createProtectedRouter()
 			const temp = character.mediaIds.filter((media) => media !== input.mediaId);
 			return await prisma.character.update({
 				data: {
-					mainMediaId: input.mediaId,
-					mediaIds: character.mainMediaId ? [...temp, character.mainMediaId] : temp,
+					coverId: input.mediaId,
+					mediaIds: character.coverId ? [...temp, character.coverId] : temp,
 				},
 				where: { id: input.characterId },
 			});
@@ -197,7 +194,7 @@ export const characterRouter = createProtectedRouter()
 		}),
 		async resolve({ input }) {
 			const character = await prisma.character.findFirst({
-				select: { mainMediaId: true, mediaIds: true },
+				select: { coverId: true, mediaIds: true },
 				where: { id: input.characterId },
 			});
 

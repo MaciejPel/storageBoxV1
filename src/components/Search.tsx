@@ -87,7 +87,11 @@ const Search: React.FC<SearchProps> = ({ setQuery, query }) => {
 				title="Clear search parameters"
 				className="btn"
 				type="button"
-				onClick={() => setQuery({ string: '', tags: [], sort: true })}
+				onClick={() => {
+					query.tags
+						? setQuery({ string: '', tags: [], sort: true })
+						: setQuery({ string: '', sort: true });
+				}}
 			>
 				<XIcon className="w-6" />
 			</button>

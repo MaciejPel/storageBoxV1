@@ -76,19 +76,12 @@ const upload = async (req: NextApiRequest, res: NextApiResponse) => {
 		{}
 	);
 
-	simplifiedFileList.map(async (file) => {
-		const cdnUpload: Response = await bunnyStorage.upload(
-			fs.readFileSync(file.path),
-			`/${characterId}/${responseDataToObject[file.uuid]}.${file.fileExtension}`
-		);
-	});
-
 	const uploadAll = async () => {
-		let uploadQ = await Promise.all(
+		const uploadQ = await Promise.all(
 			simplifiedFileList.map(async (file) => {
 				return await bunnyStorage.upload(
 					fs.readFileSync(file.path),
-					`/${characterId}/${responseDataToObject[file.uuid]}.${file.fileExtension}`
+					`/${responseDataToObject[file.uuid]}.${file.fileExtension}`
 				);
 			})
 		);

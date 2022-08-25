@@ -27,8 +27,8 @@ model Character {
   authorId    String @db.ObjectId
   author      User   @relation(fields: [authorId], references: [id], name: "userCharacters")
 
-  mainMedia   Media?  @relation(fields: [mainMediaId], references: [id], name: "characterMainMedia")
-  mainMediaId String? @db.ObjectId
+  cover   Media?  @relation(fields: [coverId], references: [id], name: "characterCover")
+  coverId String? @db.ObjectId
 
   mediaIds String[] @default([]) @db.ObjectId
   media    Media[]  @relation(fields: [mediaIds], references: [id])
@@ -38,7 +38,6 @@ model Character {
 
 model Media {
   id            String @id @default(auto()) @map("_id") @db.ObjectId
-  catalogName   String
   fileName      String
   fileExtension String
   mimetype      String
@@ -46,7 +45,8 @@ model Media {
   author        User   @relation(fields: [authorId], references: [id], name: "userMedia")
   authorId      String @db.ObjectId
 
-  mainFor Character[] @relation(name: "characterMainMedia")
+  characterCover Character[] @relation(name: "characterCover")
+  tagCover       Tag[]       @relation(name: "tagCover")
 
   likes        User?       @relation(fields: [likeIds], references: [id], name: "userLikes")
   likeIds      String[]    @default([]) @db.ObjectId
@@ -59,6 +59,9 @@ model Tag {
   name     String
   authorId String @db.ObjectId
   author   User   @relation(fields: [authorId], references: [id], name: "userTags")
+
+  cover   Media?  @relation(fields: [coverId], references: [id], name: "tagCover")
+  coverId String? @db.ObjectId
 
   characterIds String[]    @default([]) @db.ObjectId
   characters   Character[] @relation(fields: [characterIds], references: [id])

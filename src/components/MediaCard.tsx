@@ -1,8 +1,16 @@
 /* eslint-disable @next/next/no-img-element */
 import { bunnyCDN } from '../utils/constants';
-import { ExternalLinkIcon, HeartIcon, SparklesIcon, XIcon } from '@heroicons/react/solid';
+import {
+	ExternalLinkIcon,
+	HeartIcon,
+	SparklesIcon,
+	TrashIcon,
+	XIcon,
+} from '@heroicons/react/solid';
 import { trpc } from '../utils/trpc';
 import { useSession } from 'next-auth/react';
+import Modal from './Modal';
+import { useState } from 'react';
 
 interface CharacterMediaCardProps {
 	cardType: 'media' | 'character-media';
@@ -14,8 +22,7 @@ interface CharacterMediaCardProps {
 	setData?: React.Dispatch<React.SetStateAction<{ characterIds: string[]; mediaIds: string[] }>>;
 	name?: string;
 	mediaId: string;
-	characterId: string;
-	catalog: string;
+	characterId?: string;
 	fileName: string;
 	fileExtension: string;
 	mimetype: string;
@@ -30,14 +37,14 @@ const MediaCard: React.FC<CharacterMediaCardProps> = ({
 	name,
 	mediaId,
 	characterId,
-	catalog,
 	fileName,
 	fileExtension,
 	mimetype,
 	likeIds,
 }) => {
 	const { data: session } = useSession();
-	const src = `${bunnyCDN}/${catalog}/${mediaId}.${fileExtension}`;
+	const [confirm, setConfirm] = useState<string>('');
+	const src = `${bunnyCDN}/${mediaId}.${fileExtension}`;
 
 	const utils = trpc.useContext();
 	const characterSetMainMutation = trpc.useMutation(['character.setMain'], {
@@ -75,18 +82,66 @@ const MediaCard: React.FC<CharacterMediaCardProps> = ({
 			<div className="card-body">
 				{name && <h2>{name}</h2>}
 				<div className="card-actions justify-end gap-0">
-					<button
-						type="button"
-						title="Remove image"
-						className="btn btn-ghost p-3"
-						onClick={() => {
-							if (cardType === 'character-media')
+					{cardType === 'character-media' && characterId && (
+						<button
+							type="button"
+							title="Remove image from character"
+							className="btn btn-ghost p-3"
+							onClick={() => {
 								characterRemoveMediaMutation.mutate({ characterId, mediaId });
-							if (cardType === 'media') mediaDeleteMutation.mutate({ mediaId });
-						}}
-					>
-						<XIcon className="w-6 transition-all duration-300" />
-					</button>
+							}}
+						>
+							<XIcon className="w-6 transition-all duration-300" />
+						</button>
+					)}
+					{cardType === 'media' && (
+						<Modal
+							buttonContent={<TrashIcon className="w-6 transition-all duration-200" />}
+							buttonType="card"
+							id="mediaDelete"
+							modalTitle="Delete media"
+						>
+							<form
+								className="flex flex-col gap-4"
+								onSubmit={(e) => {
+									e.preventDefault();
+									mediaDeleteMutation.mutate({ mediaId });
+								}}
+							>
+								<div>
+									<label className="label pb-1 cursor-pointer" htmlFor="name">
+										<span className="label-text">
+											Confirm by typing <span className="font-extrabold">{name}</span> in
+										</span>
+									</label>
+									<input
+										id="name"
+										type="text"
+										placeholder={name}
+										className="input w-full input-bordered"
+										required
+										value={confirm}
+										onChange={(e) => setConfirm(e.target.value)}
+									/>
+								</div>
+								<div className="flex justify-end">
+									{mediaDeleteMutation.isLoading && (
+										<button type="button" title="Processing" className="btn loading">
+											Processing...
+										</button>
+									)}
+									{!mediaDeleteMutation.isLoading && (
+										<input
+											type="submit"
+											className="btn btn-error"
+											value="Delete"
+											disabled={name !== confirm}
+										/>
+									)}
+								</div>
+							</form>
+						</Modal>
+					)}
 					{assign && data && setData && (
 						<label htmlFor={'assignMedia-' + mediaId} className="btn btn-ghost p-3">
 							<input
@@ -120,7 +175,7 @@ const MediaCard: React.FC<CharacterMediaCardProps> = ({
 						/>
 						<span className="text-md font-bold">{likeIds.length}</span>
 					</button>
-					{cardType === 'character-media' && mimetype.includes('image') && (
+					{cardType === 'character-media' && characterId && mimetype.includes('image') && (
 						<button
 							type="button"
 							title="Set image as main"

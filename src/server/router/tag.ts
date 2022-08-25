@@ -8,7 +8,12 @@ export const tagRouter = createProtectedRouter()
 	.query('all', {
 		async resolve() {
 			const tags = await prisma.tag.findMany({
-				select: { id: true, name: true, characterIds: true },
+				select: {
+					id: true,
+					name: true,
+					cover: { select: { id: true, fileName: true, fileExtension: true } },
+					characterIds: true,
+				},
 				orderBy: { name: 'asc' },
 			});
 			return tags;

@@ -28,9 +28,9 @@ const Media: NextPage = () => {
 	const [query, setQuery] = useState<QueryParams>({ string: '', sort: true });
 	const breakpointColumnsObj = {
 		default: assign ? 4 : 5,
-		1536: 4,
-		1280: 3,
-		1024: 3,
+		1536: assign ? 3 : 4,
+		1280: assign ? 2 : 3,
+		1024: assign ? 2 : 3,
 		768: 2,
 		640: 1,
 	};
@@ -55,23 +55,28 @@ const Media: NextPage = () => {
 			<Container type="start">
 				<div className="w-full flex justify-between items-center">
 					<h2 className="text-4xl font-extrabold my-4 text-start w-1/4 mt-2">Media</h2>
-					<div className="flex gap-2 w-3/4 justify-end items-center">
-						<label htmlFor="assign" className="label cursor-pointer">
-							Assign mode
-						</label>
-						<input
-							type="checkbox"
-							className="toggle toggle-lg"
-							id="assign"
-							onChange={() => setAssign(!assign)}
-						/>
-					</div>
+					{mediaQuery.isSuccess &&
+						mediaQuery.data.length > 0 &&
+						charactersQuery.isSuccess &&
+						charactersQuery.data.length > 0 && (
+							<div className="flex gap-2 w-3/4 justify-end items-center">
+								<label htmlFor="assign" className="label cursor-pointer">
+									Assign mode
+								</label>
+								<input
+									type="checkbox"
+									className="toggle"
+									id="assign"
+									onChange={() => setAssign(!assign)}
+								/>
+							</div>
+						)}
 				</div>
 				<Search setQuery={setQuery} query={query} />
 				{mediaQuery.data?.length === 0 && <Container type="center">No media yet 🤐</Container>}
 				{mediaQuery.isSuccess && mediaQuery.data?.length > 0 && (
-					<div className={`w-full mt-4 gap-4 ${assign ? 'flex' : 'block'}`}>
-						<div className={`w-full ${assign ? 'md:w-10/12' : ''}`}>
+					<div className={`w-full mt-4 gap-4 ${assign ? 'md:flex' : ''} block`}>
+						<div className={`w-full ${assign ? 'md:w-3/4' : ''}`}>
 							<Masonry
 								breakpointCols={breakpointColumnsObj}
 								className="flex w-full gap-4"
@@ -93,8 +98,6 @@ const Media: NextPage = () => {
 											setData={setData}
 											name={`${media.fileName}.${media.fileExtension}`}
 											mediaId={media.id}
-											characterId={media.catalogName}
-											catalog={media.catalogName}
 											fileName={media.fileName}
 											fileExtension={media.fileExtension}
 											mimetype={media.mimetype}
@@ -103,38 +106,41 @@ const Media: NextPage = () => {
 									))}
 							</Masonry>
 						</div>
-						<div className={`flex flex-col ${assign ? 'md:w-2/12 w-full' : 'hidden'}`}>
-							{assign &&
-								charactersQuery.data?.map((character) => (
-									<label
-										key={character.id}
-										className="w-full cursor-pointer flex gap-2 p-2 hover:bg-base-300 rounded-lg"
-										htmlFor={'assignCharacter-' + character.id}
-									>
-										<input
-											type="checkbox"
-											className="checkbox"
-											id={'assignCharacter-' + character.id}
-											checked={data.characterIds.includes(character.id)}
-											onChange={(e) =>
-												setData({
-													...data,
-													characterIds: e.target.checked
-														? [...data.characterIds, character.id]
-														: data.characterIds.filter(
-																(characterId) => characterId !== character.id
-														  ),
-												})
-											}
-										/>
-										{character.name}
-									</label>
-								))}
-							<div className="btn-group-vertical w-full flex mt-2">
+						<div className={`flex flex-col mb-2 ${assign ? 'md:w-1/4' : 'hidden'}`}>
+							<h2 className="text-2xl font-bold">Characters</h2>
+							<div className="grid grid-cols-2 md:grid-cols-1">
+								{assign &&
+									charactersQuery.data?.map((character) => (
+										<label
+											key={character.id}
+											className="w-full cursor-pointer flex gap-2 p-2 hover:bg-base-300 rounded-lg"
+											htmlFor={'assignCharacter-' + character.id}
+										>
+											<input
+												type="checkbox"
+												className="checkbox"
+												id={'assignCharacter-' + character.id}
+												checked={data.characterIds.includes(character.id)}
+												onChange={(e) =>
+													setData({
+														...data,
+														characterIds: e.target.checked
+															? [...data.characterIds, character.id]
+															: data.characterIds.filter(
+																	(characterId) => characterId !== character.id
+															  ),
+													})
+												}
+											/>
+											{character.name}
+										</label>
+									))}
+							</div>
+							<div className="md:btn-group-vertical w-full mt-2">
 								<button
 									title="Reset form"
 									type="button"
-									className="btn btn-warning"
+									className="btn btn-warning w-1/3 md:w-full md:rounded rounded-r-none"
 									onClick={() => setData({ characterIds: [], mediaIds: [] })}
 								>
 									Reset
@@ -142,7 +148,7 @@ const Media: NextPage = () => {
 								<button
 									title="Submit form"
 									type="submit"
-									className="btn btn-primary"
+									className="btn btn-primary w-2/3 md:w-full md:rounded rounded-l-none"
 									onClick={() => mediaAssignMutation.mutate(data)}
 								>
 									Submit
