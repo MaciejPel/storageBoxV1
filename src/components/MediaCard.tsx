@@ -13,7 +13,7 @@ import Modal from './Modal';
 import { useState } from 'react';
 
 interface CharacterMediaCardProps {
-	cardType: 'media' | 'character-media';
+	cardType: 'media' | 'character-media' | 'tag-media';
 	assign?: boolean;
 	data?: {
 		characterIds: string[];
@@ -27,6 +27,8 @@ interface CharacterMediaCardProps {
 	fileExtension: string;
 	mimetype: string;
 	likeIds: string[];
+	tagId?: string;
+	tagCover?: string | null;
 }
 
 const MediaCard: React.FC<CharacterMediaCardProps> = ({
@@ -41,9 +43,12 @@ const MediaCard: React.FC<CharacterMediaCardProps> = ({
 	fileExtension,
 	mimetype,
 	likeIds,
+	tagId,
+	tagCover,
 }) => {
 	const { data: session } = useSession();
 	const [confirm, setConfirm] = useState<string>('');
+	const [toConfirm, setToConfirm] = useState<string>('');
 	const src = `${bunnyCDN}/${mediaId}.${fileExtension}`;
 
 	const utils = trpc.useContext();
@@ -62,6 +67,7 @@ const MediaCard: React.FC<CharacterMediaCardProps> = ({
 		onSuccess() {
 			utils.invalidateQueries(['character.single']);
 			utils.invalidateQueries(['media.all']);
+			utils.invalidateQueries(['tag.media']);
 		},
 	});
 	const mediaDeleteMutation = trpc.useMutation(['media.delete'], {
@@ -70,9 +76,16 @@ const MediaCard: React.FC<CharacterMediaCardProps> = ({
 			utils.invalidateQueries(['media.all']);
 		},
 	});
+	const tagSetMainMutation = trpc.useMutation(['tag.setMain'], {
+		onSuccess() {
+			utils.invalidateQueries(['tag.single']);
+			utils.invalidateQueries(['tag.all']);
+			utils.invalidateQueries(['tag.media']);
+		},
+	});
 
 	return (
-		<div className="card card-compact static w-full bg-base-300 col-span-1 card-bordered mb-4">
+		<div className="card card-compact static w-full bg-base-300 card-bordered mb-4">
 			{mimetype.includes('video') && (
 				<video controls={true}>
 					<source src={src} type="video/mp4" />
@@ -80,7 +93,7 @@ const MediaCard: React.FC<CharacterMediaCardProps> = ({
 			)}
 			{mimetype.includes('image') && <img src={src} alt={`${fileName}.${fileExtension}`} />}
 			<div className="card-body">
-				{name && <h2>{name}</h2>}
+				{name && <h2 className="text-lg break-words">{name}</h2>}
 				<div className="card-actions justify-end gap-0">
 					{cardType === 'character-media' && characterId && (
 						<button
@@ -94,7 +107,7 @@ const MediaCard: React.FC<CharacterMediaCardProps> = ({
 							<XIcon className="w-6 transition-all duration-300" />
 						</button>
 					)}
-					{cardType === 'media' && (
+					{/* {cardType === 'media' && (
 						<Modal
 							buttonContent={<TrashIcon className="w-6 transition-all duration-200" />}
 							buttonType="card"
@@ -141,7 +154,7 @@ const MediaCard: React.FC<CharacterMediaCardProps> = ({
 								</div>
 							</form>
 						</Modal>
-					)}
+					)} */}
 					{assign && data && setData && (
 						<label htmlFor={'assignMedia-' + mediaId} className="btn btn-ghost p-3">
 							<input
@@ -182,6 +195,18 @@ const MediaCard: React.FC<CharacterMediaCardProps> = ({
 							className="btn btn-ghost p-3 gap-1 group"
 							onClick={() => {
 								characterSetMainMutation.mutate({ mediaId, characterId });
+							}}
+						>
+							<SparklesIcon className="w-6 group-hover:fill-warning duration-300 transition-all" />
+						</button>
+					)}
+					{cardType === 'tag-media' && tagId && mediaId !== tagCover && mimetype.includes('image') && (
+						<button
+							type="button"
+							title="Set image as main"
+							className="btn btn-ghost p-3 gap-1 group"
+							onClick={() => {
+								tagSetMainMutation.mutate({ mediaId, tagId });
 							}}
 						>
 							<SparklesIcon className="w-6 group-hover:fill-warning duration-300 transition-all" />

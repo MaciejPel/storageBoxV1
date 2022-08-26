@@ -46,6 +46,7 @@ const Home: NextPage = () => {
 
 	return (
 		<Container type="start">
+			<h2 className="text-4xl font-extrabold my-4 text-start w-full mt-0 mb-2">Characters</h2>
 			<div className="w-full flex items-center gap-1 md:flex-row flex-col mb-2">
 				<Search setQuery={setQuery} query={query} />
 				<Modal modalTitle="New tag" buttonType="button" buttonContent="Add tag" id="tag">
@@ -114,26 +115,17 @@ const Home: NextPage = () => {
 										</div>
 										<p className="flex gap-1 flex-wrap">
 											{character.tags.map((tag) => (
-												<span
-													key={tag.id}
-													className={`badge badge-md badge-outline hover:bg-info hover:text-info-content !py-3 ${
-														query.tags && query.tags.includes(tag.id)
-															? 'bg-success text-success-content'
-															: ''
-													}`}
-													onClick={(e) => {
-														e.preventDefault();
-														query.tags &&
-															setQuery({
-																...query,
-																tags: query.tags.includes(tag.id)
-																	? query.tags.filter((tagId) => tagId !== tag.id)
-																	: [...query.tags, tag.id],
-															});
-													}}
-												>
-													{tag.name}
-												</span>
+												<Link href={`/tag/${tag.id}`} key={tag.id}>
+													<span
+														className={`badge badge-md badge-outline hover:bg-info hover:text-info-content !py-3 ${
+															query.tags && query.tags.includes(tag.id)
+																? 'bg-success text-success-content'
+																: ''
+														}`}
+													>
+														{tag.name}
+													</span>
+												</Link>
 											))}
 										</p>
 										<div className="card-actions justify-end">

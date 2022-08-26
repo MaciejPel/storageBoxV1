@@ -9,7 +9,7 @@ const Profile: NextPage = () => {
 		<>
 			<Meta title="Profile" />
 			<Container type="start">
-				<h2 className="text-4xl font-extrabold my-4">Profile</h2>
+				<h2 className="text-4xl font-extrabold my-4 text-start w-full mt-0 mb-2">Profile</h2>
 			</Container>
 		</>
 	);

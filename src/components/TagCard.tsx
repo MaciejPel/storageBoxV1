@@ -1,23 +1,17 @@
 /* eslint-disable @next/next/no-img-element */
-import {
-	ExternalLinkIcon,
-	HeartIcon,
-	PencilAltIcon,
-	PhotographIcon,
-	TrashIcon,
-} from '@heroicons/react/solid';
+
+import { ExternalLinkIcon, PencilAltIcon, PhotographIcon, TrashIcon } from '@heroicons/react/solid';
 import { useSession } from 'next-auth/react';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { FormEvent, useState } from 'react';
+import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import { bunnyCDN } from '../utils/constants';
 import { closeModal } from '../utils/functions';
 import { trpc } from '../utils/trpc';
-import CharacterEditForm from './forms/CharacterEditForm';
+import TagEditForm from './forms/TagEditFrom';
 import Modal from './Modal';
 
-interface CharacterCardProps {
+interface TagCardProps {
 	id: string;
 	name: string;
 	author: string;
@@ -27,24 +21,11 @@ interface CharacterCardProps {
 		fileName: string;
 		fileExtension: string;
 		mimetype: string;
-		likeIds: string[];
 	} | null;
-	tags: {
-		id: string;
-		name: string;
-	}[];
 	sumOfLikes: number;
 }
 
-const CharacterCard: React.FC<CharacterCardProps> = ({
-	id,
-	name,
-	author,
-	description,
-	image,
-	tags,
-	sumOfLikes,
-}) => {
+const TagCard: React.FC<TagCardProps> = ({ id, name, author, description, image, sumOfLikes }) => {
 	const router = useRouter();
 	const { data: session } = useSession();
 	const [readMore, setReadMore] = useState<boolean>(false);
@@ -53,32 +34,26 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
 	const imageURL =
 		image && image.mimetype.includes('image') && `${bunnyCDN}/${image.id}.${image.fileExtension}`;
 
-	const utils = trpc.useContext();
-	const mediaUpdateMutation = trpc.useMutation(['media.update'], {
-		onSuccess() {
-			utils.invalidateQueries(['character.single', { characterId: id }]);
-		},
-	});
-	const characterQuery = trpc.useQuery(['character.single', { characterId: id as string }], {
+	const tagQuery = trpc.useQuery(['tag.single', { tagId: id }], {
 		enabled: session ? true : false,
 	});
-	const characterDeleteMutation = trpc.useMutation(['character.delete'], {
+	const tagDeleteMutation = trpc.useMutation(['tag.delete'], {
 		onSuccess() {
-			toast.success('Character has been removed', {
+			toast.success('Tag has been removed', {
 				className: '!bg-base-300 !text-base-content !rounded-xl',
 			});
-			closeModal('characterDelete');
-			router.push('/');
+			closeModal('tagDelete');
+			router.push('/tag');
 		},
 	});
 
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		characterDeleteMutation.mutate({ characterId: id });
+		tagDeleteMutation.mutate({ tagId: id });
 	};
 
 	return (
-		<div className="card card-compact static w-full bg-base-300 col-span-1 card-bordered">
+		<div className="card card-compact static w-full bg-base-300 col-span-4 card-bordered">
 			{imageURL ? (
 				<img src={imageURL} alt={`${image.fileName}.${image.fileExtension}`} />
 			) : (
@@ -105,15 +80,6 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
 							</span>
 						)}
 					</p>
-					<p className="flex gap-1 flex-wrap">
-						{tags.map((tag) => (
-							<Link href={`/tag/${tag.id}`} key={tag.id}>
-								<span className="badge badge-md badge-outline hover:bg-base-100 !py-3 cursor-pointer">
-									{tag.name}
-								</span>
-							</Link>
-						))}
-					</p>
 				</div>
 				<div className="card-actions justify-end gap-0">
 					<Modal
@@ -121,8 +87,8 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
 							<TrashIcon className="w-6 group-hover:fill-error transition-all duration-200" />
 						}
 						buttonType="card"
-						id="characterDelete"
-						modalTitle="Delete character"
+						id="tagDelete"
+						modalTitle="Delete tag"
 					>
 						<form className="flex flex-col gap-4" onSubmit={handleSubmit}>
 							<div>
@@ -142,12 +108,12 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
 								/>
 							</div>
 							<div className="flex justify-end">
-								{characterDeleteMutation.isLoading && (
+								{tagDeleteMutation.isLoading && (
 									<button type="button" title="Processing" className="btn loading">
 										Processing...
 									</button>
 								)}
-								{!characterDeleteMutation.isLoading && (
+								{!tagDeleteMutation.isLoading && (
 									<input
 										type="submit"
 										className="btn btn-error"
@@ -161,33 +127,16 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
 					<Modal
 						buttonContent={<PencilAltIcon className="w-6" />}
 						buttonType="card"
-						id="characterEdit"
-						modalTitle="Edit character"
+						id="tagEdit"
+						modalTitle="Edit tag"
 					>
-						<CharacterEditForm
+						<TagEditForm
 							id={id}
-							name={characterQuery.data?.name || ''}
-							description={characterQuery.data?.description || ''}
-							tags={characterQuery.data?.tags.map((tag) => tag.id) || []}
+							name={tagQuery.data?.name || ''}
+							description={tagQuery.data?.description || ''}
 						/>
 					</Modal>
-					<button
-						type="button"
-						title="Like image"
-						className="btn btn-ghost p-3 gap-1"
-						onClick={() => {
-							if (imageURL) mediaUpdateMutation.mutate({ mediaId: image.id });
-						}}
-					>
-						<HeartIcon
-							className={`w-6 group-hover:fill-warning transition-all duration-200 ${
-								imageURL && image.likeIds.includes(session?.user.id || '') ? 'fill-red-600 ' : ''
-							}`}
-						/>
-						<span className="text-md font-bold">
-							{sumOfLikes} {imageURL && `(${image?.likeIds.length})`}
-						</span>
-					</button>
+
 					{imageURL && (
 						<a href={imageURL} target="_blank" rel="noreferrer" className="btn btn-ghost p-3">
 							<ExternalLinkIcon className="w-6" />
@@ -198,4 +147,4 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
 		</div>
 	);
 };
-export default CharacterCard;
+export default TagCard;

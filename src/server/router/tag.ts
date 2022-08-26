@@ -11,12 +11,76 @@ export const tagRouter = createProtectedRouter()
 				select: {
 					id: true,
 					name: true,
+					description: true,
 					cover: { select: { id: true, fileName: true, fileExtension: true } },
 					characterIds: true,
+					characters: {
+						select: {
+							id: true,
+							cover: { select: { id: true, likeIds: true } },
+							media: { select: { id: true, likeIds: true } },
+						},
+					},
 				},
 				orderBy: { name: 'asc' },
 			});
 			return tags;
+		},
+	})
+	.query('single', {
+		input: z.object({
+			tagId: z.string(),
+		}),
+		async resolve({ input }) {
+			const tag = await prisma.tag.findFirst({
+				select: {
+					id: true,
+					name: true,
+					description: true,
+					author: { select: { id: true, username: true } },
+					cover: { select: { id: true, fileName: true, fileExtension: true, mimetype: true } },
+					characterIds: true,
+				},
+				where: { id: input.tagId },
+			});
+			return tag;
+		},
+	})
+	.query('media', {
+		input: z.object({
+			tagId: z.string(),
+		}),
+		async resolve({ input }) {
+			const tag = await prisma.tag.findFirst({
+				select: {
+					id: true,
+					characters: {
+						select: {
+							id: true,
+							cover: {
+								select: {
+									id: true,
+									fileName: true,
+									fileExtension: true,
+									mimetype: true,
+									likeIds: true,
+								},
+							},
+							media: {
+								select: {
+									id: true,
+									fileName: true,
+									fileExtension: true,
+									mimetype: true,
+									likeIds: true,
+								},
+							},
+						},
+					},
+				},
+				where: { id: input.tagId },
+			});
+			return tag;
 		},
 	})
 	.mutation('create', {
@@ -28,16 +92,63 @@ export const tagRouter = createProtectedRouter()
 					.min(2, { message: 'must contain at least 2 character(s)' })
 					.max(18, { message: 'must contain at most 18 character(s)' })
 			),
+			description: z.preprocess(
+				trimString,
+				z
+					.string()
+					.min(3, { message: 'must contain at least 3 character(s)' })
+					.max(140, { message: 'must contain at most 140 character(s)' })
+			),
 		}),
 		async resolve({ input, ctx }) {
 			const author = ctx.session.user.id;
 			if (!author) throw new trpc.TRPCError({ code: 'UNAUTHORIZED' });
 
 			const tag = await prisma.tag.create({
-				data: { name: input.name, authorId: author },
+				data: { name: input.name, description: input.description, authorId: author },
 			});
 
 			return { id: tag.id };
+		},
+	})
+	.mutation('update', {
+		input: z.object({
+			name: z.preprocess(
+				trimString,
+				z
+					.string()
+					.min(2, { message: 'must contain at least 2 character(s)' })
+					.max(18, { message: 'must contain at most 18 character(s)' })
+			),
+			description: z.preprocess(
+				trimString,
+				z
+					.string()
+					.min(3, { message: 'must contain at least 3 character(s)' })
+					.max(140, { message: 'must contain at most 140 character(s)' })
+			),
+			tagId: z.string(),
+		}),
+		async resolve({ input, ctx }) {
+			const tag = await prisma.tag.update({
+				data: { name: input.name, description: input.description },
+				where: { id: input.tagId },
+			});
+
+			return tag;
+		},
+	})
+	.mutation('setMain', {
+		input: z.object({
+			mediaId: z.string(),
+			tagId: z.string(),
+		}),
+		async resolve({ input }) {
+			const tag = await prisma.tag.update({
+				data: { coverId: input.mediaId },
+				where: { id: input.tagId },
+			});
+			return tag;
 		},
 	})
 	.mutation('delete', {

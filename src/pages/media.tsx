@@ -54,7 +54,7 @@ const Media: NextPage = () => {
 			<Meta title="Media" />
 			<Container type="start">
 				<div className="w-full flex justify-between items-center">
-					<h2 className="text-4xl font-extrabold my-4 text-start w-1/4 mt-2">Media</h2>
+					<h2 className="text-4xl font-extrabold my-4 text-start w-full mt-0 mb-2">Media</h2>
 					{mediaQuery.isSuccess &&
 						mediaQuery.data.length > 0 &&
 						charactersQuery.isSuccess &&
@@ -75,7 +75,7 @@ const Media: NextPage = () => {
 				<Search setQuery={setQuery} query={query} />
 				{mediaQuery.data?.length === 0 && <Container type="center">No media yet 🤐</Container>}
 				{mediaQuery.isSuccess && mediaQuery.data?.length > 0 && (
-					<div className={`w-full mt-4 gap-4 ${assign ? 'md:flex' : ''} block`}>
+					<div className={`w-full my-4 gap-4 ${assign ? 'md:flex flex-row-reverse' : ''} block`}>
 						<div className={`w-full ${assign ? 'md:w-3/4' : ''}`}>
 							<Masonry
 								breakpointCols={breakpointColumnsObj}

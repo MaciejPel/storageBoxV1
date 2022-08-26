@@ -55,10 +55,11 @@ model Media {
 }
 
 model Tag {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
-  name     String
-  authorId String @db.ObjectId
-  author   User   @relation(fields: [authorId], references: [id], name: "userTags")
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String
+  authorId    String @db.ObjectId
+  author      User   @relation(fields: [authorId], references: [id], name: "userTags")
 
   cover   Media?  @relation(fields: [coverId], references: [id], name: "tagCover")
   coverId String? @db.ObjectId

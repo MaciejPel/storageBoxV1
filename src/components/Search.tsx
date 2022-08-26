@@ -33,7 +33,7 @@ const Search: React.FC<SearchProps> = ({ setQuery, query }) => {
 
 			{query.tags && tagsQuery.isSuccess && tagsQuery.data.length > 0 && (
 				<div className="dropdown sticky">
-					<label tabIndex={0} className="btn">
+					<label tabIndex={0} className="btn ">
 						{query.tags.length ? (
 							<FilterIconSolid className="w-6" />
 						) : (

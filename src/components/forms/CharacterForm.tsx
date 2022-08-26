@@ -106,11 +106,17 @@ const CharacterForm: React.FC = () => {
 				)}
 			</div>
 			<div className="btn-group justify-end w-full mt-3">
-				{characterMutation.isLoading ? (
+				{characterMutation.isLoading && (
 					<button title="Loading" type="button" className="btn loading w-1/2">
 						Processing...
 					</button>
-				) : (
+				)}
+				{characterMutation.isSuccess && (
+					<button title="Success" type="button" className="btn btn-success w-1/2">
+						Success
+					</button>
+				)}
+				{!characterMutation.isLoading && !characterMutation.isSuccess && (
 					<>
 						<input
 							className="btn btn-error rounded sm:w-1/6"
