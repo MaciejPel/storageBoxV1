@@ -30,6 +30,8 @@ const TagCard: React.FC<TagCardProps> = ({ id, name, author, description, image,
 	const { data: session } = useSession();
 	const [readMore, setReadMore] = useState<boolean>(false);
 	const [confirm, setConfirm] = useState<string>('');
+	const [editTag, setEditTag] = useState<boolean>(false);
+	const [deleteTag, setDeleteTag] = useState<boolean>(false);
 
 	const imageURL =
 		image && image.mimetype.includes('image') && `${bunnyCDN}/${image.id}.${image.fileExtension}`;
@@ -42,7 +44,7 @@ const TagCard: React.FC<TagCardProps> = ({ id, name, author, description, image,
 			toast.success('Tag has been removed', {
 				className: '!bg-base-300 !text-base-content !rounded-xl',
 			});
-			closeModal('tagDelete');
+			setDeleteTag(false);
 			router.push('/tag');
 		},
 	});
@@ -82,14 +84,15 @@ const TagCard: React.FC<TagCardProps> = ({ id, name, author, description, image,
 					</p>
 				</div>
 				<div className="card-actions justify-end gap-0">
-					<Modal
-						buttonContent={
-							<TrashIcon className="w-6 group-hover:fill-error transition-all duration-200" />
-						}
-						buttonType="card"
-						id="tagDelete"
-						modalTitle="Delete tag"
+					<button
+						type="button"
+						title="Delete tag"
+						className="btn btn-ghost"
+						onClick={() => setDeleteTag(true)}
 					>
+						<TrashIcon className="w-6 group-hover:fill-error transition-all duration-200" />
+					</button>
+					<Modal open={deleteTag} setOpen={setDeleteTag} modalTitle="Delete tag">
 						<form className="flex flex-col gap-4" onSubmit={handleSubmit}>
 							<div>
 								<label className="label pb-1 cursor-pointer" htmlFor="name">
@@ -124,14 +127,18 @@ const TagCard: React.FC<TagCardProps> = ({ id, name, author, description, image,
 							</div>
 						</form>
 					</Modal>
-					<Modal
-						buttonContent={<PencilAltIcon className="w-6" />}
-						buttonType="card"
-						id="tagEdit"
-						modalTitle="Edit tag"
+					<button
+						type="button"
+						title="Edit character"
+						className="btn btn-ghost"
+						onClick={() => setEditTag(true)}
 					>
+						<PencilAltIcon className="w-6" />
+					</button>
+					<Modal open={editTag} setOpen={setEditTag} modalTitle="Edit tag">
 						<TagEditForm
 							id={id}
+							setEditTag={setEditTag}
 							name={tagQuery.data?.name || ''}
 							description={tagQuery.data?.description || ''}
 						/>

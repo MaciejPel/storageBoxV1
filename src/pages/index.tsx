@@ -34,6 +34,8 @@ const Home: NextPage = () => {
 	const router = useRouter();
 	const { data: session, status } = useSession();
 	const [query, setQuery] = useState<QueryParams>({ string: '', tags: [], sort: true });
+	const [characterModal, setCharacterModal] = useState<boolean>(false);
+	const [tagModal, setTagModal] = useState<boolean>(false);
 
 	const charactersQuery = trpc.useQuery(['character.all'], {
 		enabled: session ? true : false,
@@ -49,16 +51,22 @@ const Home: NextPage = () => {
 			<h2 className="text-4xl font-extrabold my-4 text-start w-full mt-0 mb-2">Characters</h2>
 			<div className="w-full flex items-center gap-1 md:flex-row flex-col mb-2">
 				<Search setQuery={setQuery} query={query} />
-				<Modal modalTitle="New tag" buttonType="button" buttonContent="Add tag" id="tag">
-					<TagForm />
-				</Modal>
-				<Modal
-					modalTitle="New character"
-					buttonContent="Add character"
-					buttonType="button"
-					id="character"
+				<button type="button" title="Add tag" onClick={() => setTagModal(true)} className="btn">
+					Add tag
+				</button>
+				<button
+					type="button"
+					title="Add character"
+					onClick={() => setCharacterModal(true)}
+					className="btn"
 				>
-					<CharacterForm />
+					Add character
+				</button>
+				<Modal open={tagModal} setOpen={setTagModal} modalTitle="New tag">
+					<TagForm setTagModal={setTagModal} />
+				</Modal>
+				<Modal open={characterModal} setOpen={setCharacterModal} modalTitle="New character">
+					<CharacterForm setCharacterModal={setCharacterModal} />
 				</Modal>
 			</div>
 			{charactersQuery.isError && <Container type="center">Something went wrong</Container>}

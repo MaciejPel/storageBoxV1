@@ -48,7 +48,7 @@ const MediaCard: React.FC<CharacterMediaCardProps> = ({
 }) => {
 	const { data: session } = useSession();
 	const [confirm, setConfirm] = useState<string>('');
-	const [toConfirm, setToConfirm] = useState<string>('');
+	const [deleteMedia, setDeleteMedia] = useState<boolean>(false);
 	const src = `${bunnyCDN}/${mediaId}.${fileExtension}`;
 
 	const utils = trpc.useContext();
@@ -107,54 +107,59 @@ const MediaCard: React.FC<CharacterMediaCardProps> = ({
 							<XIcon className="w-6 transition-all duration-300" />
 						</button>
 					)}
-					{/* {cardType === 'media' && (
-						<Modal
-							buttonContent={<TrashIcon className="w-6 transition-all duration-200" />}
-							buttonType="card"
-							id="mediaDelete"
-							modalTitle="Delete media"
-						>
-							<form
-								className="flex flex-col gap-4"
-								onSubmit={(e) => {
-									e.preventDefault();
-									mediaDeleteMutation.mutate({ mediaId });
-								}}
+					{cardType === 'media' && (
+						<>
+							<button
+								type="button"
+								title="Delete media"
+								className="btn btn-ghost"
+								onClick={() => setDeleteMedia(true)}
 							>
-								<div>
-									<label className="label pb-1 cursor-pointer" htmlFor="name">
-										<span className="label-text">
-											Confirm by typing <span className="font-extrabold">{name}</span> in
-										</span>
-									</label>
-									<input
-										id="name"
-										type="text"
-										placeholder={name}
-										className="input w-full input-bordered"
-										required
-										value={confirm}
-										onChange={(e) => setConfirm(e.target.value)}
-									/>
-								</div>
-								<div className="flex justify-end">
-									{mediaDeleteMutation.isLoading && (
-										<button type="button" title="Processing" className="btn loading">
-											Processing...
-										</button>
-									)}
-									{!mediaDeleteMutation.isLoading && (
+								<TrashIcon className="w-6" />
+							</button>
+							<Modal open={deleteMedia} setOpen={setDeleteMedia} modalTitle="Delete media">
+								<form
+									className="flex flex-col gap-4"
+									onSubmit={(e) => {
+										e.preventDefault();
+										mediaDeleteMutation.mutate({ mediaId });
+									}}
+								>
+									<div>
+										<label className="label pb-1 cursor-pointer" htmlFor="name">
+											<span className="label-text">
+												Confirm by typing <span className="font-extrabold">{name}</span> in
+											</span>
+										</label>
 										<input
-											type="submit"
-											className="btn btn-error"
-											value="Delete"
-											disabled={name !== confirm}
+											id="name"
+											type="text"
+											placeholder={name}
+											className="input w-full input-bordered"
+											required
+											value={confirm}
+											onChange={(e) => setConfirm(e.target.value)}
 										/>
-									)}
-								</div>
-							</form>
-						</Modal>
-					)} */}
+									</div>
+									<div className="flex justify-end">
+										{mediaDeleteMutation.isLoading && (
+											<button type="button" title="Processing" className="btn loading">
+												Processing...
+											</button>
+										)}
+										{!mediaDeleteMutation.isLoading && (
+											<input
+												type="submit"
+												className="btn btn-error"
+												value="Delete"
+												disabled={name !== confirm}
+											/>
+										)}
+									</div>
+								</form>
+							</Modal>
+						</>
+					)}
 					{assign && data && setData && (
 						<label htmlFor={'assignMedia-' + mediaId} className="btn btn-ghost p-3">
 							<input

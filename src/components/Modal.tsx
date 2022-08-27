@@ -1,38 +1,23 @@
 import React, { useState } from 'react';
 
 interface ModalProps {
+	open: boolean;
+	setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 	modalTitle: string;
-	buttonContent: string | JSX.Element;
-	buttonType: 'card' | 'button';
-	id: string;
 	children: React.ReactNode;
 }
 
-const Modal: React.FC<ModalProps> = ({ modalTitle, buttonContent, buttonType, id, children }) => {
-	const [open, setOpen] = useState<boolean>(false);
-	const styles = { button: 'btn w-full md:w-auto', card: 'btn btn-ghost p-3' };
-
+const Modal: React.FC<ModalProps> = ({ open, setOpen, modalTitle, children }) => {
 	return (
-		<>
-			<label htmlFor={id} className={styles[buttonType]}>
-				{buttonContent}
+		<div
+			className={`modal ${open ? 'modal-open' : ''} cursor-pointer !z-0`}
+			onClick={() => setOpen(false)}
+		>
+			<label className="modal-box cursor-auto relative !z-10" onClick={(e) => e.stopPropagation()}>
+				<h3 className="text-lg font-bold">{modalTitle}</h3>
+				{children}
 			</label>
-			<input
-				type="checkbox"
-				id={id}
-				className="modal-toggle"
-				onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-					const value = e.target.value === 'on' ? true : false;
-					setOpen(!value);
-				}}
-			/>
-			<label htmlFor={id} className={`modal ${open ? 'modal-open' : ''} cursor-pointer`}>
-				<label htmlFor="" className="modal-box cursor-auto relative">
-					<h3 className="text-lg font-bold">{modalTitle}</h3>
-					{children}
-				</label>
-			</label>
-		</>
+		</div>
 	);
 };
 export default Modal;

@@ -4,12 +4,19 @@ import { trpc } from '../../utils/trpc';
 
 interface CharacterEditFormProps {
 	id: string;
+	setCharacterEdit: React.Dispatch<React.SetStateAction<boolean>>;
 	name: string;
 	description: string;
 	tags: string[];
 }
 
-const CharacterEditForm: React.FC<CharacterEditFormProps> = ({ id, name, description, tags }) => {
+const CharacterEditForm: React.FC<CharacterEditFormProps> = ({
+	id,
+	setCharacterEdit,
+	name,
+	description,
+	tags,
+}) => {
 	const [character, setCharacter] = useState({ characterId: id, name, description, tags });
 	const [error, setError] = useState<{ message?: string; field?: string }>();
 
@@ -18,7 +25,7 @@ const CharacterEditForm: React.FC<CharacterEditFormProps> = ({ id, name, descrip
 	const characterEditMutation = trpc.useMutation(['character.edit'], {
 		onSuccess() {
 			utils.invalidateQueries(['character.single', { characterId: id }]);
-			closeModal('characterEdit');
+			setCharacterEdit(false);
 		},
 		onError: (error) => {
 			const fieldErrors = error.data?.zodError?.fieldErrors;

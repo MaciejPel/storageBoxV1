@@ -4,11 +4,12 @@ import { trpc } from '../../utils/trpc';
 
 interface TagEditFormProps {
 	id: string;
+	setEditTag: React.Dispatch<React.SetStateAction<boolean>>;
 	name: string;
 	description: string;
 }
 
-const TagEditForm: React.FC<TagEditFormProps> = ({ id, name, description }) => {
+const TagEditForm: React.FC<TagEditFormProps> = ({ id, setEditTag, name, description }) => {
 	const [character, setCharacter] = useState({ tagId: id, name, description });
 	const [error, setError] = useState<{ message?: string; field?: string }>();
 
@@ -16,7 +17,7 @@ const TagEditForm: React.FC<TagEditFormProps> = ({ id, name, description }) => {
 	const tagUpdateMutation = trpc.useMutation(['tag.update'], {
 		onSuccess() {
 			utils.invalidateQueries(['tag.single', { tagId: id }]);
-			closeModal('tagEdit');
+			setEditTag(false);
 		},
 		onError: (error) => {
 			const fieldErrors = error.data?.zodError?.fieldErrors;

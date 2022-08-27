@@ -49,6 +49,8 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
 	const { data: session } = useSession();
 	const [readMore, setReadMore] = useState<boolean>(false);
 	const [confirm, setConfirm] = useState<string>('');
+	const [characterEdit, setCharacterEdit] = useState<boolean>(false);
+	const [characterDelete, setCharacterDelete] = useState<boolean>(false);
 
 	const imageURL =
 		image && image.mimetype.includes('image') && `${bunnyCDN}/${image.id}.${image.fileExtension}`;
@@ -67,7 +69,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
 			toast.success('Character has been removed', {
 				className: '!bg-base-300 !text-base-content !rounded-xl',
 			});
-			closeModal('characterDelete');
+			setCharacterDelete(false);
 			router.push('/');
 		},
 	});
@@ -116,14 +118,15 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
 					</p>
 				</div>
 				<div className="card-actions justify-end gap-0">
-					<Modal
-						buttonContent={
-							<TrashIcon className="w-6 group-hover:fill-error transition-all duration-200" />
-						}
-						buttonType="card"
-						id="characterDelete"
-						modalTitle="Delete character"
+					<button
+						type="button"
+						title="Delete character"
+						className="btn btn-ghost"
+						onClick={() => setCharacterDelete(true)}
 					>
+						<TrashIcon className="w-6 group-hover:fill-error transition-all duration-200" />
+					</button>
+					<Modal open={characterDelete} setOpen={setCharacterDelete} modalTitle="Delete character">
 						<form className="flex flex-col gap-4" onSubmit={handleSubmit}>
 							<div>
 								<label className="label pb-1 cursor-pointer" htmlFor="name">
@@ -158,14 +161,19 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
 							</div>
 						</form>
 					</Modal>
-					<Modal
-						buttonContent={<PencilAltIcon className="w-6" />}
-						buttonType="card"
-						id="characterEdit"
-						modalTitle="Edit character"
+
+					<button
+						type="button"
+						title="Edit character"
+						className="btn btn-ghost"
+						onClick={() => setCharacterEdit(true)}
 					>
+						<PencilAltIcon className="w-6" />
+					</button>
+					<Modal open={characterEdit} setOpen={setCharacterEdit} modalTitle="Edit character">
 						<CharacterEditForm
 							id={id}
+							setCharacterEdit={setCharacterEdit}
 							name={characterQuery.data?.name || ''}
 							description={characterQuery.data?.description || ''}
 							tags={characterQuery.data?.tags.map((tag) => tag.id) || []}
