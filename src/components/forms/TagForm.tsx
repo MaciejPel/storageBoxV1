@@ -1,10 +1,7 @@
 import { useState } from 'react';
-import { closeModal } from '../../utils/functions';
 import { trpc } from '../../utils/trpc';
 
-const TagForm: React.FC<{ setTagModal: React.Dispatch<React.SetStateAction<boolean>> }> = ({
-	setTagModal,
-}) => {
+const TagForm: React.FC<{ closeModal: Function }> = ({ closeModal }) => {
 	const [tag, setTag] = useState<{ name: string; description: string }>({
 		name: '',
 		description: '',
@@ -14,7 +11,7 @@ const TagForm: React.FC<{ setTagModal: React.Dispatch<React.SetStateAction<boole
 	const tagMutation = trpc.useMutation(['tag.create'], {
 		onSuccess: () => {
 			utils.invalidateQueries(['tag.all']);
-			setTagModal(false);
+			closeModal();
 			setTag({ name: '', description: '' });
 		},
 		onError: (error) => {

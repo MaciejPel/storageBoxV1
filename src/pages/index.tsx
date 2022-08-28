@@ -34,8 +34,10 @@ const Home: NextPage = () => {
 	const router = useRouter();
 	const { data: session, status } = useSession();
 	const [query, setQuery] = useState<QueryParams>({ string: '', tags: [], sort: true });
-	const [characterModal, setCharacterModal] = useState<boolean>(false);
-	const [tagModal, setTagModal] = useState<boolean>(false);
+	const [modal, setModal] = useState<{ tag: boolean; character: boolean }>({
+		tag: false,
+		character: false,
+	});
 
 	const charactersQuery = trpc.useQuery(['character.all'], {
 		enabled: session ? true : false,
@@ -51,22 +53,37 @@ const Home: NextPage = () => {
 			<h2 className="text-4xl font-extrabold my-4 text-start w-full mt-0 mb-2">Characters</h2>
 			<div className="w-full flex items-center gap-1 md:flex-row flex-col mb-2">
 				<Search setQuery={setQuery} query={query} />
-				<button type="button" title="Add tag" onClick={() => setTagModal(true)} className="btn">
+
+				<button
+					type="button"
+					title="Add tag"
+					onClick={() => setModal({ ...modal, tag: true })}
+					className="btn"
+				>
 					Add tag
 				</button>
+				<Modal
+					open={modal.tag}
+					onClose={() => setModal({ ...modal, tag: false })}
+					modalTitle="New tag"
+				>
+					<TagForm closeModal={() => setModal({ ...modal, tag: false })} />
+				</Modal>
+
 				<button
 					type="button"
 					title="Add character"
-					onClick={() => setCharacterModal(true)}
+					onClick={() => setModal({ ...modal, character: true })}
 					className="btn"
 				>
 					Add character
 				</button>
-				<Modal open={tagModal} setOpen={setTagModal} modalTitle="New tag">
-					<TagForm setTagModal={setTagModal} />
-				</Modal>
-				<Modal open={characterModal} setOpen={setCharacterModal} modalTitle="New character">
-					<CharacterForm setCharacterModal={setCharacterModal} />
+				<Modal
+					open={modal.character}
+					onClose={() => setModal({ ...modal, character: false })}
+					modalTitle="New character"
+				>
+					<CharacterForm closeModal={() => setModal({ ...modal, character: false })} />
 				</Modal>
 			</div>
 			{charactersQuery.isError && <Container type="center">Something went wrong</Container>}

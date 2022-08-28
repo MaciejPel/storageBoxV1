@@ -6,7 +6,6 @@ import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import { bunnyCDN } from '../utils/constants';
-import { closeModal } from '../utils/functions';
 import { trpc } from '../utils/trpc';
 import TagEditForm from './forms/TagEditFrom';
 import Modal from './Modal';
@@ -30,8 +29,10 @@ const TagCard: React.FC<TagCardProps> = ({ id, name, author, description, image,
 	const { data: session } = useSession();
 	const [readMore, setReadMore] = useState<boolean>(false);
 	const [confirm, setConfirm] = useState<string>('');
-	const [editTag, setEditTag] = useState<boolean>(false);
-	const [deleteTag, setDeleteTag] = useState<boolean>(false);
+	const [modal, setModal] = useState<{ edit: boolean; delete: boolean }>({
+		edit: false,
+		delete: false,
+	});
 
 	const imageURL =
 		image && image.mimetype.includes('image') && `${bunnyCDN}/${image.id}.${image.fileExtension}`;
@@ -44,7 +45,7 @@ const TagCard: React.FC<TagCardProps> = ({ id, name, author, description, image,
 			toast.success('Tag has been removed', {
 				className: '!bg-base-300 !text-base-content !rounded-xl',
 			});
-			setDeleteTag(false);
+			setModal({ ...modal, delete: false });
 			router.push('/tag');
 		},
 	});
@@ -88,11 +89,15 @@ const TagCard: React.FC<TagCardProps> = ({ id, name, author, description, image,
 						type="button"
 						title="Delete tag"
 						className="btn btn-ghost"
-						onClick={() => setDeleteTag(true)}
+						onClick={() => setModal({ ...modal, delete: true })}
 					>
 						<TrashIcon className="w-6 group-hover:fill-error transition-all duration-200" />
 					</button>
-					<Modal open={deleteTag} setOpen={setDeleteTag} modalTitle="Delete tag">
+					<Modal
+						open={modal.delete}
+						onClose={() => setModal({ ...modal, delete: false })}
+						modalTitle="Delete tag"
+					>
 						<form className="flex flex-col gap-4" onSubmit={handleSubmit}>
 							<div>
 								<label className="label pb-1 cursor-pointer" htmlFor="name">
@@ -131,14 +136,18 @@ const TagCard: React.FC<TagCardProps> = ({ id, name, author, description, image,
 						type="button"
 						title="Edit character"
 						className="btn btn-ghost"
-						onClick={() => setEditTag(true)}
+						onClick={() => setModal({ ...modal, edit: true })}
 					>
 						<PencilAltIcon className="w-6" />
 					</button>
-					<Modal open={editTag} setOpen={setEditTag} modalTitle="Edit tag">
+					<Modal
+						open={modal.edit}
+						onClose={() => setModal({ ...modal, edit: false })}
+						modalTitle="Edit tag"
+					>
 						<TagEditForm
 							id={id}
-							setEditTag={setEditTag}
+							closeModal={() => setModal({ ...modal, edit: false })}
 							name={tagQuery.data?.name || ''}
 							description={tagQuery.data?.description || ''}
 						/>

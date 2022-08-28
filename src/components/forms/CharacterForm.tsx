@@ -1,10 +1,7 @@
 import { useState } from 'react';
-import { closeModal } from '../../utils/functions';
 import { trpc } from '../../utils/trpc';
 
-const CharacterForm: React.FC<{
-	setCharacterModal: React.Dispatch<React.SetStateAction<boolean>>;
-}> = ({ setCharacterModal }) => {
+const CharacterForm: React.FC<{ closeModal: Function }> = ({ closeModal }) => {
 	const [character, setCharacter] = useState<{ name: string; description: string; tags: string[] }>(
 		{ name: '', description: '', tags: [] }
 	);
@@ -15,7 +12,7 @@ const CharacterForm: React.FC<{
 	const characterMutation = trpc.useMutation(['character.create'], {
 		onSuccess: () => {
 			utils.invalidateQueries(['character.all']);
-			setCharacterModal(false);
+			closeModal();
 			setCharacter({ name: '', description: '', tags: [] });
 		},
 		onError: (error) => {

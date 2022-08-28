@@ -48,7 +48,7 @@ const MediaCard: React.FC<CharacterMediaCardProps> = ({
 }) => {
 	const { data: session } = useSession();
 	const [confirm, setConfirm] = useState<string>('');
-	const [deleteMedia, setDeleteMedia] = useState<boolean>(false);
+	const [modal, setModal] = useState<boolean>(false);
 	const src = `${bunnyCDN}/${mediaId}.${fileExtension}`;
 
 	const utils = trpc.useContext();
@@ -74,6 +74,7 @@ const MediaCard: React.FC<CharacterMediaCardProps> = ({
 		onSuccess() {
 			utils.invalidateQueries(['character.single']);
 			utils.invalidateQueries(['media.all']);
+			setModal(false);
 		},
 	});
 	const tagSetMainMutation = trpc.useMutation(['tag.setMain'], {
@@ -113,11 +114,11 @@ const MediaCard: React.FC<CharacterMediaCardProps> = ({
 								type="button"
 								title="Delete media"
 								className="btn btn-ghost"
-								onClick={() => setDeleteMedia(true)}
+								onClick={() => setModal(true)}
 							>
 								<TrashIcon className="w-6" />
 							</button>
-							<Modal open={deleteMedia} setOpen={setDeleteMedia} modalTitle="Delete media">
+							<Modal open={modal} onClose={() => setModal(false)} modalTitle="Delete media">
 								<form
 									className="flex flex-col gap-4"
 									onSubmit={(e) => {

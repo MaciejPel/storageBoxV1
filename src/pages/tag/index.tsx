@@ -32,7 +32,7 @@ const breakpointColumnsObj = {
 const TagsPage: NextPage = () => {
 	const { data: session } = useSession();
 	const [query, setQuery] = useState<QueryParams>({ string: '', sort: true });
-	const [tagModal, setTagModal] = useState<boolean>(false);
+	const [modal, setModal] = useState<boolean>(false);
 
 	const tagsQuery = trpc.useQuery(['tag.all'], {
 		enabled: session ? true : false,
@@ -45,8 +45,8 @@ const TagsPage: NextPage = () => {
 				<h2 className="text-4xl font-extrabold my-4 text-start w-full mt-0 mb-2">Tags</h2>
 				<div className="w-full flex items-center gap-1 md:flex-row flex-col mb-2">
 					<Search setQuery={setQuery} query={query} />
-					<Modal open={tagModal} setOpen={setTagModal} modalTitle="New tag">
-						<TagForm setTagModal={setTagModal} />
+					<Modal open={modal} onClose={() => setModal(false)} modalTitle="New tag">
+						<TagForm closeModal={() => setModal(false)} />
 					</Modal>
 				</div>
 				{tagsQuery.isError && <Container type="center">Something went wrong</Container>}

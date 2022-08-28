@@ -1,10 +1,9 @@
 import { useState } from 'react';
-import { closeModal } from '../../utils/functions';
 import { trpc } from '../../utils/trpc';
 
 interface CharacterEditFormProps {
 	id: string;
-	setCharacterEdit: React.Dispatch<React.SetStateAction<boolean>>;
+	closeModal: Function;
 	name: string;
 	description: string;
 	tags: string[];
@@ -12,7 +11,7 @@ interface CharacterEditFormProps {
 
 const CharacterEditForm: React.FC<CharacterEditFormProps> = ({
 	id,
-	setCharacterEdit,
+	closeModal,
 	name,
 	description,
 	tags,
@@ -25,7 +24,7 @@ const CharacterEditForm: React.FC<CharacterEditFormProps> = ({
 	const characterEditMutation = trpc.useMutation(['character.edit'], {
 		onSuccess() {
 			utils.invalidateQueries(['character.single', { characterId: id }]);
-			setCharacterEdit(false);
+			closeModal();
 		},
 		onError: (error) => {
 			const fieldErrors = error.data?.zodError?.fieldErrors;

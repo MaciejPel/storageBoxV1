@@ -9,10 +9,9 @@ import {
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { FormEvent, useState } from 'react';
+import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { bunnyCDN } from '../utils/constants';
-import { closeModal } from '../utils/functions';
 import { trpc } from '../utils/trpc';
 import CharacterEditForm from './forms/CharacterEditForm';
 import Modal from './Modal';
@@ -49,8 +48,10 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
 	const { data: session } = useSession();
 	const [readMore, setReadMore] = useState<boolean>(false);
 	const [confirm, setConfirm] = useState<string>('');
-	const [characterEdit, setCharacterEdit] = useState<boolean>(false);
-	const [characterDelete, setCharacterDelete] = useState<boolean>(false);
+	const [modal, setModal] = useState<{ edit: boolean; delete: boolean }>({
+		edit: false,
+		delete: false,
+	});
 
 	const imageURL =
 		image && image.mimetype.includes('image') && `${bunnyCDN}/${image.id}.${image.fileExtension}`;
@@ -69,7 +70,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
 			toast.success('Character has been removed', {
 				className: '!bg-base-300 !text-base-content !rounded-xl',
 			});
-			setCharacterDelete(false);
+			setModal({ ...modal, delete: false });
 			router.push('/');
 		},
 	});
@@ -122,11 +123,15 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
 						type="button"
 						title="Delete character"
 						className="btn btn-ghost"
-						onClick={() => setCharacterDelete(true)}
+						onClick={() => setModal({ ...modal, delete: true })}
 					>
 						<TrashIcon className="w-6 group-hover:fill-error transition-all duration-200" />
 					</button>
-					<Modal open={characterDelete} setOpen={setCharacterDelete} modalTitle="Delete character">
+					<Modal
+						open={modal.delete}
+						onClose={() => setModal({ ...modal, delete: false })}
+						modalTitle="Delete character"
+					>
 						<form className="flex flex-col gap-4" onSubmit={handleSubmit}>
 							<div>
 								<label className="label pb-1 cursor-pointer" htmlFor="name">
@@ -166,14 +171,18 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
 						type="button"
 						title="Edit character"
 						className="btn btn-ghost"
-						onClick={() => setCharacterEdit(true)}
+						onClick={() => setModal({ ...modal, edit: true })}
 					>
 						<PencilAltIcon className="w-6" />
 					</button>
-					<Modal open={characterEdit} setOpen={setCharacterEdit} modalTitle="Edit character">
+					<Modal
+						open={modal.edit}
+						onClose={() => setModal({ ...modal, edit: false })}
+						modalTitle="Edit character"
+					>
 						<CharacterEditForm
 							id={id}
-							setCharacterEdit={setCharacterEdit}
+							closeModal={() => setModal({ ...modal, edit: false })}
 							name={characterQuery.data?.name || ''}
 							description={characterQuery.data?.description || ''}
 							tags={characterQuery.data?.tags.map((tag) => tag.id) || []}
