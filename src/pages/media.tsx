@@ -10,6 +10,7 @@ import { useSession } from 'next-auth/react';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import Search from '../components/Search';
+import Modal from '../components/Modal';
 
 interface DataProps {
 	characterIds: string[];
@@ -25,6 +26,12 @@ const Media: NextPage = () => {
 	const { data: session } = useSession();
 	const [data, setData] = useState<DataProps>({ characterIds: [], mediaIds: [] });
 	const [assign, setAssign] = useState<boolean>(false);
+	const [modal, setModal] = useState<boolean>(false);
+	const [confirm, setConfirm] = useState<{ name: string; input: string; id: string }>({
+		name: '',
+		input: '',
+		id: '',
+	});
 	const [query, setQuery] = useState<QueryParams>({ string: '', sort: true });
 	const breakpointColumnsObj = {
 		default: assign ? 4 : 5,
@@ -46,6 +53,13 @@ const Media: NextPage = () => {
 			toast.success('Media assigned', {
 				className: '!bg-base-300 !text-base-content !rounded-xl',
 			});
+		},
+	});
+	const mediaDeleteMutation = trpc.useMutation(['media.delete'], {
+		onSuccess() {
+			utils.invalidateQueries(['character.single']);
+			utils.invalidateQueries(['media.all']);
+			setModal(false);
 		},
 	});
 
@@ -73,9 +87,51 @@ const Media: NextPage = () => {
 						)}
 				</div>
 				<Search setQuery={setQuery} query={query} />
+
 				{mediaQuery.data?.length === 0 && <Container type="center">No media yet 🤐</Container>}
 				{mediaQuery.isSuccess && mediaQuery.data?.length > 0 && (
 					<div className={`w-full my-4 gap-4 ${assign ? 'md:flex flex-row-reverse' : ''} block`}>
+						<Modal open={modal} onClose={() => setModal(false)} modalTitle="Delete media">
+							<form
+								className="flex flex-col gap-4"
+								onSubmit={(e) => {
+									e.preventDefault();
+									mediaDeleteMutation.mutate({ mediaId: confirm.id });
+								}}
+							>
+								<div>
+									<label className="label pb-1 cursor-pointer" htmlFor="name">
+										<span className="label-text">
+											Confirm by typing <span className="font-extrabold">{confirm.name}</span> in
+										</span>
+									</label>
+									<input
+										id="name"
+										type="text"
+										placeholder={confirm.name}
+										className="input w-full input-bordered"
+										required
+										value={confirm.input}
+										onChange={(e) => setConfirm({ ...confirm, input: e.target.value })}
+									/>
+								</div>
+								<div className="flex justify-end">
+									{mediaDeleteMutation.isLoading && (
+										<button type="button" title="Processing" className="btn loading">
+											Processing...
+										</button>
+									)}
+									{!mediaDeleteMutation.isLoading && (
+										<input
+											type="submit"
+											className="btn btn-error"
+											value="Delete"
+											disabled={confirm.name !== confirm.input}
+										/>
+									)}
+								</div>
+							</form>
+						</Modal>
 						<div className={`w-full ${assign ? 'md:w-3/4' : ''}`}>
 							<Masonry
 								breakpointCols={breakpointColumnsObj}
@@ -102,6 +158,8 @@ const Media: NextPage = () => {
 											fileExtension={media.fileExtension}
 											mimetype={media.mimetype}
 											likeIds={media.likeIds}
+											setModal={setModal}
+											setConfirm={setConfirm}
 										/>
 									))}
 							</Masonry>

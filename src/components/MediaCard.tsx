@@ -10,7 +10,7 @@ import {
 import { trpc } from '../utils/trpc';
 import { useSession } from 'next-auth/react';
 import Modal from './Modal';
-import { useState } from 'react';
+import React, { useState } from 'react';
 
 interface CharacterMediaCardProps {
 	cardType: 'media' | 'character-media' | 'tag-media';
@@ -29,6 +29,8 @@ interface CharacterMediaCardProps {
 	likeIds: string[];
 	tagId?: string;
 	tagCover?: string | null;
+	setModal?: React.Dispatch<React.SetStateAction<boolean>>;
+	setConfirm?: React.Dispatch<React.SetStateAction<{ name: string; input: string; id: string }>>;
 }
 
 const MediaCard: React.FC<CharacterMediaCardProps> = ({
@@ -45,10 +47,10 @@ const MediaCard: React.FC<CharacterMediaCardProps> = ({
 	likeIds,
 	tagId,
 	tagCover,
+	setModal,
+	setConfirm,
 }) => {
 	const { data: session } = useSession();
-	const [confirm, setConfirm] = useState<string>('');
-	const [modal, setModal] = useState<boolean>(false);
 	const src = `${bunnyCDN}/${mediaId}.${fileExtension}`;
 
 	const utils = trpc.useContext();
@@ -68,13 +70,6 @@ const MediaCard: React.FC<CharacterMediaCardProps> = ({
 			utils.invalidateQueries(['character.single']);
 			utils.invalidateQueries(['media.all']);
 			utils.invalidateQueries(['tag.media']);
-		},
-	});
-	const mediaDeleteMutation = trpc.useMutation(['media.delete'], {
-		onSuccess() {
-			utils.invalidateQueries(['character.single']);
-			utils.invalidateQueries(['media.all']);
-			setModal(false);
 		},
 	});
 	const tagSetMainMutation = trpc.useMutation(['tag.setMain'], {
@@ -108,58 +103,18 @@ const MediaCard: React.FC<CharacterMediaCardProps> = ({
 							<XIcon className="w-6 transition-all duration-300" />
 						</button>
 					)}
-					{cardType === 'media' && (
-						<>
-							<button
-								type="button"
-								title="Delete media"
-								className="btn btn-ghost"
-								onClick={() => setModal(true)}
-							>
-								<TrashIcon className="w-6" />
-							</button>
-							<Modal open={modal} onClose={() => setModal(false)} modalTitle="Delete media">
-								<form
-									className="flex flex-col gap-4"
-									onSubmit={(e) => {
-										e.preventDefault();
-										mediaDeleteMutation.mutate({ mediaId });
-									}}
-								>
-									<div>
-										<label className="label pb-1 cursor-pointer" htmlFor="name">
-											<span className="label-text">
-												Confirm by typing <span className="font-extrabold">{name}</span> in
-											</span>
-										</label>
-										<input
-											id="name"
-											type="text"
-											placeholder={name}
-											className="input w-full input-bordered"
-											required
-											value={confirm}
-											onChange={(e) => setConfirm(e.target.value)}
-										/>
-									</div>
-									<div className="flex justify-end">
-										{mediaDeleteMutation.isLoading && (
-											<button type="button" title="Processing" className="btn loading">
-												Processing...
-											</button>
-										)}
-										{!mediaDeleteMutation.isLoading && (
-											<input
-												type="submit"
-												className="btn btn-error"
-												value="Delete"
-												disabled={name !== confirm}
-											/>
-										)}
-									</div>
-								</form>
-							</Modal>
-						</>
+					{cardType === 'media' && setModal && setConfirm && name && (
+						<button
+							type="button"
+							title="Delete media"
+							className="btn btn-ghost"
+							onClick={() => {
+								setConfirm({ name, input: '', id: mediaId });
+								setModal(true);
+							}}
+						>
+							<TrashIcon className="w-6" />
+						</button>
 					)}
 					{assign && data && setData && (
 						<label htmlFor={'assignMedia-' + mediaId} className="btn btn-ghost p-3">
