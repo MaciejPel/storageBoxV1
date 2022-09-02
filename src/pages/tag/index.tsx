@@ -6,12 +6,12 @@ import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useState } from 'react';
 import Masonry from 'react-masonry-css';
+import Card from '../../components/Card';
 import Container from '../../components/Container';
 import TagForm from '../../components/forms/TagForm';
 import Meta from '../../components/Meta';
 import Modal from '../../components/Modal';
 import Search from '../../components/Search';
-import { bunnyCDN } from '../../utils/constants';
 import { trpc } from '../../utils/trpc';
 import { authOptions } from '../api/auth/[...nextauth]';
 
@@ -44,8 +44,15 @@ const TagsPage: NextPage = () => {
 			<Container type="start">
 				<h2 className="text-4xl font-extrabold my-4 text-start w-full mt-0 mb-2">Tags</h2>
 				<div className="w-full flex items-center gap-1 md:flex-row flex-col mb-2">
-					<Search setQuery={setQuery} query={query} />
-					<Modal open={modal} onClose={() => setModal(false)} modalTitle="New tag">
+					<Search
+						setQuery={setQuery}
+						query={query}
+					/>
+					<Modal
+						open={modal}
+						onClose={() => setModal(false)}
+						modalTitle="New tag"
+					>
 						<TagForm closeModal={() => setModal(false)} />
 					</Modal>
 				</div>
@@ -70,22 +77,20 @@ const TagsPage: NextPage = () => {
 								return 0;
 							})
 							.map((tag) => (
-								<Link href={`/tag/${tag.id}`} key={tag.id}>
-									<div className="card card-compact static bg-base-100 card-bordered cursor-pointer mb-4">
-										{tag?.cover ? (
-											<img
-												src={`${bunnyCDN}/${tag.cover.id}.${tag.cover.fileExtension}`}
-												alt={`${tag.cover.fileName}.${tag.cover.fileExtension}`}
-											/>
-										) : (
-											<PhotographIcon />
-										)}
-										<div className="card-body w-full bg-base-300">
-											<div>
-												<h2 className="card-title !mb-0">{tag.name}</h2>
-												<p className="truncate">{tag.description}</p>
-											</div>
-											<div className="card-actions justify-end">
+								<Link
+									href={`/tag/${tag.id}`}
+									key={tag.id}
+								>
+									<a>
+										<Card
+											image={tag.cover}
+											body={
+												<div>
+													<h2 className="card-title !mb-0">{tag.name}</h2>
+													<p className="truncate">{tag.description}</p>
+												</div>
+											}
+											actions={
 												<button className="flex gap-1 text-base">
 													<HeartIcon className="w-6 fill-red-500" />
 													{tag.characters.reduce((acc, character) => {
@@ -98,9 +103,9 @@ const TagsPage: NextPage = () => {
 														);
 													}, 0)}
 												</button>
-											</div>
-										</div>
-									</div>
+											}
+										/>
+									</a>
 								</Link>
 							))}
 				</Masonry>

@@ -15,6 +15,7 @@ import Modal from '../components/Modal';
 import CharacterForm from '../components/forms/CharacterForm';
 import TagForm from '../components/forms/TagForm';
 import Masonry from 'react-masonry-css';
+import Card from '../components/Card';
 
 const breakpointColumnsObj = {
 	default: 5,
@@ -52,7 +53,10 @@ const Home: NextPage = () => {
 		<Container type="start">
 			<h2 className="text-4xl font-extrabold my-4 text-start w-full mt-0 mb-2">Characters</h2>
 			<div className="w-full flex items-center gap-1 md:flex-row flex-col mb-2">
-				<Search setQuery={setQuery} query={query} />
+				<Search
+					setQuery={setQuery}
+					query={query}
+				/>
 
 				<button
 					type="button"
@@ -119,49 +123,49 @@ const Home: NextPage = () => {
 							if (likesF > likesS) return query.sort ? -1 : 1;
 							return 0;
 						})
-						.map((character, index) => (
-							<Link href={`/character/${character.id}`} key={character.id}>
-								<div
-									data-test={index}
-									className="card card-compact static bg-base-100 card-bordered cursor-pointer mb-4"
-								>
-									{character?.cover && character.cover.mimetype.includes('image') ? (
-										<img
-											src={`${bunnyCDN}/${character.cover.id}.${character.cover.fileExtension}`}
-											alt={`${character.cover.fileName}.${character.cover.fileExtension}`}
-										/>
-									) : (
-										<PhotographIcon />
-									)}
-									<div className="card-body w-full bg-base-300">
-										<div>
-											<h2 className="card-title !mb-0">{character.name}</h2>
-											<p className="truncate">{character.description}</p>
-										</div>
-										<p className="flex gap-1 flex-wrap">
-											{character.tags.map((tag) => (
-												<Link href={`/tag/${tag.id}`} key={tag.id}>
-													<span
-														className={`badge badge-md badge-outline hover:bg-info hover:text-info-content !py-3 ${
-															query.tags && query.tags.includes(tag.id)
-																? 'bg-success text-success-content'
-																: ''
-														}`}
-													>
-														{tag.name}
-													</span>
-												</Link>
-											))}
-										</p>
-										<div className="card-actions justify-end">
+						.map((character) => (
+							<Link
+								href={`/character/${character.id}`}
+								key={character.id}
+							>
+								<a>
+									<Card
+										image={character.cover}
+										body={
+											<>
+												<div>
+													<h2 className="card-title !mb-0">{character.name}</h2>
+													<p className="truncate">{character.description}</p>
+												</div>
+												<p className="flex gap-1 flex-wrap">
+													{character.tags.map((tag) => (
+														<Link
+															href={`/tag/${tag.id}`}
+															key={tag.id}
+														>
+															<span
+																className={`badge badge-md badge-outline hover:bg-info hover:text-info-content !py-3 cursor-pointer ${
+																	query.tags && query.tags.includes(tag.id)
+																		? 'bg-success text-success-content'
+																		: ''
+																}`}
+															>
+																{tag.name}
+															</span>
+														</Link>
+													))}
+												</p>
+											</>
+										}
+										actions={
 											<button className="flex gap-1 text-base">
 												<HeartIcon className="w-6 fill-red-500" />
 												{character.media.reduce((acc, media) => acc + media.likeIds.length, 0) +
 													(character.cover?.likeIds.length || 0)}
 											</button>
-										</div>
-									</div>
-								</div>
+										}
+									/>
+								</a>
 							</Link>
 						))}
 			</Masonry>
