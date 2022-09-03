@@ -13,7 +13,7 @@ const uploadLimits = { length: 10, size: 25 * 1024 * 1024 };
 
 const UploadForm: React.FC = () => {
 	const router = useRouter();
-	const { id } = router.query;
+	const characterId = router.query.id as string;
 	const [bg, setBg] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [compressing, setCompressing] = useState(false);
@@ -79,24 +79,27 @@ const UploadForm: React.FC = () => {
 		setLoading(true);
 		e.preventDefault();
 		const formData = new FormData();
-		if (images?.files && id) {
+		if (images?.files && characterId) {
 			images.files.forEach((file: File, index: number) => formData.append(`file-${index}`, file));
-			formData.append('characterId', id as string);
+			formData.append('characterId', characterId);
 		}
 		const response = await fetch('/api/upload', {
 			method: 'POST',
 			body: formData,
 			credentials: 'include',
 		});
-		if (response && id) {
-			utils.invalidateQueries(['character.single', { characterId: id as string }]);
+		if (response && characterId) {
+			utils.invalidateQueries(['character.single', { characterId }]);
 			setImages({ files: [] });
 			setLoading(false);
 		}
 	};
 
 	return (
-		<form onSubmit={handleSubmit} className="form-control gap-4 w-full h-full">
+		<form
+			onSubmit={handleSubmit}
+			className="form-control gap-4 w-full h-full"
+		>
 			{images?.files?.length > 0 && (
 				<div className="h-full overflow-x-auto">
 					<table className="table static w-full">
@@ -110,7 +113,10 @@ const UploadForm: React.FC = () => {
 						</thead>
 						<tbody>
 							{images.files.map((file, index) => (
-								<tr key={index} className="hover">
+								<tr
+									key={index}
+									className="hover"
+								>
 									<td className="p-3 xl:max-w-[15rem] lg:max-w-[10rem] md:max-w-[6rem] sm:max-w-[3rem] max-w-[5rem] truncate">
 										{file.name}
 									</td>
@@ -192,7 +198,11 @@ const UploadForm: React.FC = () => {
 			/>
 			<div className="btn-group justify-end">
 				{loading && (
-					<button title="Loading" type="button" className="btn loading w-1/2">
+					<button
+						title="Loading"
+						type="button"
+						className="btn loading w-1/2"
+					>
 						Processing...
 					</button>
 				)}
@@ -217,3 +227,4 @@ const UploadForm: React.FC = () => {
 	);
 };
 export default UploadForm;
+

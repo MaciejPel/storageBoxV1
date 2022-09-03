@@ -1,4 +1,10 @@
-import { ExternalLinkIcon, PencilAltIcon, TrashIcon } from '@heroicons/react/solid';
+import {
+	ExternalLinkIcon,
+	HeartIcon,
+	PencilAltIcon,
+	SparklesIcon,
+	TrashIcon,
+} from '@heroicons/react/solid';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
@@ -24,7 +30,7 @@ const breakpointColumnsObj = {
 
 const TagPage = () => {
 	const router = useRouter();
-	const { id } = router.query;
+	const tagId = router.query.id as string;
 	const { data: session } = useSession();
 	const [readMore, setReadMore] = useState<boolean>(false);
 	const [confirm, setConfirm] = useState<string>('');
@@ -33,10 +39,11 @@ const TagPage = () => {
 		delete: false,
 	});
 
-	const tagQuery = trpc.useQuery(['tag.single', { tagId: id as string }], {
+	const utils = trpc.useContext();
+	const tagQuery = trpc.useQuery(['tag.single', { tagId }], {
 		enabled: session ? true : false,
 	});
-	const tagMediaQuery = trpc.useQuery(['tag.media', { tagId: id as string }], {
+	const tagMediaQuery = trpc.useQuery(['tag.media', { tagId }], {
 		enabled: session ? true : false,
 	});
 	const tagDeleteMutation = trpc.useMutation(['tag.delete'], {
@@ -48,19 +55,43 @@ const TagPage = () => {
 			router.push('/tag');
 		},
 	});
+	const mediaUpdateMutation = trpc.useMutation(['media.update'], {
+		onSuccess() {
+			utils.invalidateQueries(['character.single']);
+			utils.invalidateQueries(['media.all']);
+			utils.invalidateQueries(['tag.media']);
+			utils.invalidateQueries(['tag.single', { tagId }]);
+		},
+	});
+	const tagSetMainMutation = trpc.useMutation(['tag.setMain'], {
+		onSuccess() {
+			utils.invalidateQueries(['tag.single']);
+			utils.invalidateQueries(['tag.all']);
+			utils.invalidateQueries(['tag.media']);
+		},
+	});
 
 	const tagsCharacterMedia = tagMediaQuery.data?.characters.map((character) => [
 		...character.media,
 		character.cover,
 	]);
 	const mergedMedia = tagsCharacterMedia?.reduce((a, b) => a.concat(b), []);
-	const filteredMedia = mergedMedia?.filter(
-		(v, i, a) => a.findIndex((v2) => v2?.id === v?.id) === i
-	);
+	const filteredMedia = mergedMedia
+		?.filter(
+			(v, i, a) => a.findIndex((v2) => v2?.id === v?.id) === i && v?.id !== tagQuery.data?.cover?.id
+		)
+		?.sort((f, s) => {
+			if (f && s) return s.likeIds.length - f.likeIds.length;
+			return 0;
+		});
+
+	if (tagQuery.isLoading) return <Container type="center">Loading tag ⌚</Container>;
+
+	if (tagQuery.isError) return <Container type="center">Error occurred ⚠</Container>;
 
 	return (
 		<>
-			<Meta title={`${tagQuery.data?.name} | Tag `} />
+			<Meta title={(tagQuery.data?.name || '...') + ' | Tag'} />
 			<Container type="start">
 				<div className="grid grid-cols-1 w-full gap-4 mb-4">
 					{tagQuery.data && (
@@ -71,7 +102,7 @@ const TagPage = () => {
 									<div>
 										<h2 className="card-title !mb-0">{tagQuery.data.name}</h2>
 										<h3 className="font-normal">
-											Created by:&nbsp;
+											Created by:{' '}
 											<span className="font-bold hover:link">{tagQuery.data.author.username}</span>
 										</h3>
 									</div>
@@ -112,7 +143,7 @@ const TagPage = () => {
 											className="flex flex-col gap-4"
 											onSubmit={(e) => {
 												e.preventDefault();
-												tagDeleteMutation.mutate({ tagId: id as string });
+												tagDeleteMutation.mutate({ tagId });
 											}}
 										>
 											<div>
@@ -158,6 +189,29 @@ const TagPage = () => {
 									</Modal>
 									<button
 										type="button"
+										title="Like image"
+										className="btn btn-ghost gap-1"
+										onClick={() =>
+											tagQuery.data?.cover &&
+											mediaUpdateMutation.mutate({ mediaId: tagQuery.data.cover.id })
+										}
+									>
+										<HeartIcon
+											className={`w-6 ${
+												tagQuery.data.cover?.likeIds.includes(session?.user.id || '')
+													? 'fill-red-600'
+													: ''
+											}`}
+										/>
+										{`${
+											(filteredMedia?.reduce((acc, media) => {
+												return acc + (media?.likeIds.length || 0);
+											}, 0) || 0) + (tagQuery.data.cover?.likeIds.length || 0)
+										}
+											 (${tagQuery.data.cover?.likeIds.length || 0})`}
+									</button>
+									<button
+										type="button"
 										title="Edit character"
 										className="btn btn-ghost"
 										onClick={() => setModal({ ...modal, edit: true })}
@@ -170,7 +224,7 @@ const TagPage = () => {
 										modalTitle="Edit tag"
 									>
 										<TagEditForm
-											id={id as string}
+											id={tagId}
 											closeModal={() => setModal({ ...modal, edit: false })}
 											name={tagQuery.data?.name || ''}
 											description={tagQuery.data?.description || ''}
@@ -200,16 +254,46 @@ const TagPage = () => {
 					{filteredMedia?.map((media) => {
 						if (media)
 							return (
-								<MediaCard
+								<Card
 									key={media.id}
-									cardType="tag-media"
-									fileName={media.fileName}
-									fileExtension={media.fileExtension}
-									mimetype={media.mimetype}
-									likeIds={media.likeIds}
-									mediaId={media.id}
-									tagId={id as string}
-									tagCover={tagQuery.data?.cover?.id}
+									image={media}
+									actions={
+										<>
+											<button
+												type="button"
+												title="Like image"
+												className="btn btn-ghost p-2 gap-1"
+												onClick={() => {
+													mediaUpdateMutation.mutate({ mediaId: media.id });
+												}}
+											>
+												<HeartIcon
+													className={`w-6 transition-all duration-300 ${
+														media.likeIds.includes(session?.user.id || '') ? 'fill-red-600 ' : ''
+													}`}
+												/>
+												<span className="text-md font-bold">{media.likeIds.length}</span>
+											</button>
+											<button
+												type="button"
+												title="Set image as main"
+												className="btn btn-ghost p-3 gap-1 group"
+												onClick={() => {
+													tagSetMainMutation.mutate({ mediaId: media.id, tagId });
+												}}
+											>
+												<SparklesIcon className="w-6 group-hover:fill-warning duration-300 transition-all" />
+											</button>
+											<a
+												href={`${bunnyCDN}/${media.id}.${media.fileExtension}`}
+												target="_blank"
+												rel="noreferrer"
+												className="btn btn-ghost p-3"
+											>
+												<ExternalLinkIcon className="w-6" />
+											</a>
+										</>
+									}
 								/>
 							);
 					})}
@@ -219,3 +303,4 @@ const TagPage = () => {
 	);
 };
 export default TagPage;
+

@@ -26,12 +26,11 @@ const Card: React.FC<CardProps> = ({ image, body, actions }) => {
 			) : (
 				<PhotographIcon />
 			)}
-			{body && (
-				<div className="card-body w-full bg-base-300">
-					{body} {actions && <div className="card-actions justify-end gap-0">{actions}</div>}
-				</div>
-			)}
+			<div className="card-body w-full bg-base-300">
+				{body} {actions && <div className="card-actions justify-end gap-0">{actions}</div>}
+			</div>
 		</div>
 	);
 };
 export default Card;
+

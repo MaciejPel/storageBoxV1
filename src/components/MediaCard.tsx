@@ -9,8 +9,6 @@ import {
 } from '@heroicons/react/solid';
 import { trpc } from '../utils/trpc';
 import { useSession } from 'next-auth/react';
-import Modal from './Modal';
-import React, { useState } from 'react';
 
 interface CharacterMediaCardProps {
 	cardType: 'media' | 'character-media' | 'tag-media';
@@ -84,10 +82,18 @@ const MediaCard: React.FC<CharacterMediaCardProps> = ({
 		<div className="card card-compact static w-full bg-base-300 card-bordered mb-4">
 			{mimetype.includes('video') && (
 				<video controls={true}>
-					<source src={src} type="video/mp4" />
+					<source
+						src={src}
+						type="video/mp4"
+					/>
 				</video>
 			)}
-			{mimetype.includes('image') && <img src={src} alt={`${fileName}.${fileExtension}`} />}
+			{mimetype.includes('image') && (
+				<img
+					src={src}
+					alt={`${fileName}.${fileExtension}`}
+				/>
+			)}
 			<div className="card-body">
 				{name && <h2 className="text-lg break-words">{name}</h2>}
 				<div className="card-actions justify-end gap-0">
@@ -117,7 +123,10 @@ const MediaCard: React.FC<CharacterMediaCardProps> = ({
 						</button>
 					)}
 					{assign && data && setData && (
-						<label htmlFor={'assignMedia-' + mediaId} className="btn btn-ghost p-3">
+						<label
+							htmlFor={'assignMedia-' + mediaId}
+							className="btn btn-ghost p-3"
+						>
 							<input
 								type="checkbox"
 								className="checkbox"
@@ -173,7 +182,12 @@ const MediaCard: React.FC<CharacterMediaCardProps> = ({
 							<SparklesIcon className="w-6 group-hover:fill-warning duration-300 transition-all" />
 						</button>
 					)}
-					<a href={src} target="_blank" rel="noreferrer" className="btn btn-ghost p-3">
+					<a
+						href={src}
+						target="_blank"
+						rel="noreferrer"
+						className="btn btn-ghost p-3"
+					>
 						<ExternalLinkIcon className="w-6" />
 					</a>
 				</div>
@@ -182,3 +196,4 @@ const MediaCard: React.FC<CharacterMediaCardProps> = ({
 	);
 };
 export default MediaCard;
+

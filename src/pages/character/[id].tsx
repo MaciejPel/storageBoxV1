@@ -9,12 +9,18 @@ import Masonry from 'react-masonry-css';
 import Container from '../../components/Container';
 import UploadForm from '../../components/forms/UploadForm';
 import Meta from '../../components/Meta';
-import MediaCard from '../../components/MediaCard';
 import { GetServerSidePropsContext } from 'next';
 import Card from '../../components/Card';
 import { useState } from 'react';
 import Link from 'next/link';
-import { ExternalLinkIcon, HeartIcon, PencilAltIcon, TrashIcon } from '@heroicons/react/solid';
+import {
+	ExternalLinkIcon,
+	HeartIcon,
+	PencilAltIcon,
+	SparklesIcon,
+	TrashIcon,
+	XIcon,
+} from '@heroicons/react/solid';
 import Modal from '../../components/Modal';
 import CharacterEditForm from '../../components/forms/CharacterEditForm';
 import { bunnyCDN } from '../../utils/constants';
@@ -30,7 +36,7 @@ const breakpointColumnsObj = {
 
 const CharacterPage = () => {
 	const router = useRouter();
-	const { id } = router.query;
+	const characterId = router.query.id as string;
 
 	const { data: session } = useSession();
 	const [readMore, setReadMore] = useState<boolean>(false);
@@ -40,7 +46,7 @@ const CharacterPage = () => {
 	});
 	const [confirm, setConfirm] = useState<string>('');
 
-	const characterQuery = trpc.useQuery(['character.single', { characterId: id as string }], {
+	const characterQuery = trpc.useQuery(['character.single', { characterId }], {
 		enabled: session ? true : false,
 		onError(err) {
 			if (err.data?.code === 'NOT_FOUND') {
@@ -58,7 +64,7 @@ const CharacterPage = () => {
 	const utils = trpc.useContext();
 	const mediaUpdateMutation = trpc.useMutation(['media.update'], {
 		onSuccess() {
-			utils.invalidateQueries(['character.single', { characterId: id as string }]);
+			utils.invalidateQueries(['character.single', { characterId }]);
 		},
 	});
 	const characterDeleteMutation = trpc.useMutation(['character.delete'], {
@@ -68,6 +74,17 @@ const CharacterPage = () => {
 			});
 			setModal({ ...modal, delete: false });
 			router.push('/');
+		},
+	});
+	const characterSetMainMutation = trpc.useMutation(['character.setMain'], {
+		onSuccess() {
+			utils.invalidateQueries(['character.single']);
+			utils.invalidateQueries(['character.all']);
+		},
+	});
+	const characterRemoveMediaMutation = trpc.useMutation(['character.removeMedia'], {
+		onSuccess() {
+			utils.invalidateQueries(['character.single']);
 		},
 	});
 
@@ -118,9 +135,11 @@ const CharacterPage = () => {
 												href={`/tag/${tag.id}`}
 												key={tag.id}
 											>
-												<span className="badge badge-md badge-outline hover:bg-base-100 !py-3 cursor-pointer">
-													{tag.name}
-												</span>
+												<a>
+													<span className="badge badge-md hover:bg-base-content hover:text-base-100 font-semibold !py-3">
+														{tag.name}
+													</span>
+												</a>
 											</Link>
 										))}
 									</p>
@@ -145,7 +164,7 @@ const CharacterPage = () => {
 											className="flex flex-col gap-4"
 											onSubmit={(e) => {
 												e.preventDefault();
-												characterDeleteMutation.mutate({ characterId: id as string });
+												characterDeleteMutation.mutate({ characterId });
 											}}
 										>
 											<div>
@@ -204,7 +223,7 @@ const CharacterPage = () => {
 										modalTitle="Edit character"
 									>
 										<CharacterEditForm
-											id={id as string}
+											id={characterId}
 											closeModal={() => setModal({ ...modal, edit: false })}
 											name={characterQuery.data?.name || ''}
 											description={characterQuery.data?.description || ''}
@@ -224,7 +243,7 @@ const CharacterPage = () => {
 											className={`w-6 group-hover:fill-warning transition-all duration-200 ${
 												characterQuery.data.cover &&
 												characterQuery.data.cover.likeIds.includes(session?.user.id || '')
-													? 'fill-red-600 '
+													? 'fill-red-600'
 													: ''
 											}`}
 										/>
@@ -251,7 +270,7 @@ const CharacterPage = () => {
 							}
 						/>
 					)}
-					<div className="card card-compact card-bordered static text-base-content bg-base-300 2xl:col-span-3 lg:col-span-2 sm:col-span-1">
+					<div className="card card-compact card-bordered static text-base-content bg-base-300 2xl:col-span-3 lg:col-span-2 sm:col-span-1 mb-4">
 						<div className="card-body items-center justify-between">
 							<UploadForm />
 						</div>
@@ -265,15 +284,57 @@ const CharacterPage = () => {
 					{characterQuery?.data?.media
 						.sort((f, s) => s.likeIds.length - f.likeIds.length)
 						.map((media) => (
-							<MediaCard
-								cardType="character-media"
+							<Card
 								key={media.id}
-								characterId={id as string}
-								mediaId={media.id}
-								fileName={media.fileName}
-								fileExtension={media.fileExtension}
-								mimetype={media.mimetype}
-								likeIds={media.likeIds}
+								image={media}
+								actions={
+									<>
+										<button
+											type="button"
+											title="Remove image from character"
+											className="btn btn-ghost p-3"
+											onClick={() => {
+												characterRemoveMediaMutation.mutate({ characterId, mediaId: media.id });
+											}}
+										>
+											<XIcon className="w-6 transition-all duration-300" />
+										</button>
+										<button
+											type="button"
+											title="Like image"
+											className="btn btn-ghost p-2 gap-1"
+											onClick={() => {
+												mediaUpdateMutation.mutate({ mediaId: media.id });
+											}}
+										>
+											<HeartIcon
+												className={`w-6 transition-all duration-300 ${
+													media.likeIds.includes(session?.user.id || '') ? 'fill-red-600 ' : ''
+												}`}
+											/>
+											<span className="text-md font-bold">{media.likeIds.length}</span>
+										</button>
+
+										<button
+											type="button"
+											title="Set image as main"
+											className="btn btn-ghost p-3 gap-1 group"
+											onClick={() => {
+												characterSetMainMutation.mutate({ mediaId: media.id, characterId });
+											}}
+										>
+											<SparklesIcon className="w-6 group-hover:fill-warning duration-300 transition-all" />
+										</button>
+										<a
+											href={`${bunnyCDN}/${media.id}/${media.fileExtension}`}
+											target="_blank"
+											rel="noreferrer"
+											className="btn btn-ghost p-3"
+										>
+											<ExternalLinkIcon className="w-6" />
+										</a>
+									</>
+								}
 							/>
 						))}
 				</Masonry>
@@ -297,3 +358,4 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 	}
 	return { props: { session } };
 };
+

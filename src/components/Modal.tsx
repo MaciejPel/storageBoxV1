@@ -26,7 +26,10 @@ const Modal: React.FC<ModalProps> = ({ open, onClose, modalTitle, children }) =>
 			className={`modal ${open ? 'modal-open' : ''} cursor-pointer !z-0`}
 			onClick={() => onClose()}
 		>
-			<label className="modal-box cursor-auto relative !z-10" onClick={(e) => e.stopPropagation()}>
+			<label
+				className="modal-box cursor-auto relative !z-10"
+				onClick={(e) => e.stopPropagation()}
+			>
 				<h3 className="text-lg font-bold">{modalTitle}</h3>
 				{children}
 			</label>
@@ -34,3 +37,4 @@ const Modal: React.FC<ModalProps> = ({ open, onClose, modalTitle, children }) =>
 	);
 };
 export default Modal;
+

@@ -6,8 +6,7 @@ import { useSession } from 'next-auth/react';
 import { unstable_getServerSession as getServerSession } from 'next-auth/next';
 import { authOptions } from './api/auth/[...nextauth]';
 import { trpc } from '../utils/trpc';
-import { bunnyCDN } from '../utils/constants';
-import { HeartIcon, PhotographIcon } from '@heroicons/react/solid';
+import { HeartIcon } from '@heroicons/react/solid';
 import Link from 'next/link';
 import Container from '../components/Container';
 import Search from '../components/Search';
@@ -144,7 +143,7 @@ const Home: NextPage = () => {
 															key={tag.id}
 														>
 															<span
-																className={`badge badge-md badge-outline hover:bg-info hover:text-info-content !py-3 cursor-pointer ${
+																className={`badge badge-md hover:bg-base-content hover:text-base-100 !py-3 cursor-pointer font-semibold ${
 																	query.tags && query.tags.includes(tag.id)
 																		? 'bg-success text-success-content'
 																		: ''
@@ -188,3 +187,4 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 	}
 	return { props: { session } };
 };
+

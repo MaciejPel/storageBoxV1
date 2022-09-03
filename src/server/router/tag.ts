@@ -38,7 +38,15 @@ export const tagRouter = createProtectedRouter()
 					name: true,
 					description: true,
 					author: { select: { id: true, username: true } },
-					cover: { select: { id: true, fileName: true, fileExtension: true, mimetype: true } },
+					cover: {
+						select: {
+							id: true,
+							fileName: true,
+							fileExtension: true,
+							mimetype: true,
+							likeIds: true,
+						},
+					},
 					characterIds: true,
 				},
 				where: { id: input.tagId },
@@ -178,3 +186,4 @@ export const tagRouter = createProtectedRouter()
 			return { id: tag.id };
 		},
 	});
+
