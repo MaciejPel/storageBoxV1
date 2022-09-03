@@ -13,7 +13,6 @@ import { toast } from 'react-toastify';
 import Card from '../../components/Card';
 import Container from '../../components/Container';
 import TagEditForm from '../../components/forms/TagEditFrom';
-import MediaCard from '../../components/MediaCard';
 import Meta from '../../components/Meta';
 import Modal from '../../components/Modal';
 import { bunnyCDN } from '../../utils/constants';
@@ -96,7 +95,7 @@ const TagPage = () => {
 				<div className="grid grid-cols-1 w-full gap-4 mb-4">
 					{tagQuery.data && (
 						<Card
-							image={tagQuery.data.cover}
+							image={tagQuery.data.cover?.mimetype.includes('image') ? tagQuery.data.cover : null}
 							body={
 								<div className="flex flex-col gap-2">
 									<div>
@@ -303,4 +302,3 @@ const TagPage = () => {
 	);
 };
 export default TagPage;
-

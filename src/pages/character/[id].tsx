@@ -99,7 +99,11 @@ const CharacterPage = () => {
 				<div className="grid 2xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 w-full gap-4 mb-4">
 					{characterQuery.data && (
 						<Card
-							image={characterQuery.data.cover}
+							image={
+								characterQuery.data.cover?.mimetype.includes('image')
+									? characterQuery.data.cover
+									: null
+							}
 							body={
 								<div className="flex flex-col gap-2">
 									<div>
@@ -314,17 +318,18 @@ const CharacterPage = () => {
 											/>
 											<span className="text-md font-bold">{media.likeIds.length}</span>
 										</button>
-
-										<button
-											type="button"
-											title="Set image as main"
-											className="btn btn-ghost p-3 gap-1 group"
-											onClick={() => {
-												characterSetMainMutation.mutate({ mediaId: media.id, characterId });
-											}}
-										>
-											<SparklesIcon className="w-6 group-hover:fill-warning duration-300 transition-all" />
-										</button>
+										{media.mimetype.includes('image') && (
+											<button
+												type="button"
+												title="Set image as main"
+												className="btn btn-ghost p-3 gap-1 group"
+												onClick={() => {
+													characterSetMainMutation.mutate({ mediaId: media.id, characterId });
+												}}
+											>
+												<SparklesIcon className="w-6 group-hover:fill-warning duration-300 transition-all" />
+											</button>
+										)}
 										<a
 											href={`${bunnyCDN}/${media.id}/${media.fileExtension}`}
 											target="_blank"
@@ -358,4 +363,3 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 	}
 	return { props: { session } };
 };
-

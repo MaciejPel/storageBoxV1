@@ -83,7 +83,7 @@ const TagsPage: NextPage = () => {
 								>
 									<a>
 										<Card
-											image={tag.cover}
+											image={tag.cover?.mimetype.includes('image') ? tag.cover : null}
 											body={
 												<div>
 													<h2 className="card-title !mb-0">{tag.name}</h2>
@@ -97,8 +97,8 @@ const TagsPage: NextPage = () => {
 														return (
 															(character.cover?.likeIds.length || 0) +
 															acc +
-															character.media.reduce((acc2, media) => {
-																return acc2 + (media.likeIds.length || 0);
+															character.media.reduce((accs, media) => {
+																return accs + (media.likeIds.length || 0);
 															}, 0)
 														);
 													}, 0)}

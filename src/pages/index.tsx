@@ -129,7 +129,7 @@ const Home: NextPage = () => {
 							>
 								<a>
 									<Card
-										image={character.cover}
+										image={character.cover?.mimetype.includes('image') ? character.cover : null}
 										body={
 											<>
 												<div>
@@ -187,4 +187,3 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 	}
 	return { props: { session } };
 };
-
