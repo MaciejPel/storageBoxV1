@@ -12,7 +12,15 @@ export const tagRouter = createProtectedRouter()
 					id: true,
 					name: true,
 					description: true,
-					cover: { select: { id: true, fileName: true, fileExtension: true, mimetype: true } },
+					cover: {
+						select: {
+							id: true,
+							fileName: true,
+							fileExtension: true,
+							mimetype: true,
+							likeIds: true,
+						},
+					},
 					characterIds: true,
 					characters: {
 						select: {
@@ -186,4 +194,3 @@ export const tagRouter = createProtectedRouter()
 			return { id: tag.id };
 		},
 	});
-

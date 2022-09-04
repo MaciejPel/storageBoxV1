@@ -95,7 +95,7 @@ const TagPage = () => {
 				<div className="grid grid-cols-1 w-full gap-4 mb-4">
 					{tagQuery.data && (
 						<Card
-							image={tagQuery.data.cover?.mimetype.includes('image') ? tagQuery.data.cover : null}
+							media={tagQuery.data.cover?.mimetype.includes('image') ? tagQuery.data.cover : null}
 							body={
 								<div className="flex flex-col gap-2">
 									<div>
@@ -151,7 +151,7 @@ const TagPage = () => {
 													htmlFor="name"
 												>
 													<span className="label-text">
-														Confirm by typing
+														Confirm by typing{' '}
 														<span className="font-extrabold">{tagQuery.data.name}</span> in
 													</span>
 												</label>
@@ -255,7 +255,7 @@ const TagPage = () => {
 							return (
 								<Card
 									key={media.id}
-									image={media}
+									media={media}
 									actions={
 										<>
 											<button

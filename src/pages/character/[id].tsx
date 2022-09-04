@@ -99,7 +99,7 @@ const CharacterPage = () => {
 				<div className="grid 2xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 w-full gap-4 mb-4">
 					{characterQuery.data && (
 						<Card
-							image={
+							media={
 								characterQuery.data.cover?.mimetype.includes('image')
 									? characterQuery.data.cover
 									: null
@@ -290,7 +290,7 @@ const CharacterPage = () => {
 						.map((media) => (
 							<Card
 								key={media.id}
-								image={media}
+								media={media}
 								actions={
 									<>
 										<button

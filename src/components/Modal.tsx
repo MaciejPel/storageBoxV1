@@ -23,7 +23,7 @@ const Modal: React.FC<ModalProps> = ({ open, onClose, modalTitle, children }) =>
 
 	return (
 		<div
-			className={`modal ${open ? 'modal-open' : ''} cursor-pointer !z-0`}
+			className={`modal !z-0 cursor-pointer ${open ? 'modal-open' : ''}`}
 			onClick={() => onClose()}
 		>
 			<label
@@ -37,4 +37,3 @@ const Modal: React.FC<ModalProps> = ({ open, onClose, modalTitle, children }) =>
 	);
 };
 export default Modal;
-

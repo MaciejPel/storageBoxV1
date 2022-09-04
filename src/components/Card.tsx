@@ -4,7 +4,7 @@ import { ReactNode } from 'react';
 import { bunnyCDN } from '../utils/constants';
 
 interface CardProps {
-	image?: {
+	media?: {
 		id: string;
 		fileName: string;
 		fileExtension: string;
@@ -15,24 +15,24 @@ interface CardProps {
 	actions?: ReactNode;
 }
 
-const Card: React.FC<CardProps> = ({ image, body, actions }) => {
+const Card: React.FC<CardProps> = ({ media, body, actions }) => {
 	return (
 		<div className="card card-compact static bg-base-100 card-bordered mb-4">
-			{image?.mimetype?.includes('image') && (
+			{media?.mimetype?.includes('image') && (
 				<img
-					src={`${bunnyCDN}/${image.id}.${image.fileExtension}`}
-					alt={`${image.fileName}.${image.fileExtension}`}
+					src={`${bunnyCDN}/${media.id}.${media.fileExtension}`}
+					alt={`${media.fileName}.${media.fileExtension}`}
 				/>
 			)}
-			{image?.mimetype?.includes('video') && (
+			{media?.mimetype?.includes('video') && (
 				<video controls={true}>
 					<source
-						src={`${bunnyCDN}/${image.id}.${image.fileExtension}`}
-						type={image.mimetype}
+						src={`${bunnyCDN}/${media.id}.${media.fileExtension}`}
+						type={media.mimetype}
 					/>
 				</video>
 			)}
-			{!image && <PhotographIcon />}
+			{!media && <PhotographIcon />}
 			<div className="card-body w-full bg-base-300">
 				{body} {actions && <div className="card-actions justify-end gap-0">{actions}</div>}
 			</div>

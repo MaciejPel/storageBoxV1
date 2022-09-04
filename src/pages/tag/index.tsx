@@ -48,6 +48,14 @@ const TagsPage: NextPage = () => {
 						setQuery={setQuery}
 						query={query}
 					/>
+					<button
+						type="button"
+						title="Add tag"
+						onClick={() => setModal(true)}
+						className="btn"
+					>
+						Add tag
+					</button>
 					<Modal
 						open={modal}
 						onClose={() => setModal(false)}
@@ -72,42 +80,57 @@ const TagsPage: NextPage = () => {
 								return tag.name.toLowerCase().includes(query.string);
 							})
 							.sort((f, s) => {
-								if (f.characterIds.length < s.characterIds.length) return query.sort ? 1 : -1;
-								if (f.characterIds.length > s.characterIds.length) return query.sort ? -1 : 1;
+								const fTagCharacterMedia = f.characters
+									.map((character) => [...character.media, character.cover])
+									.reduce((arr, media) => arr.concat(media), [])
+									.filter((v, i, a) => a.findIndex((v2) => v2?.id === v?.id) === i)
+									.reduce((acc, media) => {
+										return acc + (media?.likeIds.length || 0);
+									}, 0);
+								const sTagCharacterMedia = s.characters
+									.map((character) => [...character.media, character.cover])
+									.reduce((arr, media) => arr.concat(media), [])
+									.filter((v, i, a) => a.findIndex((v2) => v2?.id === v?.id) === i)
+									.reduce((acc, media) => {
+										return acc + (media?.likeIds.length || 0);
+									}, 0);
+								if (fTagCharacterMedia < sTagCharacterMedia) return query.sort ? 1 : -1;
+								if (fTagCharacterMedia > sTagCharacterMedia) return query.sort ? -1 : 1;
 								return 0;
 							})
-							.map((tag) => (
-								<Link
-									href={`/tag/${tag.id}`}
-									key={tag.id}
-								>
-									<a>
-										<Card
-											image={tag.cover?.mimetype.includes('image') ? tag.cover : null}
-											body={
-												<div>
-													<h2 className="card-title !mb-0">{tag.name}</h2>
-													<p className="truncate">{tag.description}</p>
-												</div>
-											}
-											actions={
-												<button className="flex gap-1 text-base">
-													<HeartIcon className="w-6 fill-red-500" />
-													{tag.characters.reduce((acc, character) => {
-														return (
-															(character.cover?.likeIds.length || 0) +
-															acc +
-															character.media.reduce((accs, media) => {
-																return accs + (media.likeIds.length || 0);
-															}, 0)
-														);
-													}, 0)}
-												</button>
-											}
-										/>
-									</a>
-								</Link>
-							))}
+							.map((tag) => {
+								const filteredTagLikes = tag.characters
+									.map((character) => [...character.media, character.cover])
+									.reduce((arr, media) => arr.concat(media), [])
+									.filter((v, i, a) => a.findIndex((v2) => v2?.id === v?.id) === i)
+									.reduce((acc, media) => {
+										return acc + (media?.likeIds.length || 0);
+									}, 0);
+								return (
+									<Link
+										href={`/tag/${tag.id}`}
+										key={tag.id}
+									>
+										<a>
+											<Card
+												media={tag.cover?.mimetype.includes('image') ? tag.cover : null}
+												body={
+													<div>
+														<h2 className="card-title !mb-0">{tag.name}</h2>
+														<p className="truncate">{tag.description}</p>
+													</div>
+												}
+												actions={
+													<button className="flex gap-1 text-base">
+														<HeartIcon className="w-6 fill-red-500" />
+														{filteredTagLikes}
+													</button>
+												}
+											/>
+										</a>
+									</Link>
+								);
+							})}
 				</Masonry>
 			</Container>
 		</>

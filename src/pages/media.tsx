@@ -5,12 +5,14 @@ import Meta from '../components/Meta';
 import { trpc } from '../utils/trpc';
 import { authOptions } from './api/auth/[...nextauth]';
 import Masonry from 'react-masonry-css';
-import MediaCard from '../components/MediaCard';
 import { useSession } from 'next-auth/react';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import Search from '../components/Search';
 import Modal from '../components/Modal';
+import Card from '../components/Card';
+import { ExternalLinkIcon, HeartIcon, TrashIcon } from '@heroicons/react/solid';
+import { bunnyCDN } from '../utils/constants';
 
 interface DataProps {
 	characterIds: string[];
@@ -34,10 +36,10 @@ const Media: NextPage = () => {
 	});
 	const [query, setQuery] = useState<QueryParams>({ string: '', sort: true });
 	const breakpointColumnsObj = {
-		default: assign ? 4 : 5,
-		1536: assign ? 3 : 4,
-		1280: assign ? 2 : 3,
-		1024: assign ? 2 : 3,
+		default: 4,
+		1536: 3,
+		1280: 2,
+		1024: 2,
 		768: 2,
 		640: 1,
 	};
@@ -55,6 +57,13 @@ const Media: NextPage = () => {
 			});
 		},
 	});
+	const mediaUpdateMutation = trpc.useMutation(['media.update'], {
+		onSuccess() {
+			utils.invalidateQueries(['character.single']);
+			utils.invalidateQueries(['media.all']);
+			utils.invalidateQueries(['tag.media']);
+		},
+	});
 	const mediaDeleteMutation = trpc.useMutation(['media.delete'], {
 		onSuccess() {
 			utils.invalidateQueries(['character.single']);
@@ -68,13 +77,16 @@ const Media: NextPage = () => {
 			<Meta title="Media" />
 			<Container type="start">
 				<div className="w-full flex justify-between items-center">
-					<h2 className="text-4xl font-extrabold my-4 text-start w-full mt-0 mb-2">Media</h2>
+					<h2 className="text-4xl font-extrabold my-4 text-start w-1/4 mt-0 mb-2">Media</h2>
 					{mediaQuery.isSuccess &&
 						mediaQuery.data.length > 0 &&
 						charactersQuery.isSuccess &&
 						charactersQuery.data.length > 0 && (
 							<div className="flex gap-2 w-3/4 justify-end items-center">
-								<label htmlFor="assign" className="label cursor-pointer">
+								<label
+									htmlFor="assign"
+									className="label cursor-pointer"
+								>
 									Assign mode
 								</label>
 								<input
@@ -86,12 +98,19 @@ const Media: NextPage = () => {
 							</div>
 						)}
 				</div>
-				<Search setQuery={setQuery} query={query} />
+				<Search
+					setQuery={setQuery}
+					query={query}
+				/>
 
 				{mediaQuery.data?.length === 0 && <Container type="center">No media yet 🤐</Container>}
 				{mediaQuery.isSuccess && mediaQuery.data?.length > 0 && (
-					<div className={`w-full my-4 gap-4 ${assign ? 'md:flex flex-row-reverse' : ''} block`}>
-						<Modal open={modal} onClose={() => setModal(false)} modalTitle="Delete media">
+					<div className="w-full my-4 gap-4 md:flex">
+						<Modal
+							open={modal}
+							onClose={() => setModal(false)}
+							modalTitle="Delete media"
+						>
 							<form
 								className="flex flex-col gap-4"
 								onSubmit={(e) => {
@@ -100,7 +119,10 @@ const Media: NextPage = () => {
 								}}
 							>
 								<div>
-									<label className="label pb-1 cursor-pointer" htmlFor="name">
+									<label
+										className="label pb-1 cursor-pointer"
+										htmlFor="name"
+									>
 										<span className="label-text">
 											Confirm by typing <span className="font-extrabold">{confirm.name}</span> in
 										</span>
@@ -117,7 +139,11 @@ const Media: NextPage = () => {
 								</div>
 								<div className="flex justify-end">
 									{mediaDeleteMutation.isLoading && (
-										<button type="button" title="Processing" className="btn loading">
+										<button
+											type="button"
+											title="Processing"
+											className="btn loading"
+										>
 											Processing...
 										</button>
 									)}
@@ -132,7 +158,7 @@ const Media: NextPage = () => {
 								</div>
 							</form>
 						</Modal>
-						<div className={`w-full ${assign ? 'md:w-3/4' : ''}`}>
+						<div className="md:w-3/4">
 							<Masonry
 								breakpointCols={breakpointColumnsObj}
 								className="flex w-full gap-4"
@@ -146,53 +172,106 @@ const Media: NextPage = () => {
 										return 0;
 									})
 									.map((media) => (
-										<MediaCard
+										<Card
 											key={media.id}
-											cardType="media"
-											assign={assign}
-											data={data}
-											setData={setData}
-											name={`${media.fileName}.${media.fileExtension}`}
-											mediaId={media.id}
-											fileName={media.fileName}
-											fileExtension={media.fileExtension}
-											mimetype={media.mimetype}
-											likeIds={media.likeIds}
-											setModal={setModal}
-											setConfirm={setConfirm}
+											media={media}
+											actions={
+												<>
+													<button
+														type="button"
+														title="Delete media"
+														className="btn btn-ghost"
+														onClick={() => {
+															setConfirm({
+																name: media.fileName + '.' + media.fileExtension,
+																input: '',
+																id: media.id,
+															});
+															setModal(true);
+														}}
+													>
+														<TrashIcon className="w-6" />
+													</button>
+													<label
+														htmlFor={'assignMedia-' + media.id}
+														className="btn btn-ghost p-3"
+													>
+														<input
+															type="checkbox"
+															className="checkbox"
+															id={'assignMedia-' + media.id}
+															checked={data?.mediaIds.includes(media.id)}
+															disabled={!assign}
+															onChange={(e) =>
+																setData({
+																	...data,
+																	mediaIds: e.target.checked
+																		? [...data.mediaIds, media.id]
+																		: data.mediaIds.filter((id) => id !== media.id),
+																})
+															}
+														/>
+													</label>
+													<button
+														type="button"
+														title="Like image"
+														className="btn btn-ghost p-2 gap-1"
+														onClick={() => {
+															mediaUpdateMutation.mutate({ mediaId: media.id });
+														}}
+													>
+														<HeartIcon
+															className={`w-6 transition-all duration-300 ${
+																media.likeIds.includes(session?.user.id || '')
+																	? 'fill-red-600 '
+																	: ''
+															}`}
+														/>
+														<span className="text-md font-bold">{media.likeIds.length}</span>
+													</button>
+													<a
+														href={`${bunnyCDN}/${media.id}.${media.fileExtension}`}
+														target="_blank"
+														rel="noreferrer"
+														className="btn btn-ghost p-3"
+													>
+														<ExternalLinkIcon className="w-6" />
+													</a>
+												</>
+											}
 										/>
 									))}
 							</Masonry>
 						</div>
-						<div className={`flex flex-col mb-2 ${assign ? 'md:w-1/4' : 'hidden'}`}>
+						<div className="flex flex-col mb-2 md:w-1/4">
 							<h2 className="text-2xl font-bold">Characters</h2>
 							<div className="grid grid-cols-2 md:grid-cols-1">
-								{assign &&
-									charactersQuery.data?.map((character) => (
-										<label
-											key={character.id}
-											className="w-full cursor-pointer flex gap-2 p-2 hover:bg-base-300 rounded-lg"
-											htmlFor={'assignCharacter-' + character.id}
-										>
-											<input
-												type="checkbox"
-												className="checkbox"
-												id={'assignCharacter-' + character.id}
-												checked={data.characterIds.includes(character.id)}
-												onChange={(e) =>
-													setData({
-														...data,
-														characterIds: e.target.checked
-															? [...data.characterIds, character.id]
-															: data.characterIds.filter(
-																	(characterId) => characterId !== character.id
-															  ),
-													})
-												}
-											/>
-											{character.name}
-										</label>
-									))}
+								{charactersQuery.data?.map((character) => (
+									<label
+										key={character.id}
+										className="w-full cursor-pointer flex gap-2 p-2 hover:bg-base-300 rounded-lg"
+										htmlFor={'assignCharacter-' + character.id}
+									>
+										<input
+											type="checkbox"
+											className="checkbox"
+											id={'assignCharacter-' + character.id}
+											checked={data.characterIds.includes(character.id)}
+											disabled={!assign}
+											onChange={(e) =>
+												setData({
+													...data,
+													characterIds: e.target.checked
+														? [...data.characterIds, character.id]
+														: data.characterIds.filter(
+																(characterId) => characterId !== character.id
+														  ),
+												})
+											}
+										/>
+										{character.name}
+									</label>
+								))}
 							</div>
 							<div className="md:btn-group-vertical w-full mt-2">
 								<button
@@ -207,6 +286,7 @@ const Media: NextPage = () => {
 									title="Submit form"
 									type="submit"
 									className="btn btn-primary w-2/3 md:w-full md:rounded rounded-l-none"
+									disabled={!assign}
 									onClick={() => mediaAssignMutation.mutate(data)}
 								>
 									Submit
