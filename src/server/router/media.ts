@@ -94,12 +94,28 @@ export const mediaRouter = createProtectedRouter()
 				where: { id: input.mediaId },
 			});
 
-			if (media) {
+			const user = await prisma.user.findFirst({
+				select: { likedMediaIds: true },
+				where: { id: userId },
+			});
+
+			if (media && user) {
 				if (media.likeIds.includes(userId)) {
 					media.likeIds = media.likeIds.filter((like) => like != userId);
 				} else {
 					media.likeIds.push(userId);
 				}
+
+				if (user.likedMediaIds.includes(input.mediaId)) {
+					user.likedMediaIds = user.likedMediaIds.filter((media) => media != input.mediaId);
+				} else {
+					user.likedMediaIds.push(input.mediaId);
+				}
+
+				await prisma.user.update({
+					data: { likedMediaIds: user.likedMediaIds },
+					where: { id: userId },
+				});
 
 				const mediaUpdate = await prisma.media.update({
 					data: {
@@ -107,6 +123,7 @@ export const mediaRouter = createProtectedRouter()
 					},
 					where: { id: input.mediaId },
 				});
+
 				return mediaUpdate;
 			}
 		},
@@ -159,6 +176,10 @@ export const mediaRouter = createProtectedRouter()
 				select: { id: true, mediaIds: true },
 				where: { mediaIds: { has: input.mediaId } },
 			});
+			const likedByUsers = await prisma.user.findMany({
+				select: { id: true, likedMediaIds: true },
+				where: { likedMediaIds: { has: input.mediaId } },
+			});
 
 			if (charactersMainImage) {
 				await prisma.character.updateMany({
@@ -171,6 +192,16 @@ export const mediaRouter = createProtectedRouter()
 					await prisma.character.update({
 						data: { mediaIds: { set: character.mediaIds.filter((id) => id != input.mediaId) } },
 						where: { id: character.id },
+					});
+				});
+			}
+			if (likedByUsers) {
+				likedByUsers.forEach(async (user) => {
+					await prisma.user.update({
+						data: {
+							likedMediaIds: { set: user.likedMediaIds.filter((id) => id != input.mediaId) },
+						},
+						where: { id: user.id },
 					});
 				});
 			}

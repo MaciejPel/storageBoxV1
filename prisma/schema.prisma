@@ -17,7 +17,8 @@ model User {
   createdCharacters Character[] @relation(name: "userCharacters")
   createdTags       Tag[]       @relation(name: "userTags")
   uploadedMedia     Media[]     @relation(name: "userMedia")
-  likedMedia        Media[]     @relation(name: "userLikes")
+  likedMediaIds     String[]    @db.ObjectId
+  likedMedia        Media[]     @relation(fields: [likedMediaIds], references: [id], name: "userLikes")
 }
 
 model Character {
@@ -47,11 +48,10 @@ model Media {
 
   characterCover Character[] @relation(name: "characterCover")
   tagCover       Tag[]       @relation(name: "tagCover")
-
-  likes        User?       @relation(fields: [likeIds], references: [id], name: "userLikes")
-  likeIds      String[]    @default([]) @db.ObjectId
-  characterIds String[]    @db.ObjectId
-  characters   Character[] @relation(fields: [characterIds], references: [id])
+  likeIds        String[]    @db.ObjectId
+  likes          User[]      @relation(fields: [likeIds], references: [id], name: "userLikes")
+  characterIds   String[]    @db.ObjectId
+  characters     Character[] @relation(fields: [characterIds], references: [id])
 }
 
 model Tag {

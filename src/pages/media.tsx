@@ -165,7 +165,13 @@ const Media: NextPage = () => {
 								columnClassName="masonry-grid-column"
 							>
 								{mediaQuery.data
-									?.filter((media) => media.fileName.toLowerCase().includes(query.string))
+									?.filter((media) =>
+										(
+											media.fileName.toLowerCase() +
+											'.' +
+											media.fileExtension.toLowerCase()
+										).includes(query.string)
+									)
 									.sort((f, s) => {
 										if (f.likeIds.length < s.likeIds.length) return query.sort ? 1 : -1;
 										if (f.likeIds.length > s.likeIds.length) return query.sort ? -1 : 1;

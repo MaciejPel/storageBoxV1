@@ -333,7 +333,7 @@ const CharacterPage = () => {
 											</button>
 										)}
 										<a
-											href={`${bunnyCDN}/${media.id}/${media.fileExtension}`}
+											href={`${bunnyCDN}/${media.id}.${media.fileExtension}`}
 											target="_blank"
 											rel="noreferrer"
 											className="btn btn-ghost p-3"

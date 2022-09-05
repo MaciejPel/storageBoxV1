@@ -22,6 +22,7 @@ const Card: React.FC<CardProps> = ({ media, body, actions }) => {
 				<img
 					src={`${bunnyCDN}/${media.id}.${media.fileExtension}`}
 					alt={`${media.fileName}.${media.fileExtension}`}
+					title={`${media.fileName}.${media.fileExtension}`}
 				/>
 			)}
 			{media?.mimetype?.includes('video') && (

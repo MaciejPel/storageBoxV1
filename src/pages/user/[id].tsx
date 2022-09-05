@@ -30,8 +30,8 @@ const UserPage: NextPage = () => {
 			<Container type="start">
 				<div>Characters: {userQuery.data?.createdCharacters.length}</div>
 				<div>Media: {userQuery.data?.uploadedMedia.length}</div>
-				<div>Liked: {userQuery.data?.likedMedia.length}</div>
 				<div>Tags: {userQuery.data?.createdTags.length}</div>
+				<div>Liked: {userQuery.data?.likedMedia.length}</div>
 			</Container>
 		</>
 	);
