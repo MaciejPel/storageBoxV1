@@ -6,6 +6,7 @@ import { authRouter } from './auth';
 import { characterRouter } from './character';
 import { tagRouter } from './tag';
 import { mediaRouter } from './media';
+import { userRouter } from './user';
 
 export const appRouter = createRouter()
 	.transformer(superjson)
@@ -13,6 +14,7 @@ export const appRouter = createRouter()
 	.merge('character.', characterRouter)
 	.merge('tag.', tagRouter)
 	.merge('media.', mediaRouter)
+	.merge('user.', userRouter)
 	.formatError(({ shape, error }) => {
 		return {
 			...shape,

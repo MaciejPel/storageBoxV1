@@ -5,7 +5,10 @@ import {
 	SparklesIcon,
 	TrashIcon,
 } from '@heroicons/react/solid';
+import { GetServerSidePropsContext, NextPage } from 'next';
+import { unstable_getServerSession as getServerSession } from 'next-auth/next';
 import { useSession } from 'next-auth/react';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import Masonry from 'react-masonry-css';
@@ -17,6 +20,7 @@ import Meta from '../../components/Meta';
 import Modal from '../../components/Modal';
 import { bunnyCDN } from '../../utils/constants';
 import { trpc } from '../../utils/trpc';
+import { authOptions } from '../api/auth/[...nextauth]';
 
 const breakpointColumnsObj = {
 	default: 5,
@@ -27,7 +31,7 @@ const breakpointColumnsObj = {
 	640: 1,
 };
 
-const TagPage = () => {
+const TagPage: NextPage = () => {
 	const router = useRouter();
 	const tagId = router.query.id as string;
 	const { data: session } = useSession();
@@ -102,7 +106,9 @@ const TagPage = () => {
 										<h2 className="card-title !mb-0">{tagQuery.data.name}</h2>
 										<h3 className="font-normal">
 											Created by:{' '}
-											<span className="font-bold hover:link">{tagQuery.data.author.username}</span>
+											<Link href={`/user/${tagQuery.data.author.id}`}>
+												<a className="font-bold hover:link">{tagQuery.data.author.username}</a>
+											</Link>
 										</h3>
 									</div>
 									<p className="break-words">
@@ -273,16 +279,18 @@ const TagPage = () => {
 												/>
 												<span className="text-md font-bold">{media.likeIds.length}</span>
 											</button>
-											<button
-												type="button"
-												title="Set image as main"
-												className="btn btn-ghost p-3 gap-1 group"
-												onClick={() => {
-													tagSetMainMutation.mutate({ mediaId: media.id, tagId });
-												}}
-											>
-												<SparklesIcon className="w-6 group-hover:fill-warning duration-300 transition-all" />
-											</button>
+											{media.mimetype.includes('image') && (
+												<button
+													type="button"
+													title="Set image as main"
+													className="btn btn-ghost p-3 gap-1 group"
+													onClick={() => {
+														tagSetMainMutation.mutate({ mediaId: media.id, tagId });
+													}}
+												>
+													<SparklesIcon className="w-6 group-hover:fill-warning duration-300 transition-all" />
+												</button>
+											)}
 											<a
 												href={`${bunnyCDN}/${media.id}.${media.fileExtension}`}
 												target="_blank"
@@ -302,3 +310,17 @@ const TagPage = () => {
 	);
 };
 export default TagPage;
+
+export const getServerSideProps = async (context: GetServerSidePropsContext) => {
+	const session = await getServerSession(context.req, context.res, authOptions);
+
+	if (!session) {
+		return {
+			redirect: {
+				destination: '/login',
+				pernament: false,
+			},
+		};
+	}
+	return { props: { session } };
+};

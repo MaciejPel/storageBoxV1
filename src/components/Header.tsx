@@ -54,7 +54,7 @@ const Header: React.FC = () => {
 										<span className="hidden md:inline">Tags</span>
 									</a>
 								</Link>
-								<Link href="/profile">
+								<Link href={`/user/${session.user.id}`}>
 									<a className="btn btn-sm btn-ghost text-base-content normal-case gap-1 ">
 										<UserIcon className="w-5" />
 										<span className="hidden md:inline">Profile</span>
@@ -63,7 +63,10 @@ const Header: React.FC = () => {
 							</>
 						)}
 						<div className="dropdown">
-							<label tabIndex={0} className="btn btn-sm gap-1 normal-case btn-ghost">
+							<label
+								tabIndex={0}
+								className="btn btn-sm gap-1 normal-case btn-ghost"
+							>
 								<ColorSwatchIcon className="w-5" />
 								<span className="hidden md:inline">Themes</span>
 							</label>

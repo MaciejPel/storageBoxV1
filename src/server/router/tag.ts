@@ -110,10 +110,7 @@ export const tagRouter = createProtectedRouter()
 			),
 			description: z.preprocess(
 				trimString,
-				z
-					.string()
-					.min(3, { message: 'must contain at least 3 character(s)' })
-					.max(140, { message: 'must contain at most 140 character(s)' })
+				z.string().max(140, { message: 'must contain at most 140 character(s)' })
 			),
 		}),
 		async resolve({ input, ctx }) {

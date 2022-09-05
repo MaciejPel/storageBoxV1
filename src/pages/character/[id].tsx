@@ -110,9 +110,11 @@ const CharacterPage = () => {
 										<h2 className="card-title !mb-0">{characterQuery.data.name}</h2>
 										<h3 className="font-normal">
 											Created by:{' '}
-											<span className="font-bold hover:link">
-												{characterQuery.data.author.username}
-											</span>
+											<Link href={`/user/${characterQuery.data.author.id}`}>
+												<a className="font-bold hover:link">
+													{characterQuery.data.author.username}
+												</a>
+											</Link>
 										</h3>
 									</div>
 									<p className="break-words">
