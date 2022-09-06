@@ -227,4 +227,3 @@ const UploadForm: React.FC = () => {
 	);
 };
 export default UploadForm;
-

@@ -13,6 +13,7 @@ export const userRouter = createProtectedRouter().query('single', {
 					select: {
 						id: true,
 						name: true,
+						description: true,
 						cover: {
 							select: {
 								id: true,
@@ -23,6 +24,7 @@ export const userRouter = createProtectedRouter().query('single', {
 							},
 						},
 						media: { select: { likeIds: true } },
+						tags: { select: { id: true, name: true }, orderBy: { name: 'asc' } },
 					},
 				},
 				uploadedMedia: {
@@ -35,6 +37,7 @@ export const userRouter = createProtectedRouter().query('single', {
 					select: {
 						id: true,
 						name: true,
+						description: true,
 						cover: {
 							select: {
 								id: true,

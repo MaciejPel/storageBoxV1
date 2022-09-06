@@ -56,39 +56,21 @@ const Home: NextPage = () => {
 					setQuery={setQuery}
 					query={query}
 				/>
-				<div className="flex gap-1 md:w-1/4 w-full">
-					<button
-						type="button"
-						title="Add tag"
-						onClick={() => setModal({ ...modal, tag: true })}
-						className="btn w-1/2 md:w-2/5"
-					>
-						Add tag
-					</button>
-					<Modal
-						open={modal.tag}
-						onClose={() => setModal({ ...modal, tag: false })}
-						modalTitle="New tag"
-					>
-						<TagForm closeModal={() => setModal({ ...modal, tag: false })} />
-					</Modal>
-
-					<button
-						type="button"
-						title="Add character"
-						onClick={() => setModal({ ...modal, character: true })}
-						className="btn w-1/2 md:w-3/5"
-					>
-						Add character
-					</button>
-					<Modal
-						open={modal.character}
-						onClose={() => setModal({ ...modal, character: false })}
-						modalTitle="New character"
-					>
-						<CharacterForm closeModal={() => setModal({ ...modal, character: false })} />
-					</Modal>
-				</div>
+				<button
+					type="button"
+					title="Add character"
+					onClick={() => setModal({ ...modal, character: true })}
+					className="btn md:w-auto w-full"
+				>
+					Add character
+				</button>
+				<Modal
+					open={modal.character}
+					onClose={() => setModal({ ...modal, character: false })}
+					modalTitle="New character"
+				>
+					<CharacterForm closeModal={() => setModal({ ...modal, character: false })} />
+				</Modal>
 			</div>
 			{charactersQuery.isError && <Container type="center">Something went wrong</Container>}
 			{charactersQuery.isLoading && <Container type="center">Loading data ⌚</Container>}

@@ -94,7 +94,7 @@ const TagPage: NextPage = () => {
 
 	return (
 		<>
-			<Meta title={(tagQuery.data?.name || '...') + ' | Tag'} />
+			<Meta title={tagQuery.data?.name + ' | Tag'} />
 			<Container type="start">
 				<div className="grid grid-cols-1 w-full gap-4 mb-4">
 					{tagQuery.data && (
@@ -110,23 +110,23 @@ const TagPage: NextPage = () => {
 												<a className="font-bold hover:link">{tagQuery.data.author.username}</a>
 											</Link>
 										</h3>
+										<p className="break-words">
+											{!readMore
+												? tagQuery.data.description?.slice(0, 50) +
+												  (tagQuery.data.description && tagQuery.data.description?.length >= 60
+														? '... '
+														: '')
+												: tagQuery.data.description + ' '}
+											{tagQuery.data.description && tagQuery.data.description?.length >= 60 && (
+												<span
+													className="font-bold btn-link text-base-content cursor-pointer"
+													onClick={() => setReadMore(!readMore)}
+												>
+													{!readMore ? 'Read more' : 'Hide'}
+												</span>
+											)}
+										</p>
 									</div>
-									<p className="break-words">
-										{!readMore
-											? tagQuery.data.description?.slice(0, 50) +
-											  (tagQuery.data.description && tagQuery.data.description?.length >= 60
-													? '... '
-													: '')
-											: tagQuery.data.description + ' '}
-										{tagQuery.data.description && tagQuery.data.description?.length >= 60 && (
-											<span
-												className="font-bold btn-link text-base-content cursor-pointer"
-												onClick={() => setReadMore(!readMore)}
-											>
-												{!readMore ? 'Read more' : 'Hide'}
-											</span>
-										)}
-									</p>
 								</div>
 							}
 							actions={

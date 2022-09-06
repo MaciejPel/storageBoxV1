@@ -116,25 +116,25 @@ const CharacterPage = () => {
 												</a>
 											</Link>
 										</h3>
+										<p className="break-words">
+											{!readMore
+												? characterQuery.data.description?.slice(0, 50) +
+												  (characterQuery.data.description &&
+												  characterQuery.data.description?.length >= 60
+														? '... '
+														: '')
+												: characterQuery.data.description + ' '}
+											{characterQuery.data.description &&
+												characterQuery.data.description?.length >= 60 && (
+													<span
+														className="font-bold btn-link text-base-content cursor-pointer"
+														onClick={() => setReadMore(!readMore)}
+													>
+														{!readMore ? 'Read more' : 'Hide'}
+													</span>
+												)}
+										</p>
 									</div>
-									<p className="break-words">
-										{!readMore
-											? characterQuery.data.description?.slice(0, 50) +
-											  (characterQuery.data.description &&
-											  characterQuery.data.description?.length >= 60
-													? '... '
-													: '')
-											: characterQuery.data.description + ' '}
-										{characterQuery.data.description &&
-											characterQuery.data.description?.length >= 60 && (
-												<span
-													className="font-bold btn-link text-base-content cursor-pointer"
-													onClick={() => setReadMore(!readMore)}
-												>
-													{!readMore ? 'Read more' : 'Hide'}
-												</span>
-											)}
-									</p>
 									<p className="flex gap-1 flex-wrap">
 										{characterQuery.data.tags.map((tag) => (
 											<Link
