@@ -1,29 +1,21 @@
 /* eslint-disable @next/next/no-img-element */
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { GetServerSidePropsContext, NextPage } from 'next';
+import { unstable_getServerSession as getServerSession } from 'next-auth/next';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
-import { unstable_getServerSession as getServerSession } from 'next-auth/next';
 import { authOptions } from './api/auth/[...nextauth]';
 import { trpc } from '../utils/trpc';
+import { defaultBreakpointColumns } from '../utils/constants';
 import { HeartIcon } from '@heroicons/react/solid';
-import Link from 'next/link';
+import Masonry from 'react-masonry-css';
 import Container from '../components/Container';
+import Card from '../components/Card';
 import Search from '../components/Search';
 import Modal from '../components/Modal';
 import CharacterForm from '../components/forms/CharacterForm';
-import TagForm from '../components/forms/TagForm';
-import Masonry from 'react-masonry-css';
-import Card from '../components/Card';
 
-const breakpointColumnsObj = {
-	default: 5,
-	1536: 4,
-	1280: 3,
-	1024: 3,
-	768: 2,
-	640: 1,
-};
 interface QueryParams {
 	string: string;
 	tags?: string[];
@@ -78,7 +70,7 @@ const Home: NextPage = () => {
 				<Container type="center">Pretty empty in here 🏜</Container>
 			)}
 			<Masonry
-				breakpointCols={breakpointColumnsObj}
+				breakpointCols={defaultBreakpointColumns}
 				className="flex w-full gap-4"
 				columnClassName="masonry-grid-column"
 			>

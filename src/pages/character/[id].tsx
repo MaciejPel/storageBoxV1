@@ -1,18 +1,14 @@
 /* eslint-disable @next/next/no-img-element */
+import { useState } from 'react';
+import { GetServerSidePropsContext } from 'next';
+import { unstable_getServerSession as getServerSession } from 'next-auth/next';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
-import { trpc } from '../../utils/trpc';
-import { unstable_getServerSession as getServerSession } from 'next-auth/next';
 import { authOptions } from '../api/auth/[...nextauth]';
+import { trpc } from '../../utils/trpc';
 import { toast } from 'react-toastify';
-import Masonry from 'react-masonry-css';
-import Container from '../../components/Container';
-import UploadForm from '../../components/forms/UploadForm';
-import Meta from '../../components/Meta';
-import { GetServerSidePropsContext } from 'next';
-import Card from '../../components/Card';
-import { useState } from 'react';
-import Link from 'next/link';
+import { bunnyCDN, defaultBreakpointColumns } from '../../utils/constants';
 import {
 	ExternalLinkIcon,
 	HeartIcon,
@@ -21,18 +17,13 @@ import {
 	TrashIcon,
 	XIcon,
 } from '@heroicons/react/solid';
+import Masonry from 'react-masonry-css';
+import Container from '../../components/Container';
+import Meta from '../../components/Meta';
 import Modal from '../../components/Modal';
+import Card from '../../components/Card';
+import UploadForm from '../../components/forms/UploadForm';
 import CharacterEditForm from '../../components/forms/CharacterEditForm';
-import { bunnyCDN } from '../../utils/constants';
-
-const breakpointColumnsObj = {
-	default: 4,
-	1536: 4,
-	1280: 3,
-	1024: 3,
-	768: 2,
-	640: 1,
-};
 
 const CharacterPage = () => {
 	const router = useRouter();
@@ -283,7 +274,7 @@ const CharacterPage = () => {
 					</div>
 				</div>
 				<Masonry
-					breakpointCols={breakpointColumnsObj}
+					breakpointCols={{ ...defaultBreakpointColumns, default: 4 }}
 					className="flex w-full gap-4"
 					columnClassName="masonry-grid-column"
 				>

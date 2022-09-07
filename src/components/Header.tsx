@@ -1,8 +1,8 @@
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useSession, signOut } from 'next-auth/react';
 import { useTheme } from 'next-themes';
-import Link from 'next/link';
 import {
 	ColorSwatchIcon,
 	UserIcon,
@@ -13,7 +13,17 @@ import {
 	HashtagIcon,
 } from '@heroicons/react/solid';
 import { CubeIcon } from '@heroicons/react/outline';
-const themes = ['light', 'retro', 'dark', 'black', 'night', 'dracula', 'coffee', 'luxury'];
+
+const themes: string[] = [
+	'light',
+	'retro',
+	'dark',
+	'black',
+	'night',
+	'dracula',
+	'coffee',
+	'luxury',
+];
 
 const Header: React.FC = () => {
 	const router = useRouter();

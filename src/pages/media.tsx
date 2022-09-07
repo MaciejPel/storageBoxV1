@@ -1,18 +1,18 @@
+import { useState } from 'react';
 import { GetServerSidePropsContext, NextPage } from 'next';
 import { unstable_getServerSession as getServerSession } from 'next-auth/next';
-import Container from '../components/Container';
-import Meta from '../components/Meta';
-import { trpc } from '../utils/trpc';
-import { authOptions } from './api/auth/[...nextauth]';
-import Masonry from 'react-masonry-css';
 import { useSession } from 'next-auth/react';
-import { useState } from 'react';
+import { authOptions } from './api/auth/[...nextauth]';
+import { trpc } from '../utils/trpc';
 import { toast } from 'react-toastify';
+import { bunnyCDN } from '../utils/constants';
+import { ExternalLinkIcon, HeartIcon, TrashIcon } from '@heroicons/react/solid';
+import Masonry from 'react-masonry-css';
+import Meta from '../components/Meta';
+import Container from '../components/Container';
 import Search from '../components/Search';
 import Modal from '../components/Modal';
 import Card from '../components/Card';
-import { ExternalLinkIcon, HeartIcon, TrashIcon } from '@heroicons/react/solid';
-import { bunnyCDN } from '../utils/constants';
 
 interface DataProps {
 	characterIds: string[];
@@ -23,6 +23,15 @@ interface QueryParams {
 	string: string;
 	sort: boolean;
 }
+
+const breakpointColumnsObj = {
+	default: 4,
+	1536: 3,
+	1280: 2,
+	1024: 2,
+	768: 2,
+	640: 1,
+};
 
 const Media: NextPage = () => {
 	const { data: session } = useSession();
@@ -35,14 +44,6 @@ const Media: NextPage = () => {
 		id: '',
 	});
 	const [query, setQuery] = useState<QueryParams>({ string: '', sort: true });
-	const breakpointColumnsObj = {
-		default: 4,
-		1536: 3,
-		1280: 2,
-		1024: 2,
-		768: 2,
-		640: 1,
-	};
 
 	const utils = trpc.useContext();
 	const mediaQuery = trpc.useQuery(['media.all'], { enabled: session ? true : false });

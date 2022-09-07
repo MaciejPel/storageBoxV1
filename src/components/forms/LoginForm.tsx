@@ -1,6 +1,6 @@
-import { signIn } from 'next-auth/react';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
+import { signIn } from 'next-auth/react';
 import { toast } from 'react-toastify';
 
 const LoginForm = () => {
@@ -40,7 +40,10 @@ const LoginForm = () => {
 			<div className="w-full card-body">
 				<div className="text-4xl font-extrabold text-center pb-2 ">Login</div>
 				<div>
-					<label className="label pb-1 cursor-pointer" htmlFor="username">
+					<label
+						className="label pb-1 cursor-pointer"
+						htmlFor="username"
+					>
 						<span className="label-text">Username</span>
 					</label>
 					<input
@@ -54,7 +57,10 @@ const LoginForm = () => {
 					/>
 				</div>
 				<div>
-					<label className="label pb-1 cursor-pointer" htmlFor="password">
+					<label
+						className="label pb-1 cursor-pointer"
+						htmlFor="password"
+					>
 						<span className="label-text">Password</span>
 					</label>
 					<input
@@ -67,17 +73,29 @@ const LoginForm = () => {
 				</div>
 				<div className="flex flex-col gap-3 pt-4">
 					{credentials.loading && (
-						<button type="button" title="Processing..." className="btn w-full loading disabled">
+						<button
+							type="button"
+							title="Processing..."
+							className="btn w-full loading disabled"
+						>
 							Processing...
 						</button>
 					)}
 					{credentials.success && (
-						<button type="button" title="Success" className="btn btn-success w-full disabled">
+						<button
+							type="button"
+							title="Success"
+							className="btn btn-success w-full disabled"
+						>
 							Success
 						</button>
 					)}
 					{!credentials.success && !credentials.loading && (
-						<input className="btn btn-primary w-full rounded" type="submit" value="Submit" />
+						<input
+							className="btn btn-primary w-full rounded"
+							type="submit"
+							value="Submit"
+						/>
 					)}
 				</div>
 			</div>

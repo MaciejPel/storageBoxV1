@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
-import { PhotographIcon } from '@heroicons/react/solid';
 import { ReactNode } from 'react';
 import { bunnyCDN } from '../utils/constants';
+import { PhotographIcon } from '@heroicons/react/solid';
 
 interface CardProps {
 	media?: {

@@ -1,35 +1,25 @@
 import { useState } from 'react';
 import { GetServerSidePropsContext, NextPage } from 'next';
+import { unstable_getServerSession as getServerSession } from 'next-auth/next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { unstable_getServerSession as getServerSession } from 'next-auth/next';
 import { useSession } from 'next-auth/react';
 import { authOptions } from '../api/auth/[...nextauth]';
-import Container from '../../components/Container';
 import { trpc } from '../../utils/trpc';
-import { bunnyCDN } from '../../utils/constants';
+import { bunnyCDN, defaultBreakpointColumns } from '../../utils/constants';
 import {
 	ExternalLinkIcon,
 	HashtagIcon,
 	HeartIcon,
 	UploadIcon,
 	UserGroupIcon,
-	UserIcon,
 } from '@heroicons/react/solid';
 import Masonry from 'react-masonry-css';
-import Card from '../../components/Card';
+import Container from '../../components/Container';
 import Meta from '../../components/Meta';
+import Card from '../../components/Card';
 
 type activeTabProps = 'liked' | 'uploaded' | 'characters' | 'tags';
-
-const breakpointColumnsObj = {
-	default: 5,
-	1536: 4,
-	1280: 3,
-	1024: 3,
-	768: 2,
-	640: 1,
-};
 
 const tabsDesc = {
 	liked: 'Liked media',
@@ -96,7 +86,7 @@ const UserPage: NextPage = () => {
 					</div>
 				</div>
 				<Masonry
-					breakpointCols={breakpointColumnsObj}
+					breakpointCols={defaultBreakpointColumns}
 					className="flex w-full gap-4 mt-2"
 					columnClassName="masonry-grid-column"
 				>

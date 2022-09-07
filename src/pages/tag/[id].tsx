@@ -1,3 +1,13 @@
+import { useState } from 'react';
+import { GetServerSidePropsContext, NextPage } from 'next';
+import { unstable_getServerSession as getServerSession } from 'next-auth/next';
+import Link from 'next/link';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/router';
+import { trpc } from '../../utils/trpc';
+import { authOptions } from '../api/auth/[...nextauth]';
+import { bunnyCDN, defaultBreakpointColumns } from '../../utils/constants';
+import { toast } from 'react-toastify';
 import {
 	ExternalLinkIcon,
 	HeartIcon,
@@ -5,31 +15,12 @@ import {
 	SparklesIcon,
 	TrashIcon,
 } from '@heroicons/react/solid';
-import { GetServerSidePropsContext, NextPage } from 'next';
-import { unstable_getServerSession as getServerSession } from 'next-auth/next';
-import { useSession } from 'next-auth/react';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
-import { useState } from 'react';
 import Masonry from 'react-masonry-css';
-import { toast } from 'react-toastify';
-import Card from '../../components/Card';
-import Container from '../../components/Container';
-import TagEditForm from '../../components/forms/TagEditFrom';
 import Meta from '../../components/Meta';
+import Container from '../../components/Container';
+import Card from '../../components/Card';
 import Modal from '../../components/Modal';
-import { bunnyCDN } from '../../utils/constants';
-import { trpc } from '../../utils/trpc';
-import { authOptions } from '../api/auth/[...nextauth]';
-
-const breakpointColumnsObj = {
-	default: 5,
-	1536: 4,
-	1280: 3,
-	1024: 3,
-	768: 2,
-	640: 1,
-};
+import TagEditForm from '../../components/forms/TagEditFrom';
 
 const TagPage: NextPage = () => {
 	const router = useRouter();
@@ -252,7 +243,7 @@ const TagPage: NextPage = () => {
 					)}
 				</div>
 				<Masonry
-					breakpointCols={breakpointColumnsObj}
+					breakpointCols={defaultBreakpointColumns}
 					className="flex w-full gap-4"
 					columnClassName="masonry-grid-column"
 				>

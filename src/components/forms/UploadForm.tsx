@@ -1,9 +1,9 @@
-import { CloudUploadIcon } from '@heroicons/react/outline';
-import { CubeIcon, TrashIcon } from '@heroicons/react/solid';
-import { useRouter } from 'next/router';
 import { useState } from 'react';
+import { useRouter } from 'next/router';
 import { trpc } from '../../utils/trpc';
 import Compressor from 'compressorjs';
+import { CubeIcon, TrashIcon } from '@heroicons/react/solid';
+import { CloudUploadIcon } from '@heroicons/react/outline';
 
 const allowedFormats = {
 	types: ['image', 'video'],

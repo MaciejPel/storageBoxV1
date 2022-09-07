@@ -1,7 +1,7 @@
 import { useState } from 'react';
+import { useRouter } from 'next/router';
 import { trpc } from '../../utils/trpc';
 import { toast } from 'react-toastify';
-import { useRouter } from 'next/router';
 
 const RegisterForm: React.FC = () => {
 	const router = useRouter();
@@ -51,7 +51,10 @@ const RegisterForm: React.FC = () => {
 			<div className="w-full  card-body">
 				<div className="text-4xl font-extrabold text-center pb-2">Register</div>
 				<div>
-					<label className="label pb-1 cursor-pointer" htmlFor="username">
+					<label
+						className="label pb-1 cursor-pointer"
+						htmlFor="username"
+					>
 						<span className="label-text">
 							Username
 							{error && error.field === 'username' && (
@@ -72,7 +75,10 @@ const RegisterForm: React.FC = () => {
 					/>
 				</div>
 				<div>
-					<label className="label pb-1 cursor-pointer" htmlFor="password">
+					<label
+						className="label pb-1 cursor-pointer"
+						htmlFor="password"
+					>
 						<span className="label-text">
 							Password
 							{error && error.field === 'password' && (
@@ -91,7 +97,10 @@ const RegisterForm: React.FC = () => {
 					/>
 				</div>
 				<div>
-					<label className="label pb-1 cursor-pointer" htmlFor="confirm-password">
+					<label
+						className="label pb-1 cursor-pointer"
+						htmlFor="confirm-password"
+					>
 						<span className="label-text">
 							Confirm password
 							{error && error.field === 'confirmPassword' && (
@@ -111,12 +120,20 @@ const RegisterForm: React.FC = () => {
 				</div>
 				<div className="flex flex-col gap-3 pt-4">
 					{userMutation.isLoading && (
-						<button type="button" title="Processing..." className="btn w-full loading disabled">
+						<button
+							type="button"
+							title="Processing..."
+							className="btn w-full loading disabled"
+						>
 							Processing...
 						</button>
 					)}
 					{!userMutation.isLoading && (
-						<input className="btn btn-primary w-full rounded" type="submit" value="Submit" />
+						<input
+							className="btn btn-primary w-full rounded"
+							type="submit"
+							value="Submit"
+						/>
 					)}
 				</div>
 			</div>

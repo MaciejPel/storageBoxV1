@@ -1,33 +1,25 @@
 /* eslint-disable @next/next/no-img-element */
-import { HeartIcon, PhotographIcon } from '@heroicons/react/solid';
+import { useState } from 'react';
 import { GetServerSidePropsContext, NextPage } from 'next';
 import { unstable_getServerSession as getServerSession } from 'next-auth/next';
-import { useSession } from 'next-auth/react';
 import Link from 'next/link';
-import { useState } from 'react';
-import Masonry from 'react-masonry-css';
-import Card from '../../components/Card';
-import Container from '../../components/Container';
-import TagForm from '../../components/forms/TagForm';
-import Meta from '../../components/Meta';
-import Modal from '../../components/Modal';
-import Search from '../../components/Search';
+import { useSession } from 'next-auth/react';
 import { trpc } from '../../utils/trpc';
 import { authOptions } from '../api/auth/[...nextauth]';
+import { defaultBreakpointColumns } from '../../utils/constants';
+import { HeartIcon } from '@heroicons/react/solid';
+import Masonry from 'react-masonry-css';
+import Container from '../../components/Container';
+import Meta from '../../components/Meta';
+import Modal from '../../components/Modal';
+import TagForm from '../../components/forms/TagForm';
+import Card from '../../components/Card';
+import Search from '../../components/Search';
 
 interface QueryParams {
 	string: string;
 	sort: boolean;
 }
-
-const breakpointColumnsObj = {
-	default: 5,
-	1536: 4,
-	1280: 3,
-	1024: 3,
-	768: 2,
-	640: 1,
-};
 
 const TagsPage: NextPage = () => {
 	const { data: session } = useSession();
@@ -52,7 +44,7 @@ const TagsPage: NextPage = () => {
 						type="button"
 						title="Add tag"
 						onClick={() => setModal(true)}
-						className="btn"
+						className="btn md:w-auto w-full"
 					>
 						Add tag
 					</button>
@@ -70,7 +62,7 @@ const TagsPage: NextPage = () => {
 					<Container type="center">Pretty empty in here 🏜</Container>
 				)}
 				<Masonry
-					breakpointCols={breakpointColumnsObj}
+					breakpointCols={defaultBreakpointColumns}
 					className="flex w-full gap-4"
 					columnClassName="masonry-grid-column"
 				>

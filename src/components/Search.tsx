@@ -1,8 +1,11 @@
-import { SearchIcon, FilterIcon, XIcon } from '@heroicons/react/outline';
-import { FilterIcon as FilterIconSolid } from '@heroicons/react/solid';
-import { SortAscendingIcon, SortDescendingIcon } from '@heroicons/react/solid';
 import { useSession } from 'next-auth/react';
 import { trpc } from '../utils/trpc';
+import {
+	SortAscendingIcon,
+	SortDescendingIcon,
+	FilterIcon as FilterIconSolid,
+} from '@heroicons/react/solid';
+import { SearchIcon, FilterIcon, XIcon } from '@heroicons/react/outline';
 
 interface SearchProps {
 	query: { string: string; tags?: string[]; sort: boolean };
@@ -26,14 +29,20 @@ const Search: React.FC<SearchProps> = ({ setQuery, query }) => {
 					placeholder="Search..."
 					id="search"
 				/>
-				<label htmlFor="search" className="btn rounded-l-none no-animation ">
+				<label
+					htmlFor="search"
+					className="btn rounded-l-none no-animation "
+				>
 					<SearchIcon className="w-6 " />
 				</label>
 			</div>
 
 			{query.tags && tagsQuery.isSuccess && tagsQuery.data.length > 0 && (
 				<div className="dropdown sticky">
-					<label tabIndex={0} className="btn ">
+					<label
+						tabIndex={0}
+						className="btn "
+					>
 						{query.tags.length ? (
 							<FilterIconSolid className="w-6" />
 						) : (
@@ -46,7 +55,10 @@ const Search: React.FC<SearchProps> = ({ setQuery, query }) => {
 					>
 						{tagsQuery.data.map((tag) => (
 							<li key={tag.id}>
-								<label htmlFor={'filter-' + tag.id} className="label flex justify-start">
+								<label
+									htmlFor={'filter-' + tag.id}
+									className="label flex justify-start"
+								>
 									<input
 										id={'filter-' + tag.id}
 										type="checkbox"

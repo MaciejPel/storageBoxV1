@@ -1,9 +1,9 @@
 import { NextPage } from 'next';
-import Container from '../components/Container';
-import Meta from '../components/Meta';
-import RegisterForm from '../components/forms/RegisterForm';
 import { unstable_getServerSession as getServerSession } from 'next-auth/next';
 import { authOptions } from './api/auth/[...nextauth]';
+import Meta from '../components/Meta';
+import Container from '../components/Container';
+import RegisterForm from '../components/forms/RegisterForm';
 
 const Register: NextPage = () => {
 	return (
