@@ -87,7 +87,7 @@ const UserPage: NextPage = () => {
 				</div>
 				<Masonry
 					breakpointCols={defaultBreakpointColumns}
-					className="flex w-full gap-4 mt-2"
+					className="flex w-full gap-4 mt-4"
 					columnClassName="masonry-grid-column"
 				>
 					{activeTab === 'liked' &&

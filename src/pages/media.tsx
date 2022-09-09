@@ -159,7 +159,7 @@ const Media: NextPage = () => {
 								</div>
 							</form>
 						</Modal>
-						<div className="md:w-3/4">
+						<div className={`${assign ? 'md:w-3/4' : 'md:w-full'}`}>
 							<Masonry
 								breakpointCols={breakpointColumnsObj}
 								className="flex w-full gap-4"
@@ -199,26 +199,28 @@ const Media: NextPage = () => {
 													>
 														<TrashIcon className="w-6" />
 													</button>
-													<label
-														htmlFor={'assignMedia-' + media.id}
-														className="btn btn-ghost p-3"
-													>
-														<input
-															type="checkbox"
-															className="checkbox"
-															id={'assignMedia-' + media.id}
-															checked={data?.mediaIds.includes(media.id)}
-															disabled={!assign}
-															onChange={(e) =>
-																setData({
-																	...data,
-																	mediaIds: e.target.checked
-																		? [...data.mediaIds, media.id]
-																		: data.mediaIds.filter((id) => id !== media.id),
-																})
-															}
-														/>
-													</label>
+													{assign && (
+														<label
+															htmlFor={'assignMedia-' + media.id}
+															className="btn btn-ghost p-3"
+														>
+															<input
+																type="checkbox"
+																className="checkbox"
+																id={'assignMedia-' + media.id}
+																checked={data?.mediaIds.includes(media.id)}
+																disabled={!assign}
+																onChange={(e) =>
+																	setData({
+																		...data,
+																		mediaIds: e.target.checked
+																			? [...data.mediaIds, media.id]
+																			: data.mediaIds.filter((id) => id !== media.id),
+																	})
+																}
+															/>
+														</label>
+													)}
 													<button
 														type="button"
 														title="Like image"
@@ -250,7 +252,7 @@ const Media: NextPage = () => {
 									))}
 							</Masonry>
 						</div>
-						<div className="flex flex-col mb-2 md:w-1/4">
+						<div className={`flex flex-col mb-2 ${assign ? 'md:w-1/4' : 'hidden'}`}>
 							<h2 className="text-2xl font-bold">Characters</h2>
 							<div className="grid grid-cols-2 md:grid-cols-1">
 								{charactersQuery.data?.map((character) => (

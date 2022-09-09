@@ -107,7 +107,7 @@ export const characterRouter = createProtectedRouter()
 			return character;
 		},
 	})
-	.mutation('edit', {
+	.mutation('update', {
 		input: z.object({
 			characterId: z.string(),
 			name: z.preprocess(

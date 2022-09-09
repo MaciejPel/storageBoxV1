@@ -21,7 +21,7 @@ const CharacterEditForm: React.FC<CharacterEditFormProps> = ({
 
 	const utils = trpc.useContext();
 	const tagsQuery = trpc.useQuery(['tag.all']);
-	const characterEditMutation = trpc.useMutation(['character.edit'], {
+	const characterEditMutation = trpc.useMutation(['character.update'], {
 		onSuccess() {
 			utils.invalidateQueries(['character.single', { characterId: id }]);
 			closeModal();
@@ -37,7 +37,10 @@ const CharacterEditForm: React.FC<CharacterEditFormProps> = ({
 
 	return (
 		<form className="form-control">
-			<label htmlFor="name" className="label cursor-pointer pb-1">
+			<label
+				htmlFor="name"
+				className="label cursor-pointer pb-1"
+			>
 				<span className="label-text">
 					Name
 					{error && error.field === 'name' && (
@@ -52,7 +55,10 @@ const CharacterEditForm: React.FC<CharacterEditFormProps> = ({
 				value={character.name}
 				onChange={(e) => setCharacter({ ...character, name: e.target.value })}
 			/>
-			<label htmlFor="description" className="label cursor-pointer pb-1 w-full">
+			<label
+				htmlFor="description"
+				className="label cursor-pointer pb-1 w-full"
+			>
 				<span className="label-text">
 					Description
 					{error?.field === 'description' && (
@@ -68,7 +74,10 @@ const CharacterEditForm: React.FC<CharacterEditFormProps> = ({
 			/>
 			{tagsQuery.isSuccess && tagsQuery.data.length > 0 && (
 				<>
-					<label htmlFor="tags" className="label cursor-pointer pb-0 w-full">
+					<label
+						htmlFor="tags"
+						className="label cursor-pointer pb-0 w-full"
+					>
 						<span className="label-text">Tags</span>
 					</label>
 					<div className="columns-2 xl:columns-3">
@@ -102,7 +111,11 @@ const CharacterEditForm: React.FC<CharacterEditFormProps> = ({
 			)}
 			<div className="card-actions justify-end btn-group gap-0 w-full mt-4">
 				{characterEditMutation.isLoading && (
-					<button title="Loading" type="button" className="btn loading w-1/2">
+					<button
+						title="Loading"
+						type="button"
+						className="btn loading w-1/2"
+					>
 						Processing...
 					</button>
 				)}

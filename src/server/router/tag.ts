@@ -114,11 +114,11 @@ export const tagRouter = createProtectedRouter()
 			),
 		}),
 		async resolve({ input, ctx }) {
-			const author = ctx.session.user.id;
-			if (!author) throw new trpc.TRPCError({ code: 'UNAUTHORIZED' });
+			const authorId = ctx.session.user.id;
+			if (!authorId) throw new trpc.TRPCError({ code: 'UNAUTHORIZED' });
 
 			const tag = await prisma.tag.create({
-				data: { name: input.name, description: input.description, authorId: author },
+				data: { name: input.name, description: input.description, authorId: authorId },
 			});
 
 			return { id: tag.id };

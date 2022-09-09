@@ -1,12 +1,12 @@
+import fs from 'fs';
 import formidable from 'formidable';
+import superjson from 'superjson';
+import { v4 as uuidv4 } from 'uuid';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { unstable_getServerSession } from 'next-auth/next';
 import { authOptions } from './auth/[...nextauth]';
-import { bunnyStorage } from '../../utils/bunny';
-import fs from 'fs';
 import { getBaseUrl } from '../../utils/functions';
-import superjson from 'superjson';
-import { v4 as uuidv4 } from 'uuid';
+import { bunnyStorage } from '../../utils/bunny';
 
 export const config = {
 	api: {

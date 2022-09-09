@@ -41,8 +41,8 @@ export const mediaRouter = createProtectedRouter()
 			characterId: z.string(),
 		}),
 		async resolve({ input, ctx }) {
-			const author = ctx.session.user.id;
-			if (!author) throw new trpc.TRPCError({ code: 'UNAUTHORIZED' });
+			const authorId = ctx.session.user.id;
+			if (!authorId) throw new trpc.TRPCError({ code: 'UNAUTHORIZED' });
 
 			const character = await prisma.character.findFirst({
 				select: { id: true, mediaIds: true },
@@ -51,7 +51,7 @@ export const mediaRouter = createProtectedRouter()
 
 			const mediaToCreate: InitialMediaType[] = input.data.map((row) => ({
 				...row,
-				authorId: author,
+				authorId: authorId,
 				characterIds: [input.characterId],
 			}));
 			const uuids: string[] = input.data.map((row) => row.uuid);
@@ -64,7 +64,7 @@ export const mediaRouter = createProtectedRouter()
 				select: { id: true, uuid: true },
 				where: {
 					uuid: { in: uuids },
-					authorId: author,
+					authorId: authorId,
 					characterIds: { has: input.characterId },
 				},
 			});

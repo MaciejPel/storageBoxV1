@@ -12,7 +12,7 @@ import {
 	PencilAltIcon,
 	HashtagIcon,
 } from '@heroicons/react/solid';
-import { CubeIcon } from '@heroicons/react/outline';
+import { CubeIcon } from '@heroicons/react/solid';
 
 const themes: string[] = [
 	'light',

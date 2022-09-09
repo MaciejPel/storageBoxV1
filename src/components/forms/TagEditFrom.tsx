@@ -29,7 +29,10 @@ const TagEditForm: React.FC<TagEditFormProps> = ({ id, closeModal, name, descrip
 
 	return (
 		<form className="form-control">
-			<label htmlFor="name" className="label cursor-pointer pb-1">
+			<label
+				htmlFor="name"
+				className="label cursor-pointer pb-1"
+			>
 				<span className="label-text">
 					Name
 					{error && error.field === 'name' && (
@@ -44,7 +47,10 @@ const TagEditForm: React.FC<TagEditFormProps> = ({ id, closeModal, name, descrip
 				value={character.name}
 				onChange={(e) => setCharacter({ ...character, name: e.target.value })}
 			/>
-			<label htmlFor="description" className="label cursor-pointer pb-1 w-full">
+			<label
+				htmlFor="description"
+				className="label cursor-pointer pb-1 w-full"
+			>
 				<span className="label-text">
 					Description
 					{error?.field === 'description' && (
@@ -60,7 +66,11 @@ const TagEditForm: React.FC<TagEditFormProps> = ({ id, closeModal, name, descrip
 			/>
 			<div className="card-actions justify-end btn-group gap-0 w-full mt-4">
 				{tagUpdateMutation.isLoading && (
-					<button title="Loading" type="button" className="btn loading w-1/2">
+					<button
+						title="Loading"
+						type="button"
+						className="btn loading w-1/2"
+					>
 						Processing...
 					</button>
 				)}
