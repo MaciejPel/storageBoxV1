@@ -53,7 +53,9 @@ const upload = async (req: NextApiRequest, res: NextApiResponse) => {
 		});
 	});
 
-	const response = await fetch(`${getBaseUrl()}/api/trpc/media.create`, {
+	const endpoint = `${getBaseUrl()}/api/trpc/${characterId ? 'character.upload' : 'media.upload'}`;
+
+	const response = await fetch(endpoint, {
 		method: 'POST',
 		credentials: 'include',
 		headers: {

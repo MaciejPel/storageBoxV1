@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useRouter } from 'next/router';
 import { trpc } from '../../utils/trpc';
 import Compressor from 'compressorjs';
 import { CubeIcon, TrashIcon } from '@heroicons/react/solid';
@@ -11,9 +10,7 @@ const allowedFormats = {
 };
 const uploadLimits = { length: 10, size: 25 * 1024 * 1024 };
 
-const UploadForm: React.FC = () => {
-	const router = useRouter();
-	const characterId = router.query.id as string;
+const UploadForm: React.FC<{ characterId?: string }> = ({ characterId }) => {
 	const [bg, setBg] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [compressing, setCompressing] = useState(false);
@@ -79,18 +76,18 @@ const UploadForm: React.FC = () => {
 		setLoading(true);
 		e.preventDefault();
 		const formData = new FormData();
-		if (images?.files && characterId) {
+		if (images?.files)
 			images.files.forEach((file: File, index: number) => formData.append(`file-${index}`, file));
-			formData.append('characterId', characterId);
-		}
+		if (characterId) formData.append('characterId', characterId);
+
 		const response = await fetch('/api/upload', {
 			method: 'POST',
 			body: formData,
 			credentials: 'include',
 		});
-		if (response && characterId) {
-			utils.invalidateQueries(['character.single', { characterId }]);
-			setImages({ files: [] });
+		if (response) {
+			if (characterId) utils.invalidateQueries(['character.single', { characterId }]);
+			// setImages({ files: [] });
 			setLoading(false);
 		}
 	};
@@ -144,7 +141,7 @@ const UploadForm: React.FC = () => {
 			{images?.files.length === 0 && (
 				<label
 					htmlFor="files"
-					className={`h-64 sm:h-full cursor-pointer border-base-content border-2 rounded-xl border-dashed hover:border-success duration-300 group ${
+					className={`h-64 sm:h-full cursor-pointer border-base-content border-2 rounded-xl border-dashed hover:border-success duration-300 group py-4 ${
 						bg ? '!border-success' : ''
 					}`}
 					onDragOver={(e) => {

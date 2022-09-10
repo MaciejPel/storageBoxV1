@@ -28,59 +28,6 @@ export const mediaRouter = createProtectedRouter()
 			});
 		},
 	})
-	.mutation('create', {
-		input: z.object({
-			data: z.array(
-				z.object({
-					fileName: z.string(),
-					fileExtension: z.string(),
-					mimetype: z.string(),
-					uuid: z.string(),
-				})
-			),
-			characterId: z.string(),
-		}),
-		async resolve({ input, ctx }) {
-			const authorId = ctx.session.user.id;
-			if (!authorId) throw new trpc.TRPCError({ code: 'UNAUTHORIZED' });
-
-			const character = await prisma.character.findFirst({
-				select: { id: true, mediaIds: true },
-				where: { id: input.characterId },
-			});
-
-			const mediaToCreate: InitialMediaType[] = input.data.map((row) => ({
-				...row,
-				authorId: authorId,
-				characterIds: [input.characterId],
-			}));
-			const uuids: string[] = input.data.map((row) => row.uuid);
-
-			await prisma.media.createMany({
-				data: mediaToCreate,
-			});
-
-			const updatedMedia = await prisma.media.findMany({
-				select: { id: true, uuid: true },
-				where: {
-					uuid: { in: uuids },
-					authorId: authorId,
-					characterIds: { has: input.characterId },
-				},
-			});
-
-			if (updatedMedia && character) {
-				const mediaToPush = updatedMedia.map((record) => record.id);
-
-				await prisma.character.update({
-					data: { mediaIds: { set: [...character.mediaIds, ...mediaToPush] } },
-					where: { id: input.characterId },
-				});
-			}
-
-			return updatedMedia;
-		},
-	})
 	.mutation('update', {
 		input: z.object({
 			mediaId: z.string(),

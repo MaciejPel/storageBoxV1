@@ -13,6 +13,7 @@ import Container from '../components/Container';
 import Search from '../components/Search';
 import Modal from '../components/Modal';
 import Card from '../components/Card';
+import UploadForm from '../components/forms/UploadForm';
 
 interface DataProps {
 	characterIds: string[];
@@ -37,7 +38,10 @@ const Media: NextPage = () => {
 	const { data: session } = useSession();
 	const [data, setData] = useState<DataProps>({ characterIds: [], mediaIds: [] });
 	const [assign, setAssign] = useState<boolean>(false);
-	const [modal, setModal] = useState<boolean>(false);
+	const [modal, setModal] = useState<{ delete: boolean; upload: boolean }>({
+		delete: false,
+		upload: false,
+	});
 	const [confirm, setConfirm] = useState<{ name: string; input: string; id: string }>({
 		name: '',
 		input: '',
@@ -69,7 +73,7 @@ const Media: NextPage = () => {
 		onSuccess() {
 			utils.invalidateQueries(['character.single']);
 			utils.invalidateQueries(['media.all']);
-			setModal(false);
+			setModal({ ...modal, delete: false });
 		},
 	});
 
@@ -99,17 +103,33 @@ const Media: NextPage = () => {
 							</div>
 						)}
 				</div>
-				<Search
-					setQuery={setQuery}
-					query={query}
-				/>
-
+				<div className="w-full flex items-center gap-1 md:flex-row flex-col mb-2">
+					<Search
+						setQuery={setQuery}
+						query={query}
+					/>
+					<button
+						title="Upload media"
+						type="button"
+						className="btn"
+						onClick={() => setModal({ ...modal, upload: true })}
+					>
+						Add media
+					</button>
+					<Modal
+						modalTitle="Upload media"
+						open={modal.upload}
+						onClose={() => setModal({ ...modal, upload: false })}
+					>
+						<UploadForm />
+					</Modal>
+				</div>
 				{mediaQuery.data?.length === 0 && <Container type="center">No media yet 🤐</Container>}
 				{mediaQuery.isSuccess && mediaQuery.data?.length > 0 && (
 					<div className="w-full my-4 gap-4 md:flex">
 						<Modal
-							open={modal}
-							onClose={() => setModal(false)}
+							open={modal.delete}
+							onClose={() => setModal({ ...modal, delete: false })}
 							modalTitle="Delete media"
 						>
 							<form
@@ -194,7 +214,7 @@ const Media: NextPage = () => {
 																input: '',
 																id: media.id,
 															});
-															setModal(true);
+															setModal({ ...modal, delete: true });
 														}}
 													>
 														<TrashIcon className="w-6" />

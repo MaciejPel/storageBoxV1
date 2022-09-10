@@ -269,7 +269,7 @@ const CharacterPage = () => {
 					)}
 					<div className="card card-compact card-bordered static text-base-content bg-base-300 2xl:col-span-3 lg:col-span-2 sm:col-span-1 mb-4">
 						<div className="card-body items-center justify-between">
-							<UploadForm />
+							<UploadForm characterId={characterId} />
 						</div>
 					</div>
 				</div>
