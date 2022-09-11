@@ -257,7 +257,7 @@ export const characterRouter = createProtectedRouter()
 			return { id: character.id };
 		},
 	})
-	.mutation('upload', {
+	.mutation('addMedia', {
 		input: z.object({
 			data: z.array(
 				z.object({

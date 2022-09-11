@@ -53,7 +53,9 @@ const upload = async (req: NextApiRequest, res: NextApiResponse) => {
 		});
 	});
 
-	const endpoint = `${getBaseUrl()}/api/trpc/${characterId ? 'character.upload' : 'media.upload'}`;
+	const endpoint = `${getBaseUrl()}/api/trpc/${
+		characterId ? 'character.addMedia' : 'media.create'
+	}`;
 
 	const response = await fetch(endpoint, {
 		method: 'POST',

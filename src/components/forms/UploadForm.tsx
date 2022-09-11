@@ -4,13 +4,18 @@ import Compressor from 'compressorjs';
 import { CubeIcon, TrashIcon } from '@heroicons/react/solid';
 import { CloudUploadIcon } from '@heroicons/react/outline';
 
+interface UploadFormProps {
+	characterId?: string;
+	closeModal?: Function;
+}
+
 const allowedFormats = {
 	types: ['image', 'video'],
 	extensions: ['gif', 'apng', 'webp', 'avif', 'mng', 'flif'],
 };
 const uploadLimits = { length: 10, size: 25 * 1024 * 1024 };
 
-const UploadForm: React.FC<{ characterId?: string }> = ({ characterId }) => {
+const UploadForm: React.FC<UploadFormProps> = ({ characterId, closeModal }) => {
 	const [bg, setBg] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [compressing, setCompressing] = useState(false);
@@ -87,8 +92,10 @@ const UploadForm: React.FC<{ characterId?: string }> = ({ characterId }) => {
 		});
 		if (response) {
 			if (characterId) utils.invalidateQueries(['character.single', { characterId }]);
-			// setImages({ files: [] });
+			utils.invalidateQueries(['media.all']);
+			setImages({ files: [] });
 			setLoading(false);
+			closeModal && closeModal();
 		}
 	};
 

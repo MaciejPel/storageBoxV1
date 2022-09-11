@@ -121,7 +121,7 @@ const Media: NextPage = () => {
 						open={modal.upload}
 						onClose={() => setModal({ ...modal, upload: false })}
 					>
-						<UploadForm />
+						<UploadForm closeModal={() => setModal({ ...modal, upload: false })} />
 					</Modal>
 				</div>
 				{mediaQuery.data?.length === 0 && <Container type="center">No media yet 🤐</Container>}

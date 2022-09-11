@@ -9,7 +9,6 @@ interface InitialMediaType {
 	mimetype: string;
 	uuid: string;
 	authorId: string;
-	characterIds: string[];
 }
 
 export const mediaRouter = createProtectedRouter()
@@ -26,6 +25,42 @@ export const mediaRouter = createProtectedRouter()
 					characterCover: true,
 				},
 			});
+		},
+	})
+	.mutation('create', {
+		input: z.object({
+			data: z.array(
+				z.object({
+					fileName: z.string(),
+					fileExtension: z.string(),
+					mimetype: z.string(),
+					uuid: z.string(),
+				})
+			),
+		}),
+		async resolve({ input, ctx }) {
+			const authorId = ctx.session.user.id;
+			if (!authorId) throw new trpc.TRPCError({ code: 'UNAUTHORIZED' });
+
+			const mediaToCreate: InitialMediaType[] = input.data.map((row) => ({
+				...row,
+				authorId: authorId,
+			}));
+			const uuids: string[] = input.data.map((row) => row.uuid);
+
+			await prisma.media.createMany({
+				data: mediaToCreate,
+			});
+
+			const updatedMedia = await prisma.media.findMany({
+				select: { id: true, uuid: true },
+				where: {
+					uuid: { in: uuids },
+					authorId: authorId,
+				},
+			});
+
+			return updatedMedia;
 		},
 	})
 	.mutation('update', {
