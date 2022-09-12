@@ -53,7 +53,7 @@ const UserPage: NextPage = () => {
 		<>
 			<Meta title={`${userQuery.data?.username} | User`} />
 			<Container type="start">
-				<div className="w-full flex items-center gap-2 justify-between">
+				<div className="w-full flex items-center gap-2 justify-between flex-col md:flex-row">
 					<div className="text-4xl font-extrabold">
 						{session?.user.username} - {tabsDesc[activeTab]}
 					</div>

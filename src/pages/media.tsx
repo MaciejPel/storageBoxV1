@@ -111,7 +111,7 @@ const Media: NextPage = () => {
 					<button
 						title="Upload media"
 						type="button"
-						className="btn"
+						className="btn w-full md:w-auto"
 						onClick={() => setModal({ ...modal, upload: true })}
 					>
 						Add media
@@ -126,7 +126,7 @@ const Media: NextPage = () => {
 				</div>
 				{mediaQuery.data?.length === 0 && <Container type="center">No media yet 🤐</Container>}
 				{mediaQuery.isSuccess && mediaQuery.data?.length > 0 && (
-					<div className="w-full my-4 gap-4 md:flex">
+					<div className="w-full gap-4 md:flex">
 						<Modal
 							open={modal.delete}
 							onClose={() => setModal({ ...modal, delete: false })}
