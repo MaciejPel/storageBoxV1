@@ -35,7 +35,7 @@ const Header: React.FC = () => {
 	if (!mounted) return null;
 
 	return (
-		<header className="navbar sticky top-0 backdrop-blur bg-opacity-50 bg-base-300 flex justify-center h-16 shadow-sm z-50">
+		<header className="navbar sticky top-0 backdrop-blur bg-opacity-50 bg-base-300 flex justify-center h-16 shadow-sm">
 			<div className="flex justify-between lg:w-4/5 w-full">
 				<div className="md:px-2">
 					<Link href="/">

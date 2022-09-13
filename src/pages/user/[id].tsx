@@ -53,7 +53,7 @@ const UserPage: NextPage = () => {
 		<>
 			<Meta title={`${userQuery.data?.username} | User`} />
 			<Container type="start">
-				<div className="w-full flex items-center gap-2 justify-between flex-col md:flex-row">
+				<div className="w-full flex items-center gap-2 justify-between flex-col md:flex-row mb-2">
 					<div className="text-4xl font-extrabold">
 						{session?.user.username} - {tabsDesc[activeTab]}
 					</div>
@@ -87,7 +87,7 @@ const UserPage: NextPage = () => {
 				</div>
 				<Masonry
 					breakpointCols={defaultBreakpointColumns}
-					className="flex w-full gap-4 mt-4"
+					className="flex w-full gap-4"
 					columnClassName="masonry-grid-column"
 				>
 					{activeTab === 'liked' &&
