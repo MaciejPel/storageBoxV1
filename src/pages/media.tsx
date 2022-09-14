@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import { GetServerSidePropsContext, NextPage } from 'next';
-import { unstable_getServerSession as getServerSession } from 'next-auth/next';
 import { useSession } from 'next-auth/react';
-import { authOptions } from './api/auth/[...nextauth]';
 import { trpc } from '../utils/trpc';
 import { toast } from 'react-toastify';
 import { bunnyCDN } from '../utils/constants';
+import { revalidateUser } from '../utils/revalidateUser';
 import { ExternalLinkIcon, HeartIcon, TrashIcon } from '@heroicons/react/solid';
 import Masonry from 'react-masonry-css';
 import Meta from '../components/Meta';
@@ -333,15 +332,7 @@ const Media: NextPage = () => {
 export default Media;
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
-	const session = await getServerSession(context.req, context.res, authOptions);
-
-	if (!session) {
-		return {
-			redirect: {
-				destination: '/login',
-				pernament: false,
-			},
-		};
-	}
-	return { props: { session } };
+	return revalidateUser(context, ({ session }: any) => {
+		return { props: { session } };
+	});
 };

@@ -1,12 +1,11 @@
 /* eslint-disable @next/next/no-img-element */
 import { useState } from 'react';
 import { GetServerSidePropsContext, NextPage } from 'next';
-import { unstable_getServerSession as getServerSession } from 'next-auth/next';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { trpc } from '../../utils/trpc';
-import { authOptions } from '../api/auth/[...nextauth]';
 import { defaultBreakpointColumns } from '../../utils/constants';
+import { revalidateUser } from '../../utils/revalidateUser';
 import { HeartIcon } from '@heroicons/react/solid';
 import Masonry from 'react-masonry-css';
 import Container from '../../components/Container';
@@ -131,15 +130,7 @@ const TagsPage: NextPage = () => {
 export default TagsPage;
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
-	const session = await getServerSession(context.req, context.res, authOptions);
-
-	if (!session) {
-		return {
-			redirect: {
-				destination: '/login',
-				pernament: false,
-			},
-		};
-	}
-	return { props: { session } };
+	return revalidateUser(context, ({ session }: any) => {
+		return { props: { session } };
+	});
 };

@@ -1,12 +1,11 @@
 import { useState } from 'react';
 import { GetServerSidePropsContext, NextPage } from 'next';
-import { unstable_getServerSession as getServerSession } from 'next-auth/next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
-import { authOptions } from '../api/auth/[...nextauth]';
 import { trpc } from '../../utils/trpc';
 import { bunnyCDN, defaultBreakpointColumns } from '../../utils/constants';
+import { revalidateUser } from '../../utils/revalidateUser';
 import {
 	ExternalLinkIcon,
 	HashtagIcon,
@@ -59,26 +58,26 @@ const UserPage: NextPage = () => {
 					</div>
 					<div className="tabs tabs-boxed">
 						<a
-							className={`tab gap-1 ${activeTab === 'liked' ? 'tab-active' : ''}`}
+							className={`tab gap-1 static ${activeTab === 'liked' ? 'tab-active' : ''}`}
 							onClick={() => setActiveTab('liked')}
 						>
 							<HeartIcon className="w-5" />
 							{userQuery.data?.likedMedia.length}
 						</a>
 						<a
-							className={`tab gap-1 ${activeTab === 'characters' ? 'tab-active' : ''}`}
+							className={`tab gap-1 static ${activeTab === 'characters' ? 'tab-active' : ''}`}
 							onClick={() => setActiveTab('characters')}
 						>
 							<UserGroupIcon className="w-5" /> {userQuery.data?.createdCharacters.length}
 						</a>
 						<a
-							className={`tab gap-1 ${activeTab === 'tags' ? 'tab-active' : ''}`}
+							className={`tab gap-1 static ${activeTab === 'tags' ? 'tab-active' : ''}`}
 							onClick={() => setActiveTab('tags')}
 						>
 							<HashtagIcon className="w-5" /> {userQuery.data?.createdTags.length}
 						</a>
 						<a
-							className={`tab gap-1 ${activeTab === 'uploaded' ? 'tab-active' : ''}`}
+							className={`tab gap-1 static ${activeTab === 'uploaded' ? 'tab-active' : ''}`}
 							onClick={() => setActiveTab('uploaded')}
 						>
 							<UploadIcon className="w-5" /> {userQuery.data?.uploadedMedia.length}
@@ -246,15 +245,7 @@ const UserPage: NextPage = () => {
 export default UserPage;
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
-	const session = await getServerSession(context.req, context.res, authOptions);
-
-	if (!session) {
-		return {
-			redirect: {
-				destination: '/login',
-				pernament: false,
-			},
-		};
-	}
-	return { props: { session } };
+	return revalidateUser(context, ({ session }: any) => {
+		return { props: { session } };
+	});
 };

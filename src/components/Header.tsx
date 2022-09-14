@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
 import { useSession, signOut } from 'next-auth/react';
 import { useTheme } from 'next-themes';
 import {
@@ -26,7 +25,6 @@ const themes: string[] = [
 ];
 
 const Header: React.FC = () => {
-	const router = useRouter();
 	const [mounted, setMounted] = useState(false);
 	const { theme: currentTheme, setTheme } = useTheme();
 	const { data: session, status } = useSession();
@@ -107,10 +105,7 @@ const Header: React.FC = () => {
 						{status === 'authenticated' && (
 							<a
 								className="btn btn-sm btn-ghost text-base-content normal-case gap-1"
-								onClick={() => {
-									signOut({ redirect: false });
-									router.push('/');
-								}}
+								onClick={() => signOut({ redirect: false })}
 							>
 								<LogoutIcon className="w-5 -scale-100" />
 								<span className="hidden md:inline">Logout</span>
@@ -138,4 +133,5 @@ const Header: React.FC = () => {
 		</header>
 	);
 };
+
 export default Header;

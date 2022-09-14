@@ -1,13 +1,12 @@
 import { useState } from 'react';
 import { GetServerSidePropsContext, NextPage } from 'next';
-import { unstable_getServerSession as getServerSession } from 'next-auth/next';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { trpc } from '../../utils/trpc';
-import { authOptions } from '../api/auth/[...nextauth]';
-import { bunnyCDN, defaultBreakpointColumns } from '../../utils/constants';
 import { toast } from 'react-toastify';
+import { bunnyCDN, defaultBreakpointColumns } from '../../utils/constants';
+import { revalidateUser } from '../../utils/revalidateUser';
 import {
 	ExternalLinkIcon,
 	HeartIcon,
@@ -303,15 +302,7 @@ const TagPage: NextPage = () => {
 export default TagPage;
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
-	const session = await getServerSession(context.req, context.res, authOptions);
-
-	if (!session) {
-		return {
-			redirect: {
-				destination: '/login',
-				pernament: false,
-			},
-		};
-	}
-	return { props: { session } };
+	return revalidateUser(context, ({ session }: any) => {
+		return { props: { session } };
+	});
 };

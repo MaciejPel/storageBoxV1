@@ -110,4 +110,5 @@ const Search: React.FC<SearchProps> = ({ setQuery, query }) => {
 		</div>
 	);
 };
+
 export default Search;

@@ -40,4 +40,5 @@ const Card: React.FC<CardProps> = ({ media, body, actions }) => {
 		</div>
 	);
 };
+
 export default Card;

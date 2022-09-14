@@ -1,11 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
 import { useEffect, useState } from 'react';
 import type { GetServerSidePropsContext, NextPage } from 'next';
-import { unstable_getServerSession as getServerSession } from 'next-auth/next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
-import { authOptions } from './api/auth/[...nextauth]';
 import { trpc } from '../utils/trpc';
 import { defaultBreakpointColumns } from '../utils/constants';
 import { HeartIcon } from '@heroicons/react/solid';
@@ -15,6 +13,7 @@ import Card from '../components/Card';
 import Search from '../components/Search';
 import Modal from '../components/Modal';
 import CharacterForm from '../components/forms/CharacterForm';
+import { revalidateUser } from '../utils/revalidateUser';
 
 interface QueryParams {
 	string: string;
@@ -150,15 +149,7 @@ const Home: NextPage = () => {
 export default Home;
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
-	const session = await getServerSession(context.req, context.res, authOptions);
-
-	if (!session) {
-		return {
-			redirect: {
-				destination: '/login',
-				pernament: false,
-			},
-		};
-	}
-	return { props: { session } };
+	return revalidateUser(context, ({ session }: any) => {
+		return { props: { session } };
+	});
 };

@@ -5,3 +5,10 @@ export const getBaseUrl = () => {
 	if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
 	return `http://localhost:${process.env.PORT ?? 3000}`;
 };
+
+export const defaultRedirect = (page: string = '/logout') => ({
+	redirect: {
+		destination: page,
+		pernament: false,
+	},
+});

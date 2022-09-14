@@ -5,11 +5,13 @@ import Container from '../components/Container';
 const NotFound: NextPage = () => {
 	return (
 		<Container type="center">
-			<h2 className="font-light text-4xl">Ooops...</h2>
-			<h3>That page cannot be found 😢</h3>
-			<Link href="/">
-				<a className="btn btn-ghost">Homepage</a>
-			</Link>
+			<div className="flex flex-col items-center gap-4">
+				<h2 className="font-light text-4xl">Ooops...</h2>
+				<h3>That page cannot be found 😢</h3>
+				<Link href="/">
+					<a className="btn btn-link">Homepage</a>
+				</Link>
+			</div>
 		</Container>
 	);
 };

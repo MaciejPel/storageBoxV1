@@ -1,14 +1,13 @@
 /* eslint-disable @next/next/no-img-element */
 import { useState } from 'react';
 import { GetServerSidePropsContext } from 'next';
-import { unstable_getServerSession as getServerSession } from 'next-auth/next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
-import { authOptions } from '../api/auth/[...nextauth]';
 import { trpc } from '../../utils/trpc';
 import { toast } from 'react-toastify';
 import { bunnyCDN, defaultBreakpointColumns } from '../../utils/constants';
+import { revalidateUser } from '../../utils/revalidateUser';
 import {
 	ExternalLinkIcon,
 	HeartIcon,
@@ -344,15 +343,7 @@ const CharacterPage = () => {
 export default CharacterPage;
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
-	const session = await getServerSession(context.req, context.res, authOptions);
-
-	if (!session) {
-		return {
-			redirect: {
-				destination: '/login',
-				pernament: false,
-			},
-		};
-	}
-	return { props: { session } };
+	return revalidateUser(context, ({ session }: any) => {
+		return { props: { session } };
+	});
 };
