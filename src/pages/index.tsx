@@ -1,11 +1,11 @@
 /* eslint-disable @next/next/no-img-element */
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import type { GetServerSidePropsContext, NextPage } from 'next';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
 import { trpc } from '../utils/trpc';
 import { defaultBreakpointColumns } from '../utils/constants';
+import { validateUser } from '../utils/validateUser';
 import { HeartIcon } from '@heroicons/react/solid';
 import Masonry from 'react-masonry-css';
 import Container from '../components/Container';
@@ -13,7 +13,6 @@ import Card from '../components/Card';
 import Search from '../components/Search';
 import Modal from '../components/Modal';
 import CharacterForm from '../components/forms/CharacterForm';
-import { revalidateUser } from '../utils/revalidateUser';
 
 interface QueryParams {
 	string: string;
@@ -22,8 +21,7 @@ interface QueryParams {
 }
 
 const Home: NextPage = () => {
-	const router = useRouter();
-	const { data: session, status } = useSession();
+	const { data: session } = useSession();
 	const [query, setQuery] = useState<QueryParams>({ string: '', tags: [], sort: true });
 	const [modal, setModal] = useState<{ tag: boolean; character: boolean }>({
 		tag: false,
@@ -33,11 +31,6 @@ const Home: NextPage = () => {
 	const charactersQuery = trpc.useQuery(['character.all'], {
 		enabled: session ? true : false,
 	});
-
-	useEffect(() => {
-		// solve problem with invalid redirect on signOut, however this solution causes problem with `Loading initial props cancelled`
-		if (status === 'unauthenticated') router.push('/login');
-	}, [status, router]);
 
 	return (
 		<Container type="start">
@@ -149,7 +142,7 @@ const Home: NextPage = () => {
 export default Home;
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
-	return revalidateUser(context, ({ session }: any) => {
+	return validateUser(context, ({ session }: any) => {
 		return { props: { session } };
 	});
 };

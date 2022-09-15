@@ -4,7 +4,7 @@ import { authOptions } from '../pages/api/auth/[...nextauth]';
 import { prisma } from '../server/db/client';
 import { defaultRedirect } from './functions';
 
-export const revalidateUser = async (context: GetServerSidePropsContext, cb: Function) => {
+export const validateUser = async (context: GetServerSidePropsContext, cb: Function) => {
 	const session = await getServerSession(context.req, context.res, authOptions);
 
 	if (!session) return defaultRedirect('/login');

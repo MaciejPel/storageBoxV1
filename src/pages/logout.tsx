@@ -9,8 +9,10 @@ const Login: NextPage = () => {
 	const router = useRouter();
 
 	useEffect(() => {
-		signOut({ redirect: false });
-		router.push('/login');
+		const out = signOut({ redirect: false });
+		out.then(() => {
+			router.push('/');
+		});
 	}, [router]);
 
 	return (
@@ -20,4 +22,5 @@ const Login: NextPage = () => {
 		</>
 	);
 };
+
 export default Login;

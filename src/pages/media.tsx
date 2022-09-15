@@ -4,7 +4,7 @@ import { useSession } from 'next-auth/react';
 import { trpc } from '../utils/trpc';
 import { toast } from 'react-toastify';
 import { bunnyCDN } from '../utils/constants';
-import { revalidateUser } from '../utils/revalidateUser';
+import { validateUser } from '../utils/validateUser';
 import { ExternalLinkIcon, HeartIcon, TrashIcon } from '@heroicons/react/solid';
 import Masonry from 'react-masonry-css';
 import Meta from '../components/Meta';
@@ -332,7 +332,7 @@ const Media: NextPage = () => {
 export default Media;
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
-	return revalidateUser(context, ({ session }: any) => {
+	return validateUser(context, ({ session }: any) => {
 		return { props: { session } };
 	});
 };

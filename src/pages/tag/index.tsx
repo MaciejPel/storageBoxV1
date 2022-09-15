@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { trpc } from '../../utils/trpc';
 import { defaultBreakpointColumns } from '../../utils/constants';
-import { revalidateUser } from '../../utils/revalidateUser';
+import { validateUser } from '../../utils/validateUser';
 import { HeartIcon } from '@heroicons/react/solid';
 import Masonry from 'react-masonry-css';
 import Container from '../../components/Container';
@@ -130,7 +130,7 @@ const TagsPage: NextPage = () => {
 export default TagsPage;
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
-	return revalidateUser(context, ({ session }: any) => {
+	return validateUser(context, ({ session }: any) => {
 		return { props: { session } };
 	});
 };

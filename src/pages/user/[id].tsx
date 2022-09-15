@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
 import { trpc } from '../../utils/trpc';
 import { bunnyCDN, defaultBreakpointColumns } from '../../utils/constants';
-import { revalidateUser } from '../../utils/revalidateUser';
+import { validateUser } from '../../utils/validateUser';
 import {
 	ExternalLinkIcon,
 	HashtagIcon,
@@ -245,7 +245,7 @@ const UserPage: NextPage = () => {
 export default UserPage;
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
-	return revalidateUser(context, ({ session }: any) => {
+	return validateUser(context, ({ session }: any) => {
 		return { props: { session } };
 	});
 };
