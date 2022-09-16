@@ -1,0 +1,8 @@
+DATABASE_URL = your_mongo_uri
+
+NEXT_PUBLIC_CDN_URL = your_cdn_url
+BUNNY_CDN_KEY = your_cdn_FTP_key
+STORAGE_NAME = name_of_your_cdn_storage_zone
+NEXT_PUBLIC_STORAGE_FOLDER = your_cdn_folder_name
+
+NEXTAUTH_SECRET = JWT_secret

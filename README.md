@@ -1,34 +1,25 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## Stack 📦
 
-## Getting Started
+This app is using **T3 stack** (Next, tRPC, TypeScript, Prisma, Tailwind, NextAuth), however packeges were installed one by one (not with `npx create-t3-app@latest`). App also uses MongoDB as database (only free db option) and BunnyCDN for media storage.
 
-First, run the development server:
+## Overview 👀
 
-```bash
-npm run dev
-# or
-yarn dev
-```
+The app is intended for private use (CDN is a paid service, Mongo as well at some point), but you can provide your own environemnt variables (check `.envexample`) and play around. At first glance app might remind you of social media app, but it count likes differently & focuses on serving most used images.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Installation ⌨
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+1. Provide your own services & secrets in `.envexample`
+2. Install dependencies- `npm i`
+3. Generate schema- `npx prisma generate`
+4. Run `npm run dev` to start project locally
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+## Known problems ❌
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+- some UI elements are overflowing, position/z-index colliding (most likely)
+- user verification in session is done by calling unstable function on every page load, this should be done with middleware, but multiple problems occured during making that part
+- compression of big images slows experience
 
-## Learn More
+## Contributing 👩🏽‍⚕️
 
-To learn more about Next.js, take a look at the following resources:
+Feel free to suggest changes or `README.MD` errors, however schema will most likely stay the same, unless there is good reason to change it.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
