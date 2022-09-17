@@ -23,7 +23,7 @@ const Modal: React.FC<ModalProps> = ({ open, onClose, modalTitle, children }) =>
 
 	return (
 		<div
-			className={`modal !z-0 cursor-pointer ${open ? 'modal-open' : ''}`}
+			className={`modal z-20 cursor-pointer ${open ? 'modal-open' : ''}`}
 			onClick={() => onClose()}
 		>
 			<label
