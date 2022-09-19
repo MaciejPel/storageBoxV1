@@ -1,6 +1,7 @@
 import { createProtectedRouter } from './protected-router';
 import { z } from 'zod';
 import { prisma } from '../db/client';
+import { bunnyStorage } from '../../utils/bunny';
 import * as trpc from '@trpc/server';
 
 interface InitialMediaType {
@@ -9,6 +10,24 @@ interface InitialMediaType {
 	mimetype: string;
 	uuid: string;
 	authorId: string;
+}
+
+interface CdnFile {
+	Guid: string;
+	StorageZoneName: string;
+	Path: string;
+	ObjectName: string;
+	Length: number;
+	LastChanged: string;
+	ServerId: number;
+	ArrayNumber: number;
+	IsDirectory: boolean;
+	UserId: string;
+	ContentType: string;
+	DateCreated: string;
+	StorageZoneId: number;
+	Checksum: string;
+	ReplicatedZones: string;
 }
 
 export const mediaRouter = createProtectedRouter()
@@ -191,5 +210,26 @@ export const mediaRouter = createProtectedRouter()
 			const deletedMedia = await prisma.media.delete({ where: { id: input.mediaId } });
 
 			return deletedMedia;
+		},
+	})
+	.mutation('purge', {
+		async resolve() {
+			const allMedia = await prisma.media.findMany({
+				select: { id: true, fileExtension: true },
+			});
+
+			const mediaList = allMedia.map((media) => `${media.id}.${media.fileExtension}`);
+			const getCdnFiles = await bunnyStorage.list('/');
+			const cdnFiles = getCdnFiles.data.map((file: CdnFile) => file.ObjectName);
+
+			const fileDiffer = cdnFiles.filter((file: string) => !mediaList.includes(file));
+
+			await Promise.all(
+				fileDiffer.map(async (file: string) => {
+					return await bunnyStorage.delete(file);
+				})
+			);
+
+			return fileDiffer.length;
 		},
 	});

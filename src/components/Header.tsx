@@ -11,8 +11,11 @@ import {
 	FolderIcon,
 	PencilAltIcon,
 	HashtagIcon,
+	LightningBoltIcon,
 } from '@heroicons/react/solid';
 import { CubeIcon } from '@heroicons/react/solid';
+import { trpc } from '../utils/trpc';
+import { toast } from 'react-toastify';
 
 const themes: string[] = [
 	'light',
@@ -30,6 +33,17 @@ const Header: React.FC = () => {
 	const [mounted, setMounted] = useState(false);
 	const { theme: currentTheme, setTheme } = useTheme();
 	const { data: session, status } = useSession();
+
+	const userInfo = trpc.useQuery(['user.isAdmin', { userId: session?.user.id || '' }], {
+		enabled: session ? true : false,
+	});
+	const mediaPurgeMutation = trpc.useMutation(['media.purge'], {
+		onSuccess(data) {
+			toast.success(`${data} ${data === 1 ? 'file' : 'files'} have been purged.`, {
+				className: '!bg-base-300 !text-base-content !rounded-xl',
+			});
+		},
+	});
 
 	useEffect(() => setMounted(true), []);
 	if (!mounted) return null;
@@ -52,20 +66,31 @@ const Header: React.FC = () => {
 					<div className="flex">
 						{status === 'authenticated' && (
 							<>
+								{userInfo.data?.admin && (
+									<button
+										type="button"
+										title="Purge media"
+										className="btn btn-sm btn-error btn-outline normal-case gap-1 mr-1"
+										onClick={() => mediaPurgeMutation.mutate()}
+									>
+										<LightningBoltIcon className="w-5" />
+										<span className="hidden md:inline">Purge</span>
+									</button>
+								)}
 								<Link href="/media">
-									<a className="btn btn-sm btn-ghost text-base-content normal-case gap-1 ">
+									<a className="btn btn-sm btn-ghost text-base-content normal-case gap-1">
 										<FolderIcon className="w-5" />
 										<span className="hidden md:inline">Media</span>
 									</a>
 								</Link>
 								<Link href="/tag">
-									<a className="btn btn-sm btn-ghost text-base-content normal-case gap-1 ">
+									<a className="btn btn-sm btn-ghost text-base-content normal-case gap-1">
 										<HashtagIcon className="w-5" />
 										<span className="hidden md:inline">Tags</span>
 									</a>
 								</Link>
 								<Link href={`/user/${session.user.id}`}>
-									<a className="btn btn-sm btn-ghost text-base-content normal-case gap-1 ">
+									<a className="btn btn-sm btn-ghost text-base-content normal-case gap-1">
 										<UserIcon className="w-5" />
 										<span className="hidden md:inline">Profile</span>
 									</a>

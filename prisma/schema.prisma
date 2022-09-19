@@ -13,6 +13,7 @@ model User {
   password String   @db.String
   verified Boolean? @default(false)
   banned   Boolean? @default(false)
+  admin    Boolean? @default(false)
 
   createdCharacters Character[] @relation(name: "userCharacters")
   createdTags       Tag[]       @relation(name: "userTags")
