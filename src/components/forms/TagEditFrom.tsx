@@ -3,7 +3,7 @@ import { trpc } from '../../utils/trpc';
 
 interface TagEditFormProps {
 	id: string;
-	closeModal: Function;
+	closeModal: () => void;
 	name: string;
 	description: string;
 }

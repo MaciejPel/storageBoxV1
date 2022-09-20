@@ -12,6 +12,7 @@ import Container from '../components/Container';
 import Card from '../components/Card';
 import Search from '../components/Search';
 import Modal from '../components/Modal';
+import Loader from '../components/Loader';
 import CharacterForm from '../components/forms/CharacterForm';
 
 interface QueryParams {
@@ -31,6 +32,15 @@ const Home: NextPage = () => {
 	const charactersQuery = trpc.useQuery(['character.all'], {
 		enabled: session ? true : false,
 	});
+
+	if (charactersQuery.isError) return <Container type="center">Something went wrong</Container>;
+
+	if (charactersQuery.isLoading)
+		return (
+			<Container type="center">
+				<Loader />
+			</Container>
+		);
 
 	return (
 		<Container type="start">
@@ -56,8 +66,6 @@ const Home: NextPage = () => {
 					<CharacterForm closeModal={() => setModal({ ...modal, character: false })} />
 				</Modal>
 			</div>
-			{charactersQuery.isError && <Container type="center">Something went wrong</Container>}
-			{charactersQuery.isLoading && <Container type="center">Loading data ⌚</Container>}
 			{charactersQuery.isSuccess && charactersQuery.data.length === 0 && (
 				<Container type="center">Pretty empty in here 🏜</Container>
 			)}

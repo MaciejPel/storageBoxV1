@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { trpc } from '../../utils/trpc';
 
-const TagForm: React.FC<{ closeModal: Function }> = ({ closeModal }) => {
+const TagForm: React.FC<{ closeModal: () => void }> = ({ closeModal }) => {
 	const [tag, setTag] = useState<{ name: string; description: string }>({
 		name: '',
 		description: '',
@@ -30,7 +30,10 @@ const TagForm: React.FC<{ closeModal: Function }> = ({ closeModal }) => {
 	return (
 		<form onSubmit={handleSubmit}>
 			<div>
-				<label className="label pb-1 cursor-pointer" htmlFor="name">
+				<label
+					className="label pb-1 cursor-pointer"
+					htmlFor="name"
+				>
 					<span className="label-text">
 						Name
 						{error && error.field === 'name' && (
@@ -49,7 +52,10 @@ const TagForm: React.FC<{ closeModal: Function }> = ({ closeModal }) => {
 				/>
 			</div>
 			<div>
-				<label className="label pb-1 cursor-pointer" htmlFor="description">
+				<label
+					className="label pb-1 cursor-pointer"
+					htmlFor="description"
+				>
 					<span className="label-text">
 						Description
 						{error?.field === 'description' && (
@@ -69,12 +75,20 @@ const TagForm: React.FC<{ closeModal: Function }> = ({ closeModal }) => {
 
 			<div className="btn-group justify-end mt-3">
 				{tagMutation.isLoading && (
-					<button title="Loading" type="button" className="btn loading w-1/2">
+					<button
+						title="Loading"
+						type="button"
+						className="btn loading w-1/2"
+					>
 						Processing...
 					</button>
 				)}
 				{tagMutation.isSuccess && (
-					<button title="Success" type="button" className="btn btn-success w-1/2">
+					<button
+						title="Success"
+						type="button"
+						className="btn btn-success w-1/2"
+					>
 						Success
 					</button>
 				)}
@@ -89,7 +103,11 @@ const TagForm: React.FC<{ closeModal: Function }> = ({ closeModal }) => {
 								setError({});
 							}}
 						/>
-						<input className="btn btn-primary rounded w-1/3" type="submit" value="Submit" />
+						<input
+							className="btn btn-primary rounded w-1/3"
+							type="submit"
+							value="Submit"
+						/>
 					</>
 				)}
 			</div>

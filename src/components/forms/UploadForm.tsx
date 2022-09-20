@@ -6,7 +6,7 @@ import { CloudUploadIcon } from '@heroicons/react/outline';
 
 interface UploadFormProps {
 	characterId?: string;
-	closeModal?: Function;
+	closeModal?: () => void;
 }
 
 const allowedFormats = {

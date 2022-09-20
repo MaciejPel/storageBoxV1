@@ -21,6 +21,7 @@ import Container from '../../components/Container';
 import Meta from '../../components/Meta';
 import Modal from '../../components/Modal';
 import Card from '../../components/Card';
+import Loader from '../../components/Loader';
 import UploadForm from '../../components/forms/UploadForm';
 import CharacterEditForm from '../../components/forms/CharacterEditForm';
 
@@ -78,7 +79,12 @@ const CharacterPage = () => {
 		},
 	});
 
-	if (characterQuery.isLoading) return <Container type="center">Loading character ⌚</Container>;
+	if (characterQuery.isLoading)
+		return (
+			<Container type="center">
+				<Loader />
+			</Container>
+		);
 
 	if (characterQuery.isError) return <Container type="center">Error occurred ⚠</Container>;
 

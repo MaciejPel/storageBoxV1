@@ -14,6 +14,7 @@ import Modal from '../../components/Modal';
 import TagForm from '../../components/forms/TagForm';
 import Card from '../../components/Card';
 import Search from '../../components/Search';
+import Loader from '../../components/Loader';
 
 interface QueryParams {
 	string: string;
@@ -56,7 +57,11 @@ const TagsPage: NextPage = () => {
 					</Modal>
 				</div>
 				{tagsQuery.isError && <Container type="center">Something went wrong</Container>}
-				{tagsQuery.isLoading && <Container type="center">Loading data ⌚</Container>}
+				{tagsQuery.isLoading && (
+					<Container type="center">
+						<Loader />
+					</Container>
+				)}
 				{tagsQuery.isSuccess && tagsQuery.data.length === 0 && (
 					<Container type="center">Pretty empty in here 🏜</Container>
 				)}

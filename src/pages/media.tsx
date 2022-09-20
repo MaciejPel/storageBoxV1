@@ -12,6 +12,7 @@ import Container from '../components/Container';
 import Search from '../components/Search';
 import Modal from '../components/Modal';
 import Card from '../components/Card';
+import Loader from '../components/Loader';
 import UploadForm from '../components/forms/UploadForm';
 
 interface DataProps {
@@ -75,6 +76,13 @@ const Media: NextPage = () => {
 			setModal({ ...modal, delete: false });
 		},
 	});
+
+	if (mediaQuery.isLoading)
+		return (
+			<Container type="center">
+				<Loader />
+			</Container>
+		);
 
 	return (
 		<>

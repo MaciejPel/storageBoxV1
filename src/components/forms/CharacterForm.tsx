@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { trpc } from '../../utils/trpc';
 
-const CharacterForm: React.FC<{ closeModal: Function }> = ({ closeModal }) => {
+const CharacterForm: React.FC<{ closeModal: () => void }> = ({ closeModal }) => {
 	const [character, setCharacter] = useState<{ name: string; description: string; tags: string[] }>(
 		{ name: '', description: '', tags: [] }
 	);
@@ -30,9 +30,15 @@ const CharacterForm: React.FC<{ closeModal: Function }> = ({ closeModal }) => {
 	};
 
 	return (
-		<form onSubmit={handleSubmit} className="form-control">
+		<form
+			onSubmit={handleSubmit}
+			className="form-control"
+		>
 			<div>
-				<label className="label pb-1 cursor-pointer" htmlFor="name">
+				<label
+					className="label pb-1 cursor-pointer"
+					htmlFor="name"
+				>
 					<span className="label-text">
 						Name
 						{error?.field === 'name' && (
@@ -51,7 +57,10 @@ const CharacterForm: React.FC<{ closeModal: Function }> = ({ closeModal }) => {
 				/>
 			</div>
 			<div>
-				<label className="label pb-1 cursor-pointer" htmlFor="description">
+				<label
+					className="label pb-1 cursor-pointer"
+					htmlFor="description"
+				>
 					<span className="label-text">
 						Description
 						{error?.field === 'description' && (
@@ -71,7 +80,10 @@ const CharacterForm: React.FC<{ closeModal: Function }> = ({ closeModal }) => {
 			<div>
 				{tagsQuery.isSuccess && tagsQuery.data.length > 0 && (
 					<>
-						<label className="label pb-1" htmlFor="tags">
+						<label
+							className="label pb-1"
+							htmlFor="tags"
+						>
 							<span className="label-text">Tags</span>
 						</label>
 						<div className="columns-2 md:columns-3">
@@ -106,12 +118,20 @@ const CharacterForm: React.FC<{ closeModal: Function }> = ({ closeModal }) => {
 			</div>
 			<div className="btn-group justify-end w-full mt-3">
 				{characterMutation.isLoading && (
-					<button title="Loading" type="button" className="btn loading w-1/2">
+					<button
+						title="Loading"
+						type="button"
+						className="btn loading w-1/2"
+					>
 						Processing...
 					</button>
 				)}
 				{characterMutation.isSuccess && (
-					<button title="Success" type="button" className="btn btn-success w-1/2">
+					<button
+						title="Success"
+						type="button"
+						className="btn btn-success w-1/2"
+					>
 						Success
 					</button>
 				)}
@@ -126,7 +146,11 @@ const CharacterForm: React.FC<{ closeModal: Function }> = ({ closeModal }) => {
 								setError({});
 							}}
 						/>
-						<input className="btn btn-primary rounded w-1/3" type="submit" value="Submit" />
+						<input
+							className="btn btn-primary rounded w-1/3"
+							type="submit"
+							value="Submit"
+						/>
 					</>
 				)}
 			</div>

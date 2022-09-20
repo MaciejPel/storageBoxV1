@@ -6,6 +6,15 @@ module.exports = {
 			colors: {
 				background: 'black',
 			},
+			keyframes: {
+				pulsate: {
+					'0%, 100%': { transform: 'scale(1);' },
+					'50%': { transform: 'scale(1.5);' },
+				},
+			},
+			animation: {
+				pulsate: 'pulsate 2s ease-in-out infinite',
+			},
 		},
 	},
 	daisyui: {
@@ -14,3 +23,4 @@ module.exports = {
 	plugins: [require('daisyui')],
 	darkMode: 'class',
 };
+

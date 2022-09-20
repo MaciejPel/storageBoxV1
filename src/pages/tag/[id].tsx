@@ -19,6 +19,7 @@ import Meta from '../../components/Meta';
 import Container from '../../components/Container';
 import Card from '../../components/Card';
 import Modal from '../../components/Modal';
+import Loader from '../../components/Loader';
 import TagEditForm from '../../components/forms/TagEditFrom';
 
 const TagPage: NextPage = () => {
@@ -78,7 +79,12 @@ const TagPage: NextPage = () => {
 			return 0;
 		});
 
-	if (tagQuery.isLoading) return <Container type="center">Loading tag ⌚</Container>;
+	if (tagQuery.isLoading)
+		return (
+			<Container type="center">
+				<Loader />
+			</Container>
+		);
 
 	if (tagQuery.isError) return <Container type="center">Error occurred ⚠</Container>;
 

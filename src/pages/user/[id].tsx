@@ -17,6 +17,7 @@ import Masonry from 'react-masonry-css';
 import Container from '../../components/Container';
 import Meta from '../../components/Meta';
 import Card from '../../components/Card';
+import Loader from '../../components/Loader';
 
 type activeTabProps = 'liked' | 'uploaded' | 'characters' | 'tags';
 
@@ -44,7 +45,12 @@ const UserPage: NextPage = () => {
 		},
 	});
 
-	if (userQuery.isLoading) return <Container type="center">Loading user ⌚</Container>;
+	if (userQuery.isLoading)
+		return (
+			<Container type="center">
+				<Loader />
+			</Container>
+		);
 
 	if (userQuery.isError) return <Container type="center">Error occurred ⚠</Container>;
 
