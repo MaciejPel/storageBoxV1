@@ -17,7 +17,7 @@ interface CardProps {
 
 const Card: React.FC<CardProps> = ({ media, body, actions }) => {
 	return (
-		<div className="card card-compact static bg-base-100 card-bordered mb-4">
+		<div className="card card-compact static bg-base-100 card-bordered mb-4 group">
 			{media?.mimetype?.includes('image') && (
 				<img
 					src={`${bunnyCDN}/${media.id}.${media.fileExtension}`}

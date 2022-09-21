@@ -9,11 +9,11 @@ module.exports = {
 			keyframes: {
 				pulsate: {
 					'0%, 100%': { transform: 'scale(1);' },
-					'50%': { transform: 'scale(1.5);' },
+					'50%': { transform: 'scale(1.4);' },
 				},
 			},
 			animation: {
-				pulsate: 'pulsate 2s ease-in-out infinite',
+				pulsate: 'pulsate 1s ease-in-out infinite',
 			},
 		},
 	},

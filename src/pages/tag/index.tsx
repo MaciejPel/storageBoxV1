@@ -30,6 +30,15 @@ const TagsPage: NextPage = () => {
 		enabled: session ? true : false,
 	});
 
+	if (tagsQuery.isError) return <Container type="center">Something went wrong</Container>;
+
+	if (tagsQuery.isLoading)
+		return (
+			<Container type="center">
+				<Loader />
+			</Container>
+		);
+
 	return (
 		<>
 			<Meta title="Tags" />
@@ -56,12 +65,6 @@ const TagsPage: NextPage = () => {
 						<TagForm closeModal={() => setModal(false)} />
 					</Modal>
 				</div>
-				{tagsQuery.isError && <Container type="center">Something went wrong</Container>}
-				{tagsQuery.isLoading && (
-					<Container type="center">
-						<Loader />
-					</Container>
-				)}
 				{tagsQuery.isSuccess && tagsQuery.data.length === 0 && (
 					<Container type="center">Pretty empty in here 🏜</Container>
 				)}
@@ -112,7 +115,7 @@ const TagsPage: NextPage = () => {
 												media={tag.cover?.mimetype.includes('image') ? tag.cover : null}
 												body={
 													<div>
-														<h2 className="card-title !mb-0">{tag.name}</h2>
+														<h2 className="card-title !mb-0 group-hover:link">{tag.name}</h2>
 														<p className="truncate">{tag.description}</p>
 													</div>
 												}

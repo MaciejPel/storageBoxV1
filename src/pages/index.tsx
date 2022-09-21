@@ -108,7 +108,7 @@ const Home: NextPage = () => {
 										body={
 											<>
 												<div>
-													<h2 className="card-title !mb-0">{character.name}</h2>
+													<h2 className="card-title !mb-0 group-hover:link">{character.name}</h2>
 													<p className="truncate">{character.description}</p>
 												</div>
 												<p className="flex gap-1 flex-wrap">
