@@ -15,6 +15,7 @@ import TagForm from '../../components/forms/TagForm';
 import Card from '../../components/Card';
 import Search from '../../components/Search';
 import Loader from '../../components/Loader';
+import Error from '../../components/Error';
 
 interface QueryParams {
 	string: string;
@@ -30,7 +31,12 @@ const TagsPage: NextPage = () => {
 		enabled: session ? true : false,
 	});
 
-	if (tagsQuery.isError) return <Container type="center">Something went wrong</Container>;
+	if (tagsQuery.isError)
+		return (
+			<Container type="center">
+				<Error message="Something went wrong" />
+			</Container>
+		);
 
 	if (tagsQuery.isLoading)
 		return (

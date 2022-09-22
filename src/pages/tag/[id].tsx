@@ -20,6 +20,7 @@ import Container from '../../components/Container';
 import Card from '../../components/Card';
 import Modal from '../../components/Modal';
 import Loader from '../../components/Loader';
+import Error from '../../components/Error';
 import TagEditForm from '../../components/forms/TagEditFrom';
 
 const TagPage: NextPage = () => {
@@ -86,7 +87,12 @@ const TagPage: NextPage = () => {
 			</Container>
 		);
 
-	if (tagQuery.isError) return <Container type="center">Error occurred ⚠</Container>;
+	if (tagQuery.isError)
+		return (
+			<Container type="center">
+				<Error message="Something went wrong" />
+			</Container>
+		);
 
 	return (
 		<>

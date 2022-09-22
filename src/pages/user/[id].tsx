@@ -18,6 +18,7 @@ import Container from '../../components/Container';
 import Meta from '../../components/Meta';
 import Card from '../../components/Card';
 import Loader from '../../components/Loader';
+import Error from '../../components/Error';
 
 type activeTabProps = 'liked' | 'uploaded' | 'characters' | 'tags';
 
@@ -52,7 +53,12 @@ const UserPage: NextPage = () => {
 			</Container>
 		);
 
-	if (userQuery.isError) return <Container type="center">Error occurred ⚠</Container>;
+	if (userQuery.isError)
+		return (
+			<Container type="center">
+				<Error message="Something went wrong" />
+			</Container>
+		);
 
 	return (
 		<>

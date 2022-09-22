@@ -22,6 +22,7 @@ import Meta from '../../components/Meta';
 import Modal from '../../components/Modal';
 import Card from '../../components/Card';
 import Loader from '../../components/Loader';
+import Error from '../../components/Error';
 import UploadForm from '../../components/forms/UploadForm';
 import CharacterEditForm from '../../components/forms/CharacterEditForm';
 
@@ -86,7 +87,12 @@ const CharacterPage = () => {
 			</Container>
 		);
 
-	if (characterQuery.isError) return <Container type="center">Error occurred ⚠</Container>;
+	if (characterQuery.isError)
+		return (
+			<Container type="center">
+				<Error message="Something went wrong" />
+			</Container>
+		);
 
 	return (
 		<>

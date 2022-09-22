@@ -13,6 +13,7 @@ import Card from '../components/Card';
 import Search from '../components/Search';
 import Modal from '../components/Modal';
 import Loader from '../components/Loader';
+import Error from '../components/Error';
 import CharacterForm from '../components/forms/CharacterForm';
 
 interface QueryParams {
@@ -33,7 +34,12 @@ const Home: NextPage = () => {
 		enabled: session ? true : false,
 	});
 
-	if (charactersQuery.isError) return <Container type="center">Something went wrong</Container>;
+	if (charactersQuery.isError)
+		return (
+			<Container type="center">
+				<Error message="Something went wrong" />
+			</Container>
+		);
 
 	if (charactersQuery.isLoading)
 		return (
