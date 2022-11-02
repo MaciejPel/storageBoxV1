@@ -13,6 +13,7 @@ import {
 	PencilAltIcon,
 	SparklesIcon,
 	TrashIcon,
+	UsersIcon,
 } from '@heroicons/react/solid';
 import Masonry from 'react-masonry-css';
 import Meta from '../../components/Meta';
@@ -36,9 +37,6 @@ const TagPage: NextPage = () => {
 
 	const utils = trpc.useContext();
 	const tagQuery = trpc.useQuery(['tag.single', { tagId }], {
-		enabled: session ? true : false,
-	});
-	const tagMediaQuery = trpc.useQuery(['tag.media', { tagId }], {
 		enabled: session ? true : false,
 	});
 	const tagDeleteMutation = trpc.useMutation(['tag.delete'], {
@@ -65,20 +63,6 @@ const TagPage: NextPage = () => {
 			utils.invalidateQueries(['tag.media']);
 		},
 	});
-
-	const tagsCharacterMedia = tagMediaQuery.data?.characters.map((character) => [
-		...character.media,
-		character.cover,
-	]);
-	const mergedMedia = tagsCharacterMedia?.reduce((a, b) => a.concat(b), []);
-	const filteredMedia = mergedMedia
-		?.filter(
-			(v, i, a) => a.findIndex((v2) => v2?.id === v?.id) === i && v?.id !== tagQuery.data?.cover?.id
-		)
-		?.sort((f, s) => {
-			if (f && s) return s.likeIds.length - f.likeIds.length;
-			return 0;
-		});
 
 	if (tagQuery.isLoading)
 		return (
@@ -139,7 +123,7 @@ const TagPage: NextPage = () => {
 										className="btn btn-ghost"
 										onClick={() => setModal({ ...modal, delete: true })}
 									>
-										<TrashIcon className="w-6 group-hover:fill-error transition-all duration-200" />
+										<TrashIcon className="w-6 hover:fill-error transition-all duration-200" />
 									</button>
 									<Modal
 										open={modal.delete}
@@ -198,24 +182,9 @@ const TagPage: NextPage = () => {
 										type="button"
 										title="Like image"
 										className="btn btn-ghost gap-1"
-										onClick={() =>
-											tagQuery.data?.cover &&
-											mediaUpdateMutation.mutate({ mediaId: tagQuery.data.cover.id })
-										}
 									>
-										<HeartIcon
-											className={`w-6 ${
-												tagQuery.data.cover?.likeIds.includes(session?.user.id || '')
-													? 'fill-red-600'
-													: ''
-											}`}
-										/>
-										{`${
-											(filteredMedia?.reduce((acc, media) => {
-												return acc + (media?.likeIds.length || 0);
-											}, 0) || 0) + (tagQuery.data.cover?.likeIds.length || 0)
-										}
-											 (${tagQuery.data.cover?.likeIds.length || 0})`}
+										<UsersIcon className="w-6" />
+										{tagQuery.data.characterIds.length}
 									</button>
 									<button
 										type="button"
@@ -258,15 +227,14 @@ const TagPage: NextPage = () => {
 					className="flex w-full gap-4"
 					columnClassName="masonry-grid-column"
 				>
-					{filteredMedia?.map((media) => {
-						if (media)
-							return (
-								<Card
-									key={media.id}
-									media={media}
-									actions={
-										<>
-											<button
+					{tagQuery.data?.characters?.map((character) => {
+						return (
+							<Card
+								key={character.id}
+								media={character.cover}
+								actions={
+									<>
+										{/* <button
 												type="button"
 												title="Like image"
 												className="btn btn-ghost p-2 gap-1"
@@ -285,12 +253,12 @@ const TagPage: NextPage = () => {
 												<button
 													type="button"
 													title="Set image as main"
-													className="btn btn-ghost p-3 gap-1 group"
+													className="btn btn-ghost p-3 gap-1"
 													onClick={() => {
 														tagSetMainMutation.mutate({ mediaId: media.id, tagId });
 													}}
 												>
-													<SparklesIcon className="w-6 group-hover:fill-warning duration-300 transition-all" />
+													<SparklesIcon className="w-6 hover:fill-warning duration-300 transition-all" />
 												</button>
 											)}
 											<a
@@ -300,11 +268,11 @@ const TagPage: NextPage = () => {
 												className="btn btn-ghost p-3"
 											>
 												<ExternalLinkIcon className="w-6" />
-											</a>
-										</>
-									}
-								/>
-							);
+											</a> */}
+									</>
+								}
+							/>
+						);
 					})}
 				</Masonry>
 			</Container>

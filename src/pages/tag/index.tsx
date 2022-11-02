@@ -6,7 +6,7 @@ import { useSession } from 'next-auth/react';
 import { trpc } from '../../utils/trpc';
 import { defaultBreakpointColumns } from '../../utils/constants';
 import { validateUser } from '../../utils/validateUser';
-import { HeartIcon } from '@heroicons/react/solid';
+import { UsersIcon } from '@heroicons/react/solid';
 import Masonry from 'react-masonry-css';
 import Container from '../../components/Container';
 import Meta from '../../components/Meta';
@@ -84,33 +84,8 @@ const TagsPage: NextPage = () => {
 							.filter((tag) => {
 								return tag.name.toLowerCase().includes(query.string);
 							})
-							.sort((f, s) => {
-								const fTagCharacterMedia = f.characters
-									.map((character) => [...character.media, character.cover])
-									.reduce((arr, media) => arr.concat(media), [])
-									.filter((v, i, a) => a.findIndex((v2) => v2?.id === v?.id) === i)
-									.reduce((acc, media) => {
-										return acc + (media?.likeIds.length || 0);
-									}, 0);
-								const sTagCharacterMedia = s.characters
-									.map((character) => [...character.media, character.cover])
-									.reduce((arr, media) => arr.concat(media), [])
-									.filter((v, i, a) => a.findIndex((v2) => v2?.id === v?.id) === i)
-									.reduce((acc, media) => {
-										return acc + (media?.likeIds.length || 0);
-									}, 0);
-								if (fTagCharacterMedia < sTagCharacterMedia) return query.sort ? 1 : -1;
-								if (fTagCharacterMedia > sTagCharacterMedia) return query.sort ? -1 : 1;
-								return 0;
-							})
+							.sort((f, s) => s.characterIds.length - f.characterIds.length)
 							.map((tag) => {
-								const filteredTagLikes = tag.characters
-									.map((character) => [...character.media, character.cover])
-									.reduce((arr, media) => arr.concat(media), [])
-									.filter((v, i, a) => a.findIndex((v2) => v2?.id === v?.id) === i)
-									.reduce((acc, media) => {
-										return acc + (media?.likeIds.length || 0);
-									}, 0);
 								return (
 									<Link
 										href={`/tag/${tag.id}`}
@@ -127,8 +102,8 @@ const TagsPage: NextPage = () => {
 												}
 												actions={
 													<button className="flex gap-1 text-base">
-														<HeartIcon className="w-6 fill-red-500" />
-														{filteredTagLikes}
+														<UsersIcon className="w-6" />
+														{tag.characterIds.length}
 													</button>
 												}
 											/>
