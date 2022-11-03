@@ -50,7 +50,7 @@ const Header: React.FC = () => {
 
 	return (
 		<header className="navbar sticky top-0 backdrop-blur bg-opacity-50 bg-base-300 flex justify-center h-16 shadow-sm z-10">
-			<div className="flex justify-between lg:w-4/5 w-full">
+			<div className="flex justify-between container">
 				<div className="md:px-2">
 					<Link href="/">
 						<a className="md:text-lg text-base font-bold flex items-center rounded px-2 md:gap-1 btn btn-ghost normal-case">

@@ -161,7 +161,7 @@ const CharacterPage = () => {
 										className="btn btn-ghost"
 										onClick={() => setModal({ ...modal, delete: true })}
 									>
-										<TrashIcon className="w-6 group-hover:fill-error transition-all duration-200" />
+										<TrashIcon className="w-6 hover:fill-error transition-all duration-200" />
 									</button>
 									<Modal
 										open={modal.delete}
@@ -248,7 +248,7 @@ const CharacterPage = () => {
 										}}
 									>
 										<HeartIcon
-											className={`w-6 group-hover:fill-warning transition-all duration-200 ${
+											className={`w-6 hover:fill-warning transition-all duration-200 ${
 												characterQuery.data.cover &&
 												characterQuery.data.cover.likeIds.includes(session?.user.id || '')
 													? 'fill-red-600'
@@ -326,12 +326,12 @@ const CharacterPage = () => {
 											<button
 												type="button"
 												title="Set image as main"
-												className="btn btn-ghost p-3 gap-1 group"
+												className="btn btn-ghost p-3 gap-1"
 												onClick={() => {
 													characterSetMainMutation.mutate({ mediaId: media.id, characterId });
 												}}
 											>
-												<SparklesIcon className="w-6 group-hover:fill-warning duration-300 transition-all" />
+												<SparklesIcon className="w-6 hover:fill-warning duration-300 transition-all" />
 											</button>
 										)}
 										<a

@@ -49,6 +49,13 @@ export const tagRouter = createProtectedRouter()
 					characters: {
 						select: {
 							id: true,
+							name: true,
+							tags: {
+								select: {
+									id: true,
+									name: true,
+								},
+							},
 							cover: {
 								select: {
 									id: true,

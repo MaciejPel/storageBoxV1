@@ -232,44 +232,33 @@ const TagPage: NextPage = () => {
 							<Card
 								key={character.id}
 								media={character.cover}
-								actions={
+								body={
 									<>
-										{/* <button
-												type="button"
-												title="Like image"
-												className="btn btn-ghost p-2 gap-1"
-												onClick={() => {
-													mediaUpdateMutation.mutate({ mediaId: media.id });
-												}}
-											>
-												<HeartIcon
-													className={`w-6 transition-all duration-300 ${
-														media.likeIds.includes(session?.user.id || '') ? 'fill-red-600 ' : ''
-													}`}
-												/>
-												<span className="text-md font-bold">{media.likeIds.length}</span>
-											</button>
-											{media.mimetype.includes('image') && (
-												<button
-													type="button"
-													title="Set image as main"
-													className="btn btn-ghost p-3 gap-1"
-													onClick={() => {
-														tagSetMainMutation.mutate({ mediaId: media.id, tagId });
-													}}
+										<div>
+											<h2 className="card-title !mb-0 group-hover:link">{character.name}</h2>
+										</div>
+										<p className="flex gap-1 flex-wrap">
+											{character.tags.map((tag) => (
+												<Link
+													href={`/tag/${tag.id}`}
+													key={tag.id}
 												>
-													<SparklesIcon className="w-6 hover:fill-warning duration-300 transition-all" />
-												</button>
-											)}
-											<a
-												href={`${bunnyCDN}/${media.id}.${media.fileExtension}`}
-												target="_blank"
-												rel="noreferrer"
-												className="btn btn-ghost p-3"
-											>
-												<ExternalLinkIcon className="w-6" />
-											</a> */}
+													<span
+														className={`badge badge-md hover:bg-base-content hover:text-base-100 !py-3 cursor-pointer font-semibold`}
+													>
+														{tag.name}
+													</span>
+												</Link>
+											))}
+										</p>
 									</>
+								}
+								actions={
+									<button className="flex gap-1 text-base">
+										<HeartIcon className="w-6 fill-red-500" />
+										{character.media.reduce((acc, media) => acc + media.likeIds.length, 0) +
+											(character.cover?.likeIds.length || 0)}
+									</button>
 								}
 							/>
 						);
