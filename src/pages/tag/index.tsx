@@ -1,12 +1,12 @@
 /* eslint-disable @next/next/no-img-element */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { GetServerSidePropsContext, NextPage } from 'next';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { trpc } from '../../utils/trpc';
 import { defaultBreakpointColumns } from '../../utils/constants';
 import { validateUser } from '../../utils/validateUser';
-import { UsersIcon } from '@heroicons/react/solid';
+import { HeartIcon } from '@heroicons/react/solid';
 import Masonry from 'react-masonry-css';
 import Container from '../../components/Container';
 import Meta from '../../components/Meta';
@@ -84,8 +84,7 @@ const TagsPage: NextPage = () => {
 							.filter((tag) => {
 								return tag.name.toLowerCase().includes(query.string);
 							})
-							.sort((f, s) => s.characterIds.length - f.characterIds.length)
-							.map((tag) => {
+							.map((tag, index) => {
 								return (
 									<Link
 										href={`/tag/${tag.id}`}
@@ -102,8 +101,8 @@ const TagsPage: NextPage = () => {
 												}
 												actions={
 													<button className="flex gap-1 text-base">
-														<UsersIcon className="w-6" />
-														{tag.characterIds.length}
+														<HeartIcon className="w-6 fill-red-500" />
+														{/* {filteredTagLikes} */}x
 													</button>
 												}
 											/>

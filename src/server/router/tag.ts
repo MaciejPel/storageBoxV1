@@ -6,6 +6,7 @@ import * as trpc from '@trpc/server';
 
 export const tagRouter = createProtectedRouter()
 	.query('all', {
+		// to change
 		async resolve() {
 			const tags = await prisma.tag.findMany({
 				select: {
@@ -21,17 +22,25 @@ export const tagRouter = createProtectedRouter()
 							likeIds: true,
 						},
 					},
-					characterIds: true,
-					characters: {
-						select: {
-							id: true,
-							cover: { select: { id: true, likeIds: true } },
-							media: { select: { id: true, likeIds: true } },
-						},
-					},
 				},
 				orderBy: { name: 'asc' },
 			});
+
+			const d = tags.map(async (tag) => {
+				const media = await prisma.media.findMany({
+					select: {
+						id: true,
+						likeIds: true,
+					},
+					where: { characters: { every: { tagIds: { has: tag.id } } } },
+				});
+
+				const result = media.reduce((acc, media) => {
+					return acc + (media?.likeIds.length || 0);
+				}, 0);
+				return { ...tag, likeIds: result };
+			});
+
 			return tags;
 		},
 	})
@@ -46,28 +55,6 @@ export const tagRouter = createProtectedRouter()
 					name: true,
 					description: true,
 					author: { select: { id: true, username: true } },
-					characters: {
-						select: {
-							id: true,
-							name: true,
-							tags: {
-								select: {
-									id: true,
-									name: true,
-								},
-							},
-							cover: {
-								select: {
-									id: true,
-									likeIds: true,
-									fileExtension: true,
-									fileName: true,
-									mimetype: true,
-								},
-							},
-							media: { select: { id: true, likeIds: true } },
-						},
-					},
 					cover: {
 						select: {
 							id: true,
@@ -89,36 +76,17 @@ export const tagRouter = createProtectedRouter()
 			tagId: z.string(),
 		}),
 		async resolve({ input }) {
-			const tag = await prisma.tag.findFirst({
+			const media = await prisma.media.findMany({
 				select: {
 					id: true,
-					characters: {
-						select: {
-							id: true,
-							cover: {
-								select: {
-									id: true,
-									fileName: true,
-									fileExtension: true,
-									mimetype: true,
-									likeIds: true,
-								},
-							},
-							media: {
-								select: {
-									id: true,
-									fileName: true,
-									fileExtension: true,
-									mimetype: true,
-									likeIds: true,
-								},
-							},
-						},
-					},
+					fileName: true,
+					fileExtension: true,
+					mimetype: true,
+					likeIds: true,
 				},
-				where: { id: input.tagId },
+				where: { characters: { every: { tagIds: { has: input.tagId } } } },
 			});
-			return tag;
+			return media;
 		},
 	})
 	.mutation('create', {
