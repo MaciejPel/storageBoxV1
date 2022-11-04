@@ -248,7 +248,7 @@ const CharacterPage = () => {
 										}}
 									>
 										<HeartIcon
-											className={`w-6 hover:fill-warning transition-all duration-200 ${
+											className={`w-6 transition-all duration-200 ${
 												characterQuery.data.cover &&
 												characterQuery.data.cover.likeIds.includes(session?.user.id || '')
 													? 'fill-red-600'

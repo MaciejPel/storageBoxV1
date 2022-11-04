@@ -26,22 +26,24 @@ export const tagRouter = createProtectedRouter()
 				orderBy: { name: 'asc' },
 			});
 
-			const d = tags.map(async (tag) => {
-				const media = await prisma.media.findMany({
-					select: {
-						id: true,
-						likeIds: true,
-					},
-					where: { characters: { every: { tagIds: { has: tag.id } } } },
-				});
+			const tagsWithLikes = await Promise.all(
+				tags.map(async (tag) => {
+					const media = await prisma.media.findMany({
+						select: {
+							id: true,
+							likeIds: true,
+						},
+						where: { characters: { every: { tagIds: { has: tag.id } } } },
+					});
 
-				const result = media.reduce((acc, media) => {
-					return acc + (media?.likeIds.length || 0);
-				}, 0);
-				return { ...tag, likeIds: result };
-			});
+					const result = media.reduce((acc, media) => {
+						return acc + (media?.likeIds.length || 0);
+					}, 0);
+					return { ...tag, likeIds: result };
+				})
+			);
 
-			return tags;
+			return tagsWithLikes;
 		},
 	})
 	.query('single', {

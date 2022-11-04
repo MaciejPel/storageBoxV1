@@ -84,7 +84,8 @@ const TagsPage: NextPage = () => {
 							.filter((tag) => {
 								return tag.name.toLowerCase().includes(query.string);
 							})
-							.map((tag, index) => {
+							.sort((f, s) => s.likeIds - f.likeIds)
+							.map((tag) => {
 								return (
 									<Link
 										href={`/tag/${tag.id}`}
@@ -102,7 +103,7 @@ const TagsPage: NextPage = () => {
 												actions={
 													<button className="flex gap-1 text-base">
 														<HeartIcon className="w-6 fill-red-500" />
-														{/* {filteredTagLikes} */}x
+														{tag.likeIds}
 													</button>
 												}
 											/>
