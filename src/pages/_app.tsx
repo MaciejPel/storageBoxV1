@@ -5,8 +5,8 @@ import type { AppRouter } from '../server/router';
 import { withTRPC } from '@trpc/next';
 import superjson from 'superjson';
 import { getBaseUrl } from '../utils/functions';
-import { ToastContainer } from 'react-toastify';
 import Layout from '../components/Layout';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles/globals.css';
 

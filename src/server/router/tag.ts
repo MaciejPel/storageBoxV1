@@ -1,12 +1,10 @@
 import { createProtectedRouter } from './protected-router';
 import { z } from 'zod';
 import { prisma } from '../db/client';
-import { trimString } from '../../utils/functions';
 import * as trpc from '@trpc/server';
 
 export const tagRouter = createProtectedRouter()
 	.query('all', {
-		// to change
 		async resolve() {
 			const tags = await prisma.tag.findMany({
 				select: {
@@ -93,17 +91,12 @@ export const tagRouter = createProtectedRouter()
 	})
 	.mutation('create', {
 		input: z.object({
-			name: z.preprocess(
-				trimString,
-				z
-					.string()
-					.min(2, { message: 'must contain at least 2 character(s)' })
-					.max(18, { message: 'must contain at most 18 character(s)' })
-			),
-			description: z.preprocess(
-				trimString,
-				z.string().max(140, { message: 'must contain at most 140 character(s)' })
-			),
+			name: z
+				.string()
+				.trim()
+				.min(2, { message: 'must contain at least 2 character(s)' })
+				.max(18, { message: 'must contain at most 18 character(s)' }),
+			description: z.string().trim().max(140, { message: 'must contain at most 140 character(s)' }),
 		}),
 		async resolve({ input, ctx }) {
 			const authorId = ctx.session.user.id;
@@ -118,17 +111,12 @@ export const tagRouter = createProtectedRouter()
 	})
 	.mutation('update', {
 		input: z.object({
-			name: z.preprocess(
-				trimString,
-				z
-					.string()
-					.min(2, { message: 'must contain at least 2 character(s)' })
-					.max(18, { message: 'must contain at most 18 character(s)' })
-			),
-			description: z.preprocess(
-				trimString,
-				z.string().max(140, { message: 'must contain at most 140 character(s)' })
-			),
+			name: z
+				.string()
+				.trim()
+				.min(2, { message: 'must contain at least 2 character(s)' })
+				.max(18, { message: 'must contain at most 18 character(s)' }),
+			description: z.string().trim().max(140, { message: 'must contain at most 140 character(s)' }),
 			tagId: z.string(),
 		}),
 		async resolve({ input, ctx }) {

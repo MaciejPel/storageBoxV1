@@ -5,7 +5,7 @@ import Meta from '../components/Meta';
 import Container from '../components/Container';
 import RegisterForm from '../components/forms/RegisterForm';
 
-const Register: NextPage = () => {
+const RegisterPage: NextPage = () => {
 	return (
 		<>
 			<Meta title="Register" />
@@ -15,7 +15,7 @@ const Register: NextPage = () => {
 		</>
 	);
 };
-export default Register;
+export default RegisterPage;
 
 export const getServerSideProps = async (context: any) => {
 	const session = await getServerSession(context.req, context.res, authOptions);

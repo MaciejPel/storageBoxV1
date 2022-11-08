@@ -22,7 +22,7 @@ interface QueryParams {
 	sort: boolean;
 }
 
-const Home: NextPage = () => {
+const HomePage: NextPage = () => {
 	const { data: session } = useSession();
 	const [query, setQuery] = useState<QueryParams>({ string: '', tags: [], sort: true });
 	const [modal, setModal] = useState<{ tag: boolean; character: boolean }>({
@@ -153,7 +153,7 @@ const Home: NextPage = () => {
 	);
 };
 
-export default Home;
+export default HomePage;
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
 	return validateUser(context, ({ session }: any) => {

@@ -5,7 +5,7 @@ import Meta from '../components/Meta';
 import Container from '../components/Container';
 import LoginForm from '../components/forms/LoginForm';
 
-const Login: NextPage = () => {
+const LoginPage: NextPage = () => {
 	return (
 		<>
 			<Meta title="Login" />
@@ -15,7 +15,7 @@ const Login: NextPage = () => {
 		</>
 	);
 };
-export default Login;
+export default LoginPage;
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
 	const session = await getServerSession(context.req, context.res, authOptions);

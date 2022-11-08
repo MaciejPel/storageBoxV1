@@ -1,7 +1,6 @@
 import { createProtectedRouter } from './protected-router';
 import { z } from 'zod';
 import { prisma } from '../db/client';
-import { trimString } from '../../utils/functions';
 import * as trpc from '@trpc/server';
 
 interface InitialMediaType {
@@ -84,17 +83,12 @@ export const characterRouter = createProtectedRouter()
 	})
 	.mutation('create', {
 		input: z.object({
-			name: z.preprocess(
-				trimString,
-				z
-					.string()
-					.min(3, { message: 'must contain at least 3 character(s)' })
-					.max(18, { message: 'must contain at most 18 character(s)' })
-			),
-			description: z.preprocess(
-				trimString,
-				z.string().max(140, { message: 'must contain at most 140 character(s)' })
-			),
+			name: z
+				.string()
+				.trim()
+				.min(3, { message: 'must contain at least 3 character(s)' })
+				.max(18, { message: 'must contain at most 18 character(s)' }),
+			description: z.string().trim().max(140, { message: 'must contain at most 140 character(s)' }),
 			tags: z.array(z.string()),
 		}),
 		async resolve({ input, ctx }) {
@@ -119,17 +113,12 @@ export const characterRouter = createProtectedRouter()
 	.mutation('update', {
 		input: z.object({
 			characterId: z.string(),
-			name: z.preprocess(
-				trimString,
-				z
-					.string()
-					.min(3, { message: 'must contain at least 3 character(s)' })
-					.max(18, { message: 'must contain at most 18 character(s)' })
-			),
-			description: z.preprocess(
-				trimString,
-				z.string().max(140, { message: 'must contain at most 140 character(s)' })
-			),
+			name: z
+				.string()
+				.trim()
+				.min(3, { message: 'must contain at least 3 character(s)' })
+				.max(18, { message: 'must contain at most 18 character(s)' }),
+			description: z.string().trim().max(140, { message: 'must contain at most 140 character(s)' }),
 			tags: z.array(z.string()),
 		}),
 		async resolve({ input }) {

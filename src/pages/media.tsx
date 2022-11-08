@@ -34,7 +34,7 @@ const breakpointColumnsObj = {
 	640: 1,
 };
 
-const Media: NextPage = () => {
+const MediaPage: NextPage = () => {
 	const { data: session } = useSession();
 	const [data, setData] = useState<DataProps>({ characterIds: [], mediaIds: [] });
 	const [assign, setAssign] = useState<boolean>(false);
@@ -337,7 +337,7 @@ const Media: NextPage = () => {
 		</>
 	);
 };
-export default Media;
+export default MediaPage;
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
 	return validateUser(context, ({ session }: any) => {

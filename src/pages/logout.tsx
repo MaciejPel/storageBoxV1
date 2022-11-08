@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { signOut } from 'next-auth/react';
 
-const Login: NextPage = () => {
+const LogoutPage: NextPage = () => {
 	const router = useRouter();
 
 	useEffect(() => {
@@ -26,4 +26,4 @@ const Login: NextPage = () => {
 	);
 };
 
-export default Login;
+export default LogoutPage;

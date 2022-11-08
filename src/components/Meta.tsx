@@ -5,7 +5,6 @@ const Meta: React.FC<{ title?: string }> = ({ title = 'Home' }) => {
 	return (
 		<Head>
 			<title>{titleTag}</title>
-			link
 			<meta
 				name="viewport"
 				content="width=device-width, initial-scale=1.0"
