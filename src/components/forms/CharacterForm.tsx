@@ -14,6 +14,7 @@ const CharacterForm: React.FC<{ closeModal: () => void }> = ({ closeModal }) => 
 			utils.invalidateQueries(['character.all']);
 			closeModal();
 			setCharacter({ name: '', description: '', tags: [] });
+			characterMutation.reset();
 		},
 		onError: (error) => {
 			const fieldErrors = error.data?.zodError?.fieldErrors;

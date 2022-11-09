@@ -13,6 +13,7 @@ const TagForm: React.FC<{ closeModal: () => void }> = ({ closeModal }) => {
 			utils.invalidateQueries(['tag.all']);
 			closeModal();
 			setTag({ name: '', description: '' });
+			tagMutation.reset();
 		},
 		onError: (error) => {
 			const fieldErrors = error.data?.zodError?.fieldErrors;
