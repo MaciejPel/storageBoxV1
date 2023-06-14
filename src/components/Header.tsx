@@ -70,7 +70,7 @@ const Header: React.FC = () => {
 									<button
 										type="button"
 										title="Purge media"
-										className="btn btn-sm btn-error btn-outline normal-case gap-1 mr-1"
+										className="btn btn-sm btn-ghost hover:text-error normal-case gap-1"
 										onClick={() => mediaPurgeMutation.mutate()}
 									>
 										<LightningBoltIcon className="w-5" />
