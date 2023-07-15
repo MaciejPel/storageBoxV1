@@ -191,7 +191,7 @@ const MediaPage: NextPage = () => {
 						<div className={`${assign ? 'md:w-3/4' : 'md:w-full'}`}>
 							<Masonry
 								breakpointCols={breakpointColumnsObj}
-								className="flex w-full gap-4"
+								className={`flex ${assign ? 'gap-0' : "gap-4"}`}
 								columnClassName="masonry-grid-column"
 							>
 								{mediaQuery.data
