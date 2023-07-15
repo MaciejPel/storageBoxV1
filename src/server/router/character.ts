@@ -213,14 +213,14 @@ export const characterRouter = createProtectedRouter()
 				where: { characterIds: { has: input.characterId } },
 			});
 
-			const tagsToUpdate: { [key: string]: string } = tags.reduce(
+			const tagsToUpdate: { [key: string]: string[] } = tags.reduce(
 				(obj, item) => ({
 					...obj,
 					[item.id]: item.characterIds.filter((tag) => tag != input.characterId),
 				}),
 				{}
 			);
-			const mediaToUpdate: { [key: string]: string } = media.reduce(
+			const mediaToUpdate: { [key: string]: string[] } = media.reduce(
 				(obj, item) => ({
 					...obj,
 					[item.id]: item.characterIds.filter((tag) => tag != input.characterId),

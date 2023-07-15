@@ -151,7 +151,7 @@ export const tagRouter = createProtectedRouter()
 				where: { tagIds: { has: input.tagId } },
 			});
 
-			const charactersToUpdate: { [key: string]: string } = characters.reduce(
+			const charactersToUpdate: { [key: string]: string[] } = characters.reduce(
 				(obj, item) => ({ ...obj, [item.id]: item.tagIds.filter((tag) => tag != input.tagId) }),
 				{}
 			);
